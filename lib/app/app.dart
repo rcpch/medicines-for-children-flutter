@@ -1,0 +1,41 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:medicines_for_children_flutter/app/router/app_router.dart';
+import 'package:medicines_for_children_flutter/core/config/app_config.dart';
+import 'package:medicines_for_children_flutter/core/config/app_theme.dart';
+
+class MedicinesApp extends ConsumerStatefulWidget {
+  const MedicinesApp({super.key});
+
+  @override
+  ConsumerState<MedicinesApp> createState() => _MedicinesAppState();
+}
+
+class _MedicinesAppState extends ConsumerState<MedicinesApp> {
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+    _router = createAppRouter();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final config = ref.watch(appConfigProvider);
+    return MaterialApp.router(
+      title: 'Medicines for Children (${config.environment.name})',
+      theme: AppTheme.light,
+      routerConfig: _router,
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],
+    );
+  }
+}
