@@ -1,10 +1,11 @@
 # Medicines for Children · Flutter Port
+![Coverage](https://img.shields.io/badge/coverage-28.6%25-yellow)
 
 This repository hosts the Flutter implementation of the Medicines for Children mobile and web client. The build now targets **Milestone 2 (Local Profiles & Offline Shell)**: the auth/controller stack is implemented with local profiles, and guarded navigation with placeholder screens is available for iterative UX work.
 
 ## Current status
 
-- ✅ Tooling, env management, and offline-first profile storage are live.
+- ✅ Tooling and offline-first profile storage are live.
 - ✅ Local profile repository + Riverpod controller + GoRouter guard redirect users between splash/login/onboarding/home.
 - ✅ Splash, onboarding, and home placeholders exercise the auth state machine, with profile selection + optional passcode gating.
 - ✅ Dedicated signup and multi-step onboarding flows capture primary carer + first-child context, persist onboarding data locally, and promote users into the authenticated shell once complete.
@@ -49,13 +50,11 @@ make run-prod
 
 ## Environment configuration
 
-Environment variables live under `env/.env.<flavor>`. Sample files with placeholder values are already committed:
+Shared-schedule API configuration is optional. The app boots without env files (values default to empty strings). If you need the backend integration:
 
-- `env/.env.dev`
-- `env/.env.staging`
-- `env/.env.prod`
-
-Replace the placeholder values with your backend URLs and API keys (never commit secrets). Flavor-specific entrypoints in `lib/main_<flavor>.dart` load the corresponding file.
+- Add `env/.env.dev`, `env/.env.staging`, and/or `env/.env.prod` locally (do not commit secrets).
+- Register those files under the `assets` section in `pubspec.yaml`.
+- The flavor entrypoints in `lib/main_<flavor>.dart` load the matching file via `dotenv`.
 
 ### API keys
 
