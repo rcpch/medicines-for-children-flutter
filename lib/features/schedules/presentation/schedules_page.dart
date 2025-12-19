@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/core/domain/active_child_provider.dart';
+import 'package:medicines_for_children_flutter/core/presentation/child_switcher_action.dart';
 import 'package:medicines_for_children_flutter/features/schedules/application/schedule_editor_controller.dart';
 
 class SchedulesPage extends ConsumerWidget {
@@ -15,7 +16,10 @@ class SchedulesPage extends ConsumerWidget {
 
     if (child == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Schedules')),
+        appBar: AppBar(
+          title: const Text('Schedules'),
+          actions: const [ChildSwitcherAction()],
+        ),
         body: const Padding(
           padding: EdgeInsets.all(16),
           child: Text('No child profile available.'),
@@ -25,7 +29,10 @@ class SchedulesPage extends ConsumerWidget {
 
     if (child.schedules.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Schedules')),
+        appBar: AppBar(
+          title: const Text('Schedules'),
+          actions: const [ChildSwitcherAction()],
+        ),
         body: const Padding(
           padding: EdgeInsets.all(16),
           child: Text('No schedules yet. Add one to get started.'),
@@ -36,7 +43,10 @@ class SchedulesPage extends ConsumerWidget {
     final medicinesById = {for (final med in child.medicines) med.id: med};
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Schedules')),
+      appBar: AppBar(
+        title: const Text('Schedules'),
+        actions: const [ChildSwitcherAction()],
+      ),
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: child.schedules.length,

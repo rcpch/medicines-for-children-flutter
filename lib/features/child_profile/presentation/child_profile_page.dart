@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/core/domain/active_child_provider.dart';
 import 'package:medicines_for_children_flutter/core/platform/image_provider.dart';
+import 'package:medicines_for_children_flutter/core/presentation/child_switcher_action.dart';
 
 class ChildProfilePage extends ConsumerWidget {
   const ChildProfilePage({super.key});
@@ -14,7 +15,10 @@ class ChildProfilePage extends ConsumerWidget {
     final child = ref.watch(activeChildProvider);
     if (child == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Child profile')),
+        appBar: AppBar(
+          title: const Text('Child profile'),
+          actions: const [ChildSwitcherAction()],
+        ),
         body: const Padding(
           padding: EdgeInsets.all(16),
           child: Text('No child profile available yet.'),
@@ -27,7 +31,10 @@ class ChildProfilePage extends ConsumerWidget {
         : createImageProvider(child.photoUrl!);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Child profile')),
+      appBar: AppBar(
+        title: const Text('Child profile'),
+        actions: const [ChildSwitcherAction()],
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),

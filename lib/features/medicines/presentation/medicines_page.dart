@@ -5,6 +5,7 @@ import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/core/domain/active_child_provider.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';
 import 'package:medicines_for_children_flutter/core/platform/image_provider.dart';
+import 'package:medicines_for_children_flutter/core/presentation/child_switcher_action.dart';
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_state_provider.dart';
 
 enum MedicineFilter { everyday, asNeeded }
@@ -32,7 +33,10 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
 
     if (child == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Medicines')),
+        appBar: AppBar(
+          title: const Text('Medicines'),
+          actions: const [ChildSwitcherAction()],
+        ),
         body: Padding(
           padding: const EdgeInsets.all(16),
           child: Text(state.errorMessage ?? 'No child profile available yet.'),
@@ -43,7 +47,10 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
     final filtered = _filterMedicines(child.medicines);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Medicines')),
+      appBar: AppBar(
+        title: const Text('Medicines'),
+        actions: const [ChildSwitcherAction()],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.goNamed(AppRoute.addMedicine.name),
         icon: const Icon(Icons.add),

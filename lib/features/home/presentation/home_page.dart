@@ -10,6 +10,7 @@ import 'package:medicines_for_children_flutter/core/domain/models/administration
 import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.dart';
 import 'package:medicines_for_children_flutter/core/notifications/notification_service.dart';
+import 'package:medicines_for_children_flutter/core/presentation/child_switcher_action.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
@@ -41,6 +42,7 @@ class HomePage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Medicines Home'),
         actions: [
+          const ChildSwitcherAction(),
           IconButton(
             tooltip: 'Refresh family data',
             onPressed: state.isLoading ? null : () => controller.refresh(),
