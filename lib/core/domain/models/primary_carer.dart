@@ -5,7 +5,7 @@ part 'primary_carer.freezed.dart';
 part 'primary_carer.g.dart';
 
 @freezed
-class PrimaryCarer with _$PrimaryCarer {
+abstract class PrimaryCarer with _$PrimaryCarer {
   const factory PrimaryCarer({
     required String id,
     required String firstName,

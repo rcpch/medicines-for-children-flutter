@@ -6,8 +6,8 @@ part of 'administration.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$AdministrationImpl _$$AdministrationImplFromJson(Map<String, dynamic> json) =>
-    _$AdministrationImpl(
+_Administration _$AdministrationFromJson(Map<String, dynamic> json) =>
+    _Administration(
       id: json['id'] as String,
       dateTime: DateTime.parse(json['dateTime'] as String),
       status: $enumDecode(_$AdministrationStatusEnumMap, json['status']),
@@ -16,16 +16,15 @@ _$AdministrationImpl _$$AdministrationImplFromJson(Map<String, dynamic> json) =>
       notes: json['notes'] as String?,
     );
 
-Map<String, dynamic> _$$AdministrationImplToJson(
-  _$AdministrationImpl instance,
-) => <String, dynamic>{
-  'id': instance.id,
-  'dateTime': instance.dateTime.toIso8601String(),
-  'status': _$AdministrationStatusEnumMap[instance.status]!,
-  'isAsNeeded': instance.isAsNeeded,
-  'administeredBy': instance.administeredBy,
-  'notes': instance.notes,
-};
+Map<String, dynamic> _$AdministrationToJson(_Administration instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'dateTime': instance.dateTime.toIso8601String(),
+      'status': _$AdministrationStatusEnumMap[instance.status]!,
+      'isAsNeeded': instance.isAsNeeded,
+      'administeredBy': instance.administeredBy,
+      'notes': instance.notes,
+    };
 
 const _$AdministrationStatusEnumMap = {
   AdministrationStatus.scheduled: 'scheduled',

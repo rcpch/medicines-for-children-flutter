@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:medicines_for_children_flutter/core/data/storage/primary_carer_local_data_source.dart';
+import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
+import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 import 'package:medicines_for_children_flutter/features/onboarding/application/onboarding_draft_provider.dart';
 import 'package:medicines_for_children_flutter/features/onboarding/data/onboarding_local_data_source.dart';
@@ -49,7 +52,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   void _hydrateFromDraft() {
     final draft = ref.read(onboardingDraftProvider);
-    final storedProfile = ref.read(onboardingLocalDataSourceProvider).readProfile();
+    final profileId = ref.read(authControllerProvider).user?.uid;
+    final storedProfile = profileId == null
+        ? null
+        : ref.read(onboardingLocalDataSourceProvider).readProfile(profileId);
     final data = draft ?? (storedProfile != null ? OnboardingDraft.fromProfile(storedProfile) : null);
     if (data == null) {
       return;
@@ -150,6 +156,14 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     }
 
     final authState = ref.read(authControllerProvider);
+    final profileId = authState.user?.uid;
+    if (profileId == null || profileId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Select a profile before completing onboarding.')),
+      );
+      return;
+    }
+
     final profile = OnboardingProfile(
       carer: CarerProfile(
         firstName: _carerFirstNameController.text.trim(),
@@ -169,7 +183,31 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     );
 
     final storage = ref.read(onboardingLocalDataSourceProvider);
-    await storage.saveProfile(profile);
+    await storage.saveProfile(profileId: profileId, profile: profile);
+
+    final primaryCarerStorage = ref.read(primaryCarerLocalDataSourceProvider);
+    final child = Child(
+      id: 'child-$profileId',
+      firstName: profile.child.firstName,
+      lastName: profile.child.lastName,
+      dateOfBirth: profile.child.dateOfBirth ?? DateTime(1970, 1, 1),
+      condition: profile.child.condition,
+      allergies: profile.child.allergies,
+      notes: profile.child.notes,
+      medicines: const [],
+      schedules: const [],
+      asNeededSchedules: const [],
+    );
+    final primaryCarer = PrimaryCarer(
+      id: profileId,
+      firstName: profile.carer.firstName,
+      lastName: profile.carer.lastName,
+      email: profile.carer.email,
+      relationshipToChild: profile.carer.relationshipToChild,
+      children: [child],
+    );
+    await primaryCarerStorage.writeForProfile(profileId, primaryCarer);
+
     await ref.read(authControllerProvider.notifier).completeOnboarding(
           displayName:
               '${_carerFirstNameController.text.trim()} ${_carerLastNameController.text.trim()}'.trim(),

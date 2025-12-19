@@ -7,7 +7,7 @@ part 'administration.g.dart';
 enum AdministrationStatus { scheduled, given, skipped }
 
 @freezed
-class Administration with _$Administration {
+abstract class Administration with _$Administration {
   const factory Administration({
     required String id,
     required DateTime dateTime,

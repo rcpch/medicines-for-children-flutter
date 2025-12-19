@@ -5,7 +5,7 @@ part 'schedule.freezed.dart';
 part 'schedule.g.dart';
 
 @freezed
-class MedicineSchedule with _$MedicineSchedule {
+abstract class MedicineSchedule with _$MedicineSchedule {
   const factory MedicineSchedule({
     required String id,
     required String medicineId,
@@ -21,7 +21,7 @@ class MedicineSchedule with _$MedicineSchedule {
 }
 
 @freezed
-class AsNeededSchedule with _$AsNeededSchedule {
+abstract class AsNeededSchedule with _$AsNeededSchedule {
   const factory AsNeededSchedule({
     required String id,
     required String medicineId,

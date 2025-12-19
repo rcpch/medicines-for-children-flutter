@@ -2,21 +2,23 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/features/auth/data/auth_repository.dart';
-import 'package:medicines_for_children_flutter/features/auth/data/credentials_repository.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/auth_status.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/auth_user.dart';
-import 'package:medicines_for_children_flutter/features/auth/domain/stored_credentials.dart';
+import 'package:medicines_for_children_flutter/features/auth/domain/local_profile.dart';
+import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 
 class AuthState {
   const AuthState({
     this.status = AuthStatus.unknown,
     this.user,
+    this.profiles = const [],
     this.isLoading = false,
     this.errorMessage,
   });
 
   final AuthStatus status;
   final AuthUser? user;
+  final List<LocalProfile> profiles;
   final bool isLoading;
   final String? errorMessage;
 
@@ -26,6 +28,7 @@ class AuthState {
     AuthStatus? status,
     AuthUser? user,
     bool clearUser = false,
+    List<LocalProfile>? profiles,
     bool? isLoading,
     String? errorMessage,
     bool clearError = false,
@@ -33,6 +36,7 @@ class AuthState {
     return AuthState(
       status: status ?? this.status,
       user: clearUser ? null : (user ?? this.user),
+      profiles: profiles ?? this.profiles,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
     );
@@ -46,7 +50,7 @@ final authControllerProvider = StateNotifierProvider<AuthController, AuthState>(
 class AuthController extends StateNotifier<AuthState> {
   AuthController(this._ref) : super(const AuthState()) {
     _repository = _ref.read(authRepositoryProvider);
-    _credentialsRepository = _ref.read(credentialsRepositoryProvider);
+    _telemetry = _ref.read(telemetryServiceProvider);
     _statusSub = _repository.statusStream().listen((status) {
       unawaited(_syncStatus(status));
     });
@@ -55,26 +59,35 @@ class AuthController extends StateNotifier<AuthState> {
 
   final Ref _ref;
   late final AuthRepository _repository;
-  late final CredentialsRepository _credentialsRepository;
+  late final TelemetryService _telemetry;
   StreamSubscription<AuthStatus>? _statusSub;
 
   Future<void> _bootstrap() async {
     try {
+      final profiles = await _repository.listProfiles();
       final user = await _repository.currentUser();
       if (!mounted) {
         return;
       }
       final status = _resolveStatusFromUser(user);
-      state = state.copyWith(status: status, user: user, isLoading: false, clearError: true);
-      if (status == AuthStatus.unauthenticated) {
-        unawaited(_attemptAutoSignIn());
-      }
+      state = state.copyWith(
+        status: status,
+        user: user,
+        profiles: profiles,
+        isLoading: false,
+        clearError: true,
+      );
     } catch (_) {
       if (!mounted) {
         return;
       }
-      state = state.copyWith(status: AuthStatus.unauthenticated, clearUser: true, isLoading: false, clearError: true);
-      unawaited(_attemptAutoSignIn());
+      state = state.copyWith(
+        status: AuthStatus.unauthenticated,
+        clearUser: true,
+        profiles: const [],
+        isLoading: false,
+        clearError: true,
+      );
     }
   }
 
@@ -88,42 +101,30 @@ class AuthController extends StateNotifier<AuthState> {
     return AuthStatus.authenticated;
   }
 
-  Future<void> _attemptAutoSignIn() async {
-    if (!_credentialsRepository.getRememberMeEnabled()) {
-      return;
-    }
-    final storedCredentials = await _credentialsRepository.readCredentials();
-    if (storedCredentials == null) {
-      return;
-    }
-    await signIn(
-      email: storedCredentials.email,
-      password: storedCredentials.password,
-      persistCredentials: false,
-      clearStoredCredentials: false,
-    );
-  }
-
   Future<void> _syncStatus(AuthStatus status) async {
     try {
       if (status == AuthStatus.authenticated || status == AuthStatus.onboarding) {
         final user = await _repository.currentUser();
+        final profiles = await _repository.listProfiles();
         if (!mounted) {
           return;
         }
         state = state.copyWith(
           status: status,
           user: user,
+          profiles: profiles,
           isLoading: false,
           clearError: true,
         );
       } else {
+        final profiles = await _repository.listProfiles();
         if (!mounted) {
           return;
         }
         state = state.copyWith(
           status: status,
           clearUser: true,
+          profiles: profiles,
           isLoading: false,
           clearError: true,
         );
@@ -141,93 +142,103 @@ class AuthController extends StateNotifier<AuthState> {
     }
   }
 
-  Future<bool> signIn({
-    required String email,
-    required String password,
-    bool persistCredentials = false,
-    bool clearStoredCredentials = false,
-  }) async {
+  Future<void> refreshProfiles() async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      await _repository.signIn(email: email, password: password);
-      if (!mounted) {
-        return true;
-      }
-      state = state.copyWith(isLoading: false);
-      if (persistCredentials) {
-        await _credentialsRepository.saveCredentials(
-          StoredCredentials(email: email, password: password),
-        );
-        await _credentialsRepository.setRememberMeEnabled(true);
-      } else if (clearStoredCredentials) {
-        await _credentialsRepository.setRememberMeEnabled(false);
-      }
-      return true;
-    } catch (_) {
-      if (!mounted) {
-        return false;
-      }
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'Unable to sign in. Check your credentials and try again.',
-      );
-      return false;
-    }
-  }
-
-  Future<void> signUp({required String email, required String password}) async {
-    state = state.copyWith(isLoading: true, clearError: true);
-    try {
-      await _repository.signUp(email: email, password: password);
+      final profiles = await _repository.listProfiles();
       if (!mounted) {
         return;
       }
-      state = state.copyWith(isLoading: false);
+      state = state.copyWith(isLoading: false, profiles: profiles, clearError: true);
     } catch (_) {
       if (!mounted) {
         return;
       }
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Unable to create your account. Please try again.',
+        errorMessage: 'Unable to load profiles. Please try again.',
       );
     }
   }
 
-  Future<void> signOut() async {
+  Future<void> createProfile({required String name, String? passcode}) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      await _repository.signOut();
+      await _repository.createProfile(name: name, passcode: passcode);
+      final profiles = await _repository.listProfiles();
+      final user = await _repository.currentUser();
       if (!mounted) {
         return;
       }
-      state = state.copyWith(isLoading: false);
+      state = state.copyWith(
+        isLoading: false,
+        profiles: profiles,
+        user: user,
+        status: _resolveStatusFromUser(user),
+        clearError: true,
+      );
+      _telemetry.trackEvent('profile_created', properties: {
+        'hasPasscode': passcode != null && passcode.isNotEmpty,
+      });
     } catch (_) {
       if (!mounted) {
         return;
       }
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Unable to sign out. Please try again.',
+        errorMessage: 'Unable to create your profile. Please try again.',
       );
     }
   }
 
-  Future<void> sendPasswordReset({required String email}) async {
+  Future<void> selectProfile(String profileId) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      await _repository.sendPasswordReset(email: email);
+      await _repository.selectProfile(profileId);
+      final user = await _repository.currentUser();
       if (!mounted) {
         return;
       }
-      state = state.copyWith(isLoading: false);
+      state = state.copyWith(
+        isLoading: false,
+        user: user,
+        status: _resolveStatusFromUser(user),
+        clearError: true,
+      );
+      _telemetry.trackEvent('profile_selected');
     } catch (_) {
       if (!mounted) {
         return;
       }
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Unable to send reset email. Please try again later.',
+        errorMessage: 'Unable to select that profile. Please try again.',
+      );
+    }
+  }
+
+  Future<void> unlockWithPasscode(String passcode) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      await _repository.unlockWithPasscode(passcode);
+      final user = await _repository.currentUser();
+      if (!mounted) {
+        return;
+      }
+      state = state.copyWith(
+        isLoading: false,
+        user: user,
+        status: _resolveStatusFromUser(user),
+        clearError: true,
+      );
+      _telemetry.trackEvent('profile_unlocked');
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Incorrect passcode. Please try again.',
       );
     }
   }
@@ -246,6 +257,7 @@ class AuthController extends StateNotifier<AuthState> {
         user: user,
         clearError: true,
       );
+      _telemetry.trackEvent('onboarding_completed');
     } catch (_) {
       if (!mounted) {
         return;
@@ -253,6 +265,30 @@ class AuthController extends StateNotifier<AuthState> {
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'Unable to save your profile. Please try again.',
+      );
+    }
+  }
+
+  Future<void> signOut() async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      await _repository.signOut();
+      if (!mounted) {
+        return;
+      }
+      state = state.copyWith(
+        isLoading: false,
+        clearUser: true,
+        status: AuthStatus.unauthenticated,
+      );
+      _telemetry.trackEvent('signed_out');
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Unable to sign out. Please try again.',
       );
     }
   }

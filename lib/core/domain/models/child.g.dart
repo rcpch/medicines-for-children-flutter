@@ -6,7 +6,7 @@ part of 'child.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ChildImpl _$$ChildImplFromJson(Map<String, dynamic> json) => _$ChildImpl(
+_Child _$ChildFromJson(Map<String, dynamic> json) => _Child(
   id: json['id'] as String,
   firstName: json['firstName'] as String,
   lastName: json['lastName'] as String,
@@ -15,6 +15,8 @@ _$ChildImpl _$$ChildImplFromJson(Map<String, dynamic> json) => _$ChildImpl(
   allergies: (json['allergies'] as List<dynamic>)
       .map((e) => e as String)
       .toList(),
+  notes: json['notes'] as String?,
+  photoUrl: json['photoUrl'] as String?,
   medicines: (json['medicines'] as List<dynamic>)
       .map((e) => Medicine.fromJson(e as Map<String, dynamic>))
       .toList(),
@@ -26,15 +28,16 @@ _$ChildImpl _$$ChildImplFromJson(Map<String, dynamic> json) => _$ChildImpl(
       .toList(),
 );
 
-Map<String, dynamic> _$$ChildImplToJson(_$ChildImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'firstName': instance.firstName,
-      'lastName': instance.lastName,
-      'dateOfBirth': instance.dateOfBirth.toIso8601String(),
-      'condition': instance.condition,
-      'allergies': instance.allergies,
-      'medicines': instance.medicines,
-      'schedules': instance.schedules,
-      'asNeededSchedules': instance.asNeededSchedules,
-    };
+Map<String, dynamic> _$ChildToJson(_Child instance) => <String, dynamic>{
+  'id': instance.id,
+  'firstName': instance.firstName,
+  'lastName': instance.lastName,
+  'dateOfBirth': instance.dateOfBirth.toIso8601String(),
+  'condition': instance.condition,
+  'allergies': instance.allergies,
+  'notes': instance.notes,
+  'photoUrl': instance.photoUrl,
+  'medicines': instance.medicines,
+  'schedules': instance.schedules,
+  'asNeededSchedules': instance.asNeededSchedules,
+};

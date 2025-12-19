@@ -7,7 +7,7 @@ part 'medicine.g.dart';
 enum MedicineType { everyday, asNeeded, both }
 
 @freezed
-class Medicine with _$Medicine {
+abstract class Medicine with _$Medicine {
   const factory Medicine({
     required String id,
     required String name,
@@ -19,6 +19,7 @@ class Medicine with _$Medicine {
     required String frequency,
     String? notes,
     String? photoUrl,
+    @Default(<String>[]) List<String> photoUrls,
   }) = _Medicine;
 
   factory Medicine.fromJson(Map<String, dynamic> json) => _$MedicineFromJson(json);

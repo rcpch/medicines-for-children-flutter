@@ -5,11 +5,17 @@ import 'package:medicines_for_children_flutter/features/auth/application/auth_co
 import 'package:medicines_for_children_flutter/features/auth/domain/auth_status.dart';
 import 'package:medicines_for_children_flutter/features/auth/presentation/login_page.dart';
 import 'package:medicines_for_children_flutter/features/auth/presentation/signup_page.dart';
+import 'package:medicines_for_children_flutter/features/child_profile/presentation/child_profile_page.dart';
 import 'package:medicines_for_children_flutter/features/home/presentation/home_page.dart';
+import 'package:medicines_for_children_flutter/features/medicines/presentation/medicine_detail_page.dart';
+import 'package:medicines_for_children_flutter/features/medicines/presentation/medicines_page.dart';
 import 'package:medicines_for_children_flutter/features/onboarding/presentation/onboarding_page.dart';
 import 'package:medicines_for_children_flutter/features/shared_schedule/presentation/shared_schedule_link_page.dart';
 import 'package:medicines_for_children_flutter/features/shared_schedule/presentation/shared_schedule_page.dart';
 import 'package:medicines_for_children_flutter/features/splash/presentation/splash_page.dart';
+import 'package:medicines_for_children_flutter/app/router/primary_shell.dart';
+import 'package:medicines_for_children_flutter/core/telemetry/telemetry_observer.dart';
+import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 
 enum AppRoute {
   splash('/'),
@@ -17,6 +23,9 @@ enum AppRoute {
   signup('/signup'),
   onboarding('/onboarding'),
   home('/home'),
+  medicines('/medicines'),
+  medicineDetail(':medicineId'),
+  childProfile('/child-profile'),
   sharedScheduleLink('/auth/:token'),
   sharedSchedule('/shared-schedule/:apiId');
 
@@ -40,11 +49,56 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: AppRoute.splash.path,
     refreshListenable: routerNotifier,
     redirect: routerNotifier.handleRedirect,
+    observers: [
+      TelemetryNavigatorObserver(ref.watch(telemetryServiceProvider)),
+    ],
     routes: [
       GoRoute(
         path: AppRoute.splash.path,
         name: AppRoute.splash.name,
         builder: (context, state) => const SplashPage(),
+      ),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            PrimaryShell(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoute.home.path,
+                name: AppRoute.home.name,
+                builder: (context, state) => const HomePage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoute.medicines.path,
+                name: AppRoute.medicines.name,
+                builder: (context, state) => const MedicinesPage(),
+                routes: [
+                  GoRoute(
+                    path: AppRoute.medicineDetail.path,
+                    name: AppRoute.medicineDetail.name,
+                    builder: (context, state) => MedicineDetailPage(
+                      medicineId: state.pathParameters['medicineId'] ?? '',
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoute.childProfile.path,
+                name: AppRoute.childProfile.name,
+                builder: (context, state) => const ChildProfilePage(),
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         path: AppRoute.login.path,
@@ -60,11 +114,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoute.onboarding.path,
         name: AppRoute.onboarding.name,
         builder: (context, state) => const OnboardingPage(),
-      ),
-      GoRoute(
-        path: AppRoute.home.path,
-        name: AppRoute.home.name,
-        builder: (context, state) => const HomePage(),
       ),
       GoRoute(
         path: AppRoute.sharedScheduleLink.path,

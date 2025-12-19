@@ -105,6 +105,7 @@ Child _sampleChild() {
     dateOfBirth: DateTime(2018, 5, 12),
     condition: 'Asthma',
     allergies: const ['Penicillin'],
+    notes: 'Requires spacer for inhaler.',
     medicines: [medicine, asNeededMedicine],
     schedules: [schedule],
     asNeededSchedules: [asNeededSchedule],

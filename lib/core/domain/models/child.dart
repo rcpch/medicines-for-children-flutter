@@ -6,7 +6,7 @@ part 'child.freezed.dart';
 part 'child.g.dart';
 
 @freezed
-class Child with _$Child {
+abstract class Child with _$Child {
   const factory Child({
     required String id,
     required String firstName,
@@ -14,6 +14,8 @@ class Child with _$Child {
     required DateTime dateOfBirth,
     required String condition,
     required List<String> allergies,
+    String? notes,
+    String? photoUrl,
     required List<Medicine> medicines,
     required List<MedicineSchedule> schedules,
     required List<AsNeededSchedule> asNeededSchedules,

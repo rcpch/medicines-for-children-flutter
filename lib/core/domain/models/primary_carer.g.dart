@@ -6,8 +6,8 @@ part of 'primary_carer.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$PrimaryCarerImpl _$$PrimaryCarerImplFromJson(Map<String, dynamic> json) =>
-    _$PrimaryCarerImpl(
+_PrimaryCarer _$PrimaryCarerFromJson(Map<String, dynamic> json) =>
+    _PrimaryCarer(
       id: json['id'] as String,
       firstName: json['firstName'] as String,
       lastName: json['lastName'] as String,
@@ -18,7 +18,7 @@ _$PrimaryCarerImpl _$$PrimaryCarerImplFromJson(Map<String, dynamic> json) =>
           .toList(),
     );
 
-Map<String, dynamic> _$$PrimaryCarerImplToJson(_$PrimaryCarerImpl instance) =>
+Map<String, dynamic> _$PrimaryCarerToJson(_PrimaryCarer instance) =>
     <String, dynamic>{
       'id': instance.id,
       'firstName': instance.firstName,
