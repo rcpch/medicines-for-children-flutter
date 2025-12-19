@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/core/domain/active_child_provider.dart';
 import 'package:medicines_for_children_flutter/core/platform/image_provider.dart';
 
@@ -97,6 +99,15 @@ class ChildProfilePage extends ConsumerWidget {
             _InfoCard(
               title: 'Medicines',
               child: Text('${child.medicines.length} active medicines'),
+            ),
+            const SizedBox(height: 16),
+            Card(
+              child: ListTile(
+                title: const Text('Share centre'),
+                subtitle: const Text('Invite carers to view the schedule.'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.pushNamed(AppRoute.shareCentre.name),
+              ),
             ),
           ],
         ),

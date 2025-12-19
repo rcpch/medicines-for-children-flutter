@@ -16,6 +16,9 @@ import 'package:medicines_for_children_flutter/features/schedules/presentation/s
 import 'package:medicines_for_children_flutter/features/schedules/presentation/schedules_page.dart';
 import 'package:medicines_for_children_flutter/features/shared_schedule/presentation/shared_schedule_link_page.dart';
 import 'package:medicines_for_children_flutter/features/shared_schedule/presentation/shared_schedule_page.dart';
+import 'package:medicines_for_children_flutter/features/share_centre/presentation/share_centre_detail_page.dart';
+import 'package:medicines_for_children_flutter/features/share_centre/presentation/share_centre_form_page.dart';
+import 'package:medicines_for_children_flutter/features/share_centre/presentation/share_centre_page.dart';
 import 'package:medicines_for_children_flutter/features/splash/presentation/splash_page.dart';
 import 'package:medicines_for_children_flutter/app/router/primary_shell.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_observer.dart';
@@ -36,6 +39,9 @@ enum AppRoute {
   medicineDetail(':medicineId'),
   editMedicine('edit'),
   childProfile('/child-profile'),
+  shareCentre('share-centre'),
+  shareCentreCreate('create'),
+  shareCentreDetail(':shareId'),
   sharedScheduleLink('/auth/:token'),
   sharedSchedule('/shared-schedule/:apiId');
 
@@ -145,6 +151,27 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: AppRoute.childProfile.path,
                 name: AppRoute.childProfile.name,
                 builder: (context, state) => const ChildProfilePage(),
+                routes: [
+                  GoRoute(
+                    path: AppRoute.shareCentre.path,
+                    name: AppRoute.shareCentre.name,
+                    builder: (context, state) => const ShareCentrePage(),
+                    routes: [
+                      GoRoute(
+                        path: AppRoute.shareCentreCreate.path,
+                        name: AppRoute.shareCentreCreate.name,
+                        builder: (context, state) => const ShareCentreCreatePage(),
+                      ),
+                      GoRoute(
+                        path: AppRoute.shareCentreDetail.path,
+                        name: AppRoute.shareCentreDetail.name,
+                        builder: (context, state) => ShareCentreDetailPage(
+                          shareId: state.pathParameters['shareId'] ?? '',
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),
