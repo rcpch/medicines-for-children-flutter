@@ -63,6 +63,7 @@
 
 ## Milestone 6 – Quality, Compliance, and Release Readiness
 - **Technical steps**:
+	- Add multi-child support (child picker, per-child storage/selection, shared schedule scoping, and UI updates across Home/Medicines/Share Centre).
 	- Implement accessibility pass (semantic labels, large text support, high-contrast themes, screen-reader flows) and add automated `flutter_gherkin` or `integration_test` scripts covering critical journeys.
 	- Add privacy/legal surfaces (consent modals, privacy policy links, data deletion request entry point) and telemetry opt-in settings.
 	- Harden offline behaviour (cache last N days of schedules/medicines, queue mutations for retry) and add background sync service.
