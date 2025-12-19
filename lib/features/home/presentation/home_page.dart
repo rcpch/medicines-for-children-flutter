@@ -75,6 +75,9 @@ class HomePage extends ConsumerWidget {
           onManageSchedules: () {
             context.goNamed(AppRoute.schedules.name);
           },
+          onRecordAsNeeded: () {
+            context.goNamed(AppRoute.recordAsNeeded.name);
+          },
         ),
       ),
     );
@@ -367,6 +370,7 @@ class _HomeBody extends StatelessWidget {
     required this.onSelectDate,
     required this.onAddSchedule,
     required this.onManageSchedules,
+    required this.onRecordAsNeeded,
   });
 
   final PrimaryCarerState state;
@@ -377,6 +381,7 @@ class _HomeBody extends StatelessWidget {
   final ValueChanged<DateTime> onSelectDate;
   final VoidCallback onAddSchedule;
   final VoidCallback onManageSchedules;
+  final VoidCallback onRecordAsNeeded;
 
   @override
   Widget build(BuildContext context) {
@@ -448,6 +453,7 @@ class _HomeBody extends StatelessWidget {
             _AsNeededSection(
               entries: asNeededEntries,
               isLoading: state.isLoading,
+              onRecordAsNeeded: onRecordAsNeeded,
             ),
           ] else
             Card(
@@ -712,10 +718,12 @@ class _AsNeededSection extends StatelessWidget {
   const _AsNeededSection({
     required this.entries,
     required this.isLoading,
+    required this.onRecordAsNeeded,
   });
 
   final List<AsNeededAdministrationEntry> entries;
   final bool isLoading;
+  final VoidCallback onRecordAsNeeded;
 
   @override
   Widget build(BuildContext context) {
@@ -728,9 +736,20 @@ class _AsNeededSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'As-needed activity',
-              style: Theme.of(context).textTheme.titleMedium,
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'As-needed activity',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: onRecordAsNeeded,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Record'),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             if (entries.isEmpty)

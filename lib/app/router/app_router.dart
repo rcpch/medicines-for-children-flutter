@@ -11,6 +11,7 @@ import 'package:medicines_for_children_flutter/features/medicines/presentation/m
 import 'package:medicines_for_children_flutter/features/medicines/presentation/medicine_form_page.dart';
 import 'package:medicines_for_children_flutter/features/medicines/presentation/medicines_page.dart';
 import 'package:medicines_for_children_flutter/features/onboarding/presentation/onboarding_page.dart';
+import 'package:medicines_for_children_flutter/features/schedules/presentation/as_needed_record_page.dart';
 import 'package:medicines_for_children_flutter/features/schedules/presentation/schedule_form_page.dart';
 import 'package:medicines_for_children_flutter/features/schedules/presentation/schedules_page.dart';
 import 'package:medicines_for_children_flutter/features/shared_schedule/presentation/shared_schedule_link_page.dart';
@@ -29,6 +30,7 @@ enum AppRoute {
   schedules('schedule'),
   addSchedule('add'),
   editSchedule(':scheduleId/edit'),
+  recordAsNeeded('as-needed'),
   medicines('/medicines'),
   addMedicine('add'),
   medicineDetail(':medicineId'),
@@ -93,6 +95,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                         builder: (context, state) => ScheduleFormPage(
                           scheduleId: state.pathParameters['scheduleId'],
                         ),
+                      ),
+                      GoRoute(
+                        path: AppRoute.recordAsNeeded.path,
+                        name: AppRoute.recordAsNeeded.name,
+                        builder: (context, state) => const AsNeededRecordPage(),
                       ),
                     ],
                   ),
