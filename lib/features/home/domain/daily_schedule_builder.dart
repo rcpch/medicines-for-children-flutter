@@ -40,6 +40,31 @@ class AsNeededAdministrationEntry {
   final Administration administration;
 }
 
+enum TimeOfDayBucket { morning, afternoon, evening, night }
+
+class TimeOfDaySection {
+  const TimeOfDaySection({
+    required this.bucket,
+    required this.entries,
+  });
+
+  final TimeOfDayBucket bucket;
+  final List<DailyScheduleEntry> entries;
+
+  String get label {
+    switch (bucket) {
+      case TimeOfDayBucket.morning:
+        return 'Morning';
+      case TimeOfDayBucket.afternoon:
+        return 'Afternoon';
+      case TimeOfDayBucket.evening:
+        return 'Evening';
+      case TimeOfDayBucket.night:
+        return 'Night';
+    }
+  }
+}
+
 class DailyScheduleBuilder {
   List<DailyScheduleEntry> buildScheduledEntries(Child child, DateTime date) {
     final Map<String, Medicine> medicineById = {
@@ -86,6 +111,20 @@ class DailyScheduleBuilder {
 
     entries.sort((a, b) => a.scheduledDateTime.compareTo(b.scheduledDateTime));
     return entries;
+  }
+
+  List<TimeOfDaySection> buildTimeOfDaySections(List<DailyScheduleEntry> entries) {
+    final Map<TimeOfDayBucket, List<DailyScheduleEntry>> bucketed = {
+      for (final bucket in TimeOfDayBucket.values) bucket: <DailyScheduleEntry>[],
+    };
+
+    for (final entry in entries) {
+      bucketed[_bucketFor(entry.scheduledDateTime)]!.add(entry);
+    }
+
+    return TimeOfDayBucket.values
+        .map((bucket) => TimeOfDaySection(bucket: bucket, entries: bucketed[bucket]!))
+        .toList();
   }
 
   List<AsNeededAdministrationEntry> buildAsNeededEntries(Child child, DateTime date) {
@@ -168,5 +207,19 @@ class DailyScheduleBuilder {
 
   DateTime _asDateOnly(DateTime dateTime) {
     return DateTime(dateTime.year, dateTime.month, dateTime.day);
+  }
+
+  TimeOfDayBucket _bucketFor(DateTime dateTime) {
+    final hour = dateTime.hour;
+    if (hour >= 6 && hour < 12) {
+      return TimeOfDayBucket.morning;
+    }
+    if (hour >= 12 && hour < 17) {
+      return TimeOfDayBucket.afternoon;
+    }
+    if (hour >= 17 && hour < 23) {
+      return TimeOfDayBucket.evening;
+    }
+    return TimeOfDayBucket.night;
   }
 }

@@ -1,10 +1,17 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:medicines_for_children_flutter/core/data/backup/backup_service.dart';
+import 'package:medicines_for_children_flutter/core/platform/backup_file_io.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/administration.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.dart';
+import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
+import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_controller.dart';
+import 'package:medicines_for_children_flutter/features/home/application/selected_date_provider.dart';
 import 'package:medicines_for_children_flutter/features/home/domain/daily_schedule_builder.dart';
 
 class HomePage extends ConsumerWidget {
@@ -14,6 +21,8 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(primaryCarerControllerProvider);
     final controller = ref.read(primaryCarerControllerProvider.notifier);
+    final selectedDate = ref.watch(selectedDateProvider);
+    final telemetry = ref.read(telemetryServiceProvider);
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -25,6 +34,24 @@ class HomePage extends ConsumerWidget {
             onPressed: state.isLoading ? null : () => controller.refresh(),
             icon: const Icon(Icons.refresh),
           ),
+          PopupMenuButton<_HomeAction>(
+            onSelected: (action) => _handleAction(context, ref, action),
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: _HomeAction.exportBackup,
+                child: Text('Export backup'),
+              ),
+              PopupMenuItem(
+                value: _HomeAction.importBackup,
+                child: Text('Import backup'),
+              ),
+              PopupMenuDivider(),
+              PopupMenuItem(
+                value: _HomeAction.signOut,
+                child: Text('Sign out'),
+              ),
+            ],
+          ),
         ],
       ),
       body: SafeArea(
@@ -33,10 +60,293 @@ class HomePage extends ConsumerWidget {
           onRefresh: controller.refresh,
           theme: theme,
           dailyScheduleBuilder: ref.watch(dailyScheduleBuilderProvider),
+          selectedDate: selectedDate,
+          onSelectDate: (date) {
+            ref.read(selectedDateProvider.notifier).state = date;
+            telemetry.trackEvent('home_date_selected', properties: {
+              'date': DateFormat('yyyy-MM-dd').format(date),
+            });
+          },
         ),
       ),
     );
   }
+
+  Future<void> _handleAction(BuildContext context, WidgetRef ref, _HomeAction action) async {
+    switch (action) {
+      case _HomeAction.exportBackup:
+        await _exportBackup(context, ref);
+        return;
+      case _HomeAction.importBackup:
+        await _importBackup(context, ref);
+        return;
+      case _HomeAction.signOut:
+        await ref.read(authControllerProvider.notifier).signOut();
+        return;
+    }
+  }
+
+  Future<void> _exportBackup(BuildContext context, WidgetRef ref) async {
+    final passphrase = await _promptPassphrase(
+      context: context,
+      title: 'Create a backup passphrase',
+      confirmLabel: 'Confirm passphrase',
+    );
+    if (passphrase == null) {
+      return;
+    }
+    try {
+      final backupService = ref.read(backupServiceProvider);
+      final backupFileIO = ref.read(backupFileIOProvider);
+      final bytes = await backupService.createBackup(passphrase: passphrase);
+      final timestamp = DateFormat('yyyyMMdd_HHmm').format(DateTime.now());
+      await backupFileIO.saveBytes(
+        bytes: bytes,
+        filename: 'mfc-backup-$timestamp.mfc',
+        mimeType: 'application/octet-stream',
+      );
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Backup exported. Store it somewhere safe.')),
+      );
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Unable to export backup: $error')),
+      );
+    }
+  }
+
+  Future<void> _importBackup(BuildContext context, WidgetRef ref) async {
+    final backupFileIO = ref.read(backupFileIOProvider);
+    Uint8List? bytes;
+    try {
+      bytes = await backupFileIO.pickFileBytes(label: 'Backup', extensions: const ['mfc']);
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Unable to open backup: $error')),
+      );
+      return;
+    }
+    if (bytes == null) {
+      return;
+    }
+
+    final details = await _promptImportDetails(context);
+    if (details == null) {
+      return;
+    }
+
+    try {
+      final backupService = ref.read(backupServiceProvider);
+      await backupService.restoreBackup(
+        bytes: bytes,
+        passphrase: details.passphrase,
+        newProfileName: details.profileName,
+        newPasscode: details.passcode,
+      );
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Backup imported.')),
+      );
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Unable to import backup: $error')),
+      );
+    }
+  }
+
+  Future<String?> _promptPassphrase({
+    required BuildContext context,
+    required String title,
+    required String confirmLabel,
+  }) async {
+    final passphraseController = TextEditingController();
+    final confirmController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: passphraseController,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'Passphrase'),
+                  validator: (value) {
+                    if (value == null || value.trim().length < 8) {
+                      return 'Use at least 8 characters';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: confirmController,
+                  obscureText: true,
+                  decoration: InputDecoration(labelText: confirmLabel),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Confirm your passphrase';
+                    }
+                    if (value != passphraseController.text) {
+                      return 'Passphrases do not match';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (formKey.currentState?.validate() ?? false) {
+                  Navigator.of(context).pop(passphraseController.text.trim());
+                }
+              },
+              child: const Text('Continue'),
+            ),
+          ],
+        );
+      },
+    );
+
+    passphraseController.dispose();
+    confirmController.dispose();
+    return result;
+  }
+
+  Future<_ImportDetails?> _promptImportDetails(BuildContext context) async {
+    final passphraseController = TextEditingController();
+    final profileNameController = TextEditingController();
+    final passcodeController = TextEditingController();
+    final confirmController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    final result = await showDialog<_ImportDetails>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Import backup'),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: passphraseController,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'Backup passphrase'),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Enter the backup passphrase';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: profileNameController,
+                  decoration: const InputDecoration(labelText: 'Profile name (optional)'),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: passcodeController,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'Passcode (optional)'),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: confirmController,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'Confirm passcode'),
+                  validator: (value) {
+                    if (passcodeController.text.trim().isEmpty) {
+                      return null;
+                    }
+                    if (value == null || value.isEmpty) {
+                      return 'Confirm your passcode';
+                    }
+                    if (value != passcodeController.text) {
+                      return 'Passcodes do not match';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (formKey.currentState?.validate() ?? false) {
+                  Navigator.of(context).pop(
+                    _ImportDetails(
+                      passphrase: passphraseController.text.trim(),
+                      profileName: profileNameController.text.trim().isEmpty
+                          ? null
+                          : profileNameController.text.trim(),
+                      passcode: passcodeController.text.trim().isEmpty
+                          ? null
+                          : passcodeController.text.trim(),
+                    ),
+                  );
+                }
+              },
+              child: const Text('Import'),
+            ),
+          ],
+        );
+      },
+    );
+
+    passphraseController.dispose();
+    profileNameController.dispose();
+    passcodeController.dispose();
+    confirmController.dispose();
+    return result;
+  }
+}
+
+enum _HomeAction { exportBackup, importBackup, signOut }
+
+class _ImportDetails {
+  const _ImportDetails({
+    required this.passphrase,
+    this.profileName,
+    this.passcode,
+  });
+
+  final String passphrase;
+  final String? profileName;
+  final String? passcode;
 }
 
 class _HomeBody extends StatelessWidget {
@@ -45,12 +355,16 @@ class _HomeBody extends StatelessWidget {
     required this.onRefresh,
     required this.theme,
     required this.dailyScheduleBuilder,
+    required this.selectedDate,
+    required this.onSelectDate,
   });
 
   final PrimaryCarerState state;
   final Future<void> Function() onRefresh;
   final ThemeData theme;
   final DailyScheduleBuilder dailyScheduleBuilder;
+  final DateTime selectedDate;
+  final ValueChanged<DateTime> onSelectDate;
 
   @override
   Widget build(BuildContext context) {
@@ -69,10 +383,11 @@ class _HomeBody extends StatelessWidget {
     final Child? primaryChild = children.isEmpty ? null : children.first;
     final scheduleEntries = primaryChild == null
         ? <DailyScheduleEntry>[]
-        : dailyScheduleBuilder.buildScheduledEntries(primaryChild, DateTime.now());
+        : dailyScheduleBuilder.buildScheduledEntries(primaryChild, selectedDate);
     final asNeededEntries = primaryChild == null
         ? <AsNeededAdministrationEntry>[]
-        : dailyScheduleBuilder.buildAsNeededEntries(primaryChild, DateTime.now());
+        : dailyScheduleBuilder.buildAsNeededEntries(primaryChild, selectedDate);
+    final timeOfDaySections = dailyScheduleBuilder.buildTimeOfDaySections(scheduleEntries);
 
     return RefreshIndicator(
       onRefresh: () => onRefresh(),
@@ -106,9 +421,20 @@ class _HomeBody extends StatelessWidget {
           if (primaryChild != null) ...[
             _ChildCard(child: primaryChild),
             const SizedBox(height: 16),
-            _ScheduleSection(entries: scheduleEntries),
+            _CalendarStrip(
+              selectedDate: selectedDate,
+              onSelectDate: onSelectDate,
+            ),
             const SizedBox(height: 16),
-            _AsNeededSection(entries: asNeededEntries),
+            _ScheduleSection(
+              sections: timeOfDaySections,
+              isLoading: state.isLoading,
+            ),
+            const SizedBox(height: 16),
+            _AsNeededSection(
+              entries: asNeededEntries,
+              isLoading: state.isLoading,
+            ),
           ] else
             Card(
               child: Padding(
@@ -232,12 +558,19 @@ class _ChildCard extends StatelessWidget {
 }
 
 class _ScheduleSection extends StatelessWidget {
-  const _ScheduleSection({required this.entries});
+  const _ScheduleSection({
+    required this.sections,
+    required this.isLoading,
+  });
 
-  final List<DailyScheduleEntry> entries;
+  final List<TimeOfDaySection> sections;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading && sections.every((section) => section.entries.isEmpty)) {
+      return const _LoadingSection(title: 'Today\'s schedule');
+    }
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -249,10 +582,19 @@ class _ScheduleSection extends StatelessWidget {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
-            if (entries.isEmpty)
+            if (sections.every((section) => section.entries.isEmpty))
               const Text('No scheduled medicines for today.'),
-            for (final entry in entries)
-              _ScheduleTile(entry: entry),
+            for (final section in sections) ...[
+              if (section.entries.isNotEmpty) ...[
+                Text(
+                  section.label,
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+                const SizedBox(height: 8),
+                for (final entry in section.entries) _ScheduleTile(entry: entry),
+                const SizedBox(height: 12),
+              ],
+            ],
           ],
         ),
       ),
@@ -333,12 +675,19 @@ class _ScheduleTile extends StatelessWidget {
 }
 
 class _AsNeededSection extends StatelessWidget {
-  const _AsNeededSection({required this.entries});
+  const _AsNeededSection({
+    required this.entries,
+    required this.isLoading,
+  });
 
   final List<AsNeededAdministrationEntry> entries;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading && entries.isEmpty) {
+      return const _LoadingSection(title: 'As-needed activity');
+    }
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -380,6 +729,111 @@ class _AsNeededSection extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CalendarStrip extends StatelessWidget {
+  const _CalendarStrip({
+    required this.selectedDate,
+    required this.onSelectDate,
+  });
+
+  final DateTime selectedDate;
+  final ValueChanged<DateTime> onSelectDate;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final days = List.generate(14, (index) {
+      final base = DateTime.now();
+      final date = DateTime(base.year, base.month, base.day).add(Duration(days: index - 3));
+      return date;
+    });
+
+    return SizedBox(
+      height: 72,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: days.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final date = days[index];
+          final isSelected = _isSameDay(date, selectedDate);
+          return GestureDetector(
+            onTap: () => onSelectDate(date),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 56,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceVariant,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    DateFormat.E().format(date),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: isSelected
+                          ? theme.colorScheme.onPrimary
+                          : theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    date.day.toString(),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: isSelected
+                          ? theme.colorScheme.onPrimary
+                          : theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+}
+
+class _LoadingSection extends StatelessWidget {
+  const _LoadingSection({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: theme.textTheme.titleMedium),
+            const SizedBox(height: 12),
+            for (var index = 0; index < 3; index++)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Container(
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceVariant,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
           ],

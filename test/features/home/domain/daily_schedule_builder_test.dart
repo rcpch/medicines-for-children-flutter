@@ -31,6 +31,54 @@ void main() {
       expect(entries, hasLength(1));
       expect(entries.first.medicine.name, 'Salbutamol');
     });
+
+    test('buildTimeOfDaySections groups entries by bucket', () {
+      final entries = [
+        DailyScheduleEntry(
+          id: 'one',
+          medicine: child.medicines.first,
+          scheduledDateTime: DateTime(2025, 1, 6, 8),
+          timeLabel: '8:00 AM',
+          status: AdministrationStatus.scheduled,
+        ),
+        DailyScheduleEntry(
+          id: 'two',
+          medicine: child.medicines.first,
+          scheduledDateTime: DateTime(2025, 1, 6, 13),
+          timeLabel: '1:00 PM',
+          status: AdministrationStatus.scheduled,
+        ),
+        DailyScheduleEntry(
+          id: 'three',
+          medicine: child.medicines.first,
+          scheduledDateTime: DateTime(2025, 1, 6, 22),
+          timeLabel: '10:00 PM',
+          status: AdministrationStatus.scheduled,
+        ),
+        DailyScheduleEntry(
+          id: 'four',
+          medicine: child.medicines.first,
+          scheduledDateTime: DateTime(2025, 1, 6, 1),
+          timeLabel: '1:00 AM',
+          status: AdministrationStatus.scheduled,
+        ),
+      ];
+
+      final sections = builder.buildTimeOfDaySections(entries);
+      final morning = sections.firstWhere((section) => section.bucket == TimeOfDayBucket.morning);
+      final afternoon = sections.firstWhere((section) => section.bucket == TimeOfDayBucket.afternoon);
+      final evening = sections.firstWhere((section) => section.bucket == TimeOfDayBucket.evening);
+      final night = sections.firstWhere((section) => section.bucket == TimeOfDayBucket.night);
+
+      expect(morning.entries, hasLength(1));
+      expect(afternoon.entries, hasLength(1));
+      expect(evening.entries, hasLength(1));
+      expect(night.entries, hasLength(1));
+      expect(morning.entries.first.scheduledDateTime, DateTime(2025, 1, 6, 8));
+      expect(afternoon.entries.first.scheduledDateTime, DateTime(2025, 1, 6, 13));
+      expect(evening.entries.first.scheduledDateTime, DateTime(2025, 1, 6, 22));
+      expect(night.entries.first.scheduledDateTime, DateTime(2025, 1, 6, 1));
+    });
   });
 }
 
