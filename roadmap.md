@@ -52,7 +52,8 @@
 
 ## Milestone 5 – Sharing Centre & Backend API Integration
 - **Technical steps**:
-	- Implement HTTP client for shared schedule endpoints (`/sharedSchedule`, `/mySharedSchedules`, `/exportSchedulePdf`, `/auth/:token`, `/administration/:apiId` etc.) with ApiKey/token headers.
+	- [~] Implement HTTP client for shared schedule endpoints (`/sharedSchedule`, `/mySharedSchedules`, `/exportSchedulePdf`, `/auth/:token`, `/administration/:apiId` etc.) with ApiKey/token headers.
+	- [x] Add shared schedule confirm/decline + administration recording endpoints.
 	- Build Share Centre UI: list of shares, detail view, create/extend/end flows, PDF export, digital link presentation (including native share sheet integration).
 	- Implement secondary-carer experience inside Flutter as WebView or Flutter web target: token-based auth, pending confirmation, schedule view, record/append administration note flows using backend endpoints.
 	- Add secure link ingestion (App Links / Universal Links) to route invite tokens directly into the secondary-carer flow.
