@@ -1,36 +1,27 @@
-import 'dart:convert';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medicines_for_children_flutter/core/data/storage/shared_preferences_provider.dart';
+import 'package:medicines_for_children_flutter/core/data/storage/profile_data_local_data_source.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class PrimaryCarerLocalDataSource {
-  PrimaryCarerLocalDataSource(this._preferences);
+  PrimaryCarerLocalDataSource(this._profileData);
 
-  static const cacheKey = 'primary_carer.cache';
+  final ProfileDataLocalDataSource _profileData;
 
-  final SharedPreferences _preferences;
-
-  PrimaryCarer? read() {
-    final raw = _preferences.getString(cacheKey);
-    if (raw == null || raw.isEmpty) {
-      return null;
-    }
-    final decoded = jsonDecode(raw) as Map<String, dynamic>;
-    return PrimaryCarer.fromJson(decoded);
+  PrimaryCarer? readForProfile(String profileId) {
+    return _profileData.readPrimaryCarer(profileId);
   }
 
-  Future<void> write(PrimaryCarer primaryCarer) async {
-    await _preferences.setString(cacheKey, jsonEncode(primaryCarer.toJson()));
+  Future<void> writeForProfile(String profileId, PrimaryCarer primaryCarer) async {
+    await _profileData.writePrimaryCarer(profileId, primaryCarer);
   }
 
-  Future<void> clear() async {
-    await _preferences.remove(cacheKey);
+  Future<void> clearForProfile(String profileId) async {
+    await _profileData.clearProfile(profileId);
   }
 }
 
 final primaryCarerLocalDataSourceProvider = Provider<PrimaryCarerLocalDataSource>((ref) {
-  final preferences = ref.watch(sharedPreferencesProvider);
-  return PrimaryCarerLocalDataSource(preferences);
+  final profileData = ref.watch(profileDataLocalDataSourceProvider);
+  return PrimaryCarerLocalDataSource(profileData);
 });
+

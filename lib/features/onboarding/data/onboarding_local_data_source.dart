@@ -1,33 +1,29 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medicines_for_children_flutter/core/data/storage/shared_preferences_provider.dart';
+import 'package:medicines_for_children_flutter/core/data/storage/profile_data_local_data_source.dart';
 import 'package:medicines_for_children_flutter/features/onboarding/domain/onboarding_profile.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-const _onboardingProfileKey = 'onboarding.profile';
 
 class OnboardingLocalDataSource {
-  OnboardingLocalDataSource(this._preferences);
+  OnboardingLocalDataSource(this._profileData);
 
-  final SharedPreferences _preferences;
+  final ProfileDataLocalDataSource _profileData;
 
-  Future<void> saveProfile(OnboardingProfile profile) async {
-    await _preferences.setString(_onboardingProfileKey, profile.toJson());
+  Future<void> saveProfile({
+    required String profileId,
+    required OnboardingProfile profile,
+  }) async {
+    await _profileData.writeOnboardingProfile(profileId, profile);
   }
 
-  OnboardingProfile? readProfile() {
-    final raw = _preferences.getString(_onboardingProfileKey);
-    if (raw == null || raw.isEmpty) {
-      return null;
-    }
-    return OnboardingProfile.fromJson(raw);
+  OnboardingProfile? readProfile(String profileId) {
+    return _profileData.readOnboardingProfile(profileId);
   }
 
-  Future<void> clearProfile() async {
-    await _preferences.remove(_onboardingProfileKey);
+  Future<void> clearProfile(String profileId) async {
+    await _profileData.clearOnboardingProfile(profileId);
   }
 }
 
 final onboardingLocalDataSourceProvider = Provider<OnboardingLocalDataSource>((ref) {
-  final preferences = ref.watch(sharedPreferencesProvider);
-  return OnboardingLocalDataSource(preferences);
+  final profileData = ref.watch(profileDataLocalDataSourceProvider);
+  return OnboardingLocalDataSource(profileData);
 });

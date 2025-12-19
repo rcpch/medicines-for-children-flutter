@@ -84,20 +84,32 @@ class OnboardingProfile {
     required this.child,
   });
 
-  factory OnboardingProfile.fromJson(String rawJson) {
-    final Map<String, dynamic> decoded = jsonDecode(rawJson) as Map<String, dynamic>;
+  factory OnboardingProfile.fromMap(Map<String, dynamic> json) {
     return OnboardingProfile(
-      carer: CarerProfile.fromJson(decoded['carer'] as Map<String, dynamic>? ?? const {}),
-      child: ChildProfile.fromJson(decoded['child'] as Map<String, dynamic>? ?? const {}),
+      carer: CarerProfile.fromJson(json['carer'] as Map<String, dynamic>? ?? const {}),
+      child: ChildProfile.fromJson(json['child'] as Map<String, dynamic>? ?? const {}),
     );
   }
 
-  String toJson() {
-    return jsonEncode({
+  factory OnboardingProfile.fromJson(String rawJson) {
+    final decoded = jsonDecode(rawJson);
+    if (decoded is! Map<String, dynamic>) {
+      return OnboardingProfile(
+        carer: CarerProfile.fromJson(const {}),
+        child: ChildProfile.fromJson(const {}),
+      );
+    }
+    return OnboardingProfile.fromMap(decoded);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
       'carer': carer.toJson(),
       'child': child.toJson(),
-    });
+    };
   }
+
+  String toJson() => jsonEncode(toMap());
 
   final CarerProfile carer;
   final ChildProfile child;

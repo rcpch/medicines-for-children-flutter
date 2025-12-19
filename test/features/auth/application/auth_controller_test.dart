@@ -2,83 +2,53 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 import 'package:medicines_for_children_flutter/features/auth/data/auth_repository.dart';
-import 'package:medicines_for_children_flutter/features/auth/data/credentials_repository.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/auth_status.dart';
-import 'package:medicines_for_children_flutter/features/auth/domain/stored_credentials.dart';
+import 'package:medicines_for_children_flutter/features/auth/data/local_profiles_local_data_source.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   group('AuthController', () {
     late ProviderContainer container;
-    late MockAuthRepository mockRepository;
-    late FakeCredentialsRepository fakeCredentialsRepository;
+    late LocalAuthRepository authRepository;
 
-    setUp(() {
-      mockRepository = MockAuthRepository();
-      fakeCredentialsRepository = FakeCredentialsRepository();
+    setUp(() async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      authRepository = LocalAuthRepository(LocalProfilesLocalDataSource(prefs));
       container = ProviderContainer(
         overrides: [
-          authRepositoryProvider.overrideWithValue(mockRepository),
-          credentialsRepositoryProvider.overrideWithValue(fakeCredentialsRepository),
+          authRepositoryProvider.overrideWithValue(authRepository),
         ],
       );
-      addTearDown(container.dispose);
+      addTearDown(() async {
+        await authRepository.dispose();
+        container.dispose();
+      });
     });
 
-    test('auto authenticates with mock user when firebase is disabled', () async {
+    test('starts unauthenticated with no profiles', () async {
       final controller = container.read(authControllerProvider.notifier);
-      final nextState = await controller.stream.firstWhere((state) => state.status == AuthStatus.authenticated);
-      expect(nextState.status, AuthStatus.authenticated);
-      expect(nextState.user, isNotNull);
-      expect(nextState.user!.email, 'dev@example.com');
-    });
-
-    test('signIn transitions to authenticated and stores user', () async {
-      final controller = container.read(authControllerProvider.notifier);
-
-      final unauthFuture = controller.stream.firstWhere((state) => state.status == AuthStatus.unauthenticated);
-      await controller.signOut();
-      await unauthFuture;
-      final authenticatedFuture = controller.stream.firstWhere((state) => state.status == AuthStatus.authenticated);
-      await controller.signIn(email: 'mock@example.com', password: 'password123');
-      final nextState = await authenticatedFuture;
-      expect(nextState.user, isNotNull);
-      expect(nextState.status, AuthStatus.authenticated);
-    });
-
-    test('signOut transitions back to unauthenticated', () async {
-      final controller = container.read(authControllerProvider.notifier);
-
-      final authenticatedState = await controller.stream.firstWhere((state) => state.status == AuthStatus.authenticated);
-
-      final unauthFuture = controller.stream.firstWhere(
-        (state) =>
-            state.status == AuthStatus.unauthenticated &&
-            state.user == null &&
-            !identical(state, authenticatedState),
-      );
-
-      await controller.signOut();
-      final nextState = await unauthFuture;
-      expect(nextState.user, isNull);
+      final nextState = await controller.stream.firstWhere((state) => state.status == AuthStatus.unauthenticated);
       expect(nextState.status, AuthStatus.unauthenticated);
+      expect(nextState.user, isNull);
     });
 
-    test('signUp transitions user into onboarding state', () async {
+    test('createProfile transitions to onboarding', () async {
       final controller = container.read(authControllerProvider.notifier);
 
       final onboardingFuture = controller.stream.firstWhere((state) => state.status == AuthStatus.onboarding);
-
-      await controller.signUp(email: 'new@example.com', password: 'password123');
-
-      final onboardingState = await onboardingFuture;
-      expect(onboardingState.status, AuthStatus.onboarding);
-      expect(onboardingState.user?.displayName, isNull);
+      await controller.createProfile(name: 'Test Profile');
+      final nextState = await onboardingFuture;
+      expect(nextState.status, AuthStatus.onboarding);
+      expect(nextState.user, isNotNull);
+      expect(nextState.user!.displayName, isNull);
     });
 
-    test('completeOnboarding promotes user to authenticated with display name', () async {
+    test('completeOnboarding promotes user to authenticated', () async {
       final controller = container.read(authControllerProvider.notifier);
 
-      await controller.signUp(email: 'new@example.com', password: 'password123');
+      await controller.createProfile(name: 'Test Profile');
       await controller.completeOnboarding(displayName: 'New Carer');
       await Future<void>.delayed(const Duration(milliseconds: 10));
 
@@ -86,44 +56,22 @@ void main() {
       expect(state.status, AuthStatus.authenticated);
       expect(state.user?.displayName, 'New Carer');
     });
+
+    test('selectProfile requires passcode to unlock', () async {
+      final controller = container.read(authControllerProvider.notifier);
+
+      await controller.createProfile(name: 'Protected', passcode: '123456');
+      await controller.signOut();
+      await controller.selectProfile(container.read(authControllerProvider).profiles.first.id);
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+
+      final lockedState = container.read(authControllerProvider);
+      expect(lockedState.status, AuthStatus.unauthenticated);
+
+      await controller.unlockWithPasscode('123456');
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      final unlockedState = container.read(authControllerProvider);
+      expect(unlockedState.status, AuthStatus.onboarding);
+    });
   });
-}
-
-class FakeCredentialsRepository implements CredentialsRepository {
-  StoredCredentials? _stored;
-  bool _rememberMe = false;
-  bool _biometricEnabled = false;
-
-  @override
-  Future<void> clearCredentials() async {
-    _stored = null;
-  }
-
-  @override
-  bool getBiometricEnabled() => _biometricEnabled;
-
-  @override
-  bool getRememberMeEnabled() => _rememberMe;
-
-  @override
-  Future<StoredCredentials?> readCredentials() async => _stored;
-
-  @override
-  Future<void> saveCredentials(StoredCredentials credentials) async {
-    _stored = credentials;
-  }
-
-  @override
-  Future<void> setBiometricEnabled(bool enabled) async {
-    _biometricEnabled = enabled;
-  }
-
-  @override
-  Future<void> setRememberMeEnabled(bool enabled) async {
-    _rememberMe = enabled;
-    if (!enabled) {
-      _biometricEnabled = false;
-      await clearCredentials();
-    }
-  }
 }

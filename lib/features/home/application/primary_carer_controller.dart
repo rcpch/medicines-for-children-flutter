@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/data/storage/primary_carer_local_data_source.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.dart';
+import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 import 'package:medicines_for_children_flutter/features/home/data/primary_carer_repository.dart';
 
 class PrimaryCarerState {
@@ -45,15 +46,30 @@ class PrimaryCarerController extends StateNotifier<PrimaryCarerState> {
       : _repository = _ref.read(primaryCarerRepositoryProvider),
         _localDataSource = _ref.read(primaryCarerLocalDataSourceProvider),
         super(const PrimaryCarerState()) {
-    unawaited(_hydrateFromCache());
+    _authSub = _ref.listen<AuthState>(
+      authControllerProvider,
+      (previous, next) => unawaited(_handleAuthChange(previous, next)),
+      fireImmediately: true,
+    );
   }
 
   final Ref _ref;
   final PrimaryCarerRepository _repository;
   final PrimaryCarerLocalDataSource _localDataSource;
+  ProviderSubscription<AuthState>? _authSub;
+  String? _activeProfileId;
 
-  Future<void> _hydrateFromCache() async {
-    final cached = _localDataSource.read();
+  Future<void> _handleAuthChange(AuthState? previous, AuthState next) async {
+    final profileId = next.user?.uid;
+    if (_activeProfileId == profileId) {
+      return;
+    }
+    _activeProfileId = profileId;
+    if (profileId == null) {
+      state = const PrimaryCarerState();
+      return;
+    }
+    final cached = _localDataSource.readForProfile(profileId);
     if (!mounted) {
       return;
     }
@@ -68,10 +84,18 @@ class PrimaryCarerController extends StateNotifier<PrimaryCarerState> {
   }
 
   Future<void> refresh() async {
+    final profileId = _activeProfileId;
+    if (profileId == null || profileId.isEmpty) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Select a profile to load your family data.',
+      );
+      return;
+    }
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final carer = await _repository.fetchPrimaryCarer();
-      await _localDataSource.write(carer);
+      await _localDataSource.writeForProfile(profileId, carer);
       if (!mounted) {
         return;
       }
@@ -93,10 +117,19 @@ class PrimaryCarerController extends StateNotifier<PrimaryCarerState> {
   }
 
   Future<void> clear() async {
-    await _localDataSource.clear();
+    final profileId = _activeProfileId;
+    if (profileId != null) {
+      await _localDataSource.clearForProfile(profileId);
+    }
     if (!mounted) {
       return;
     }
     state = const PrimaryCarerState();
+  }
+
+  @override
+  void dispose() {
+    _authSub?.close();
+    super.dispose();
   }
 }

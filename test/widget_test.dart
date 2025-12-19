@@ -17,15 +17,8 @@ void main() {
     TestWidgetsFlutterBinding.ensureInitialized();
     const config = AppConfig(
       environment: AppEnvironment.dev,
-      firebaseProjectId: 'test-project',
-      firebaseStorageBucket: 'test-bucket',
-      firebaseMessagingSenderId: '123',
-      firebaseAndroidAppId: 'android',
-      firebaseIosAppId: 'ios',
-      firebaseWebAppId: 'web',
       sharedScheduleApiBaseUrl: 'https://api',
       sharedScheduleApiKey: 'key',
-      enableFirebase: false,
     );
 
     SharedPreferences.setMockInitialValues({});
