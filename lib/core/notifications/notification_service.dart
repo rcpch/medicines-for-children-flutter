@@ -1,17 +1,20 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/schedule.dart';
+import 'package:medicines_for_children_flutter/core/notifications/notification_schedule_calculator.dart';
 import 'package:medicines_for_children_flutter/core/notifications/notification_store.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
-  NotificationService(this._store) : _plugin = FlutterLocalNotificationsPlugin();
+  NotificationService(this._store)
+      : _plugin = FlutterLocalNotificationsPlugin(),
+        _calculator = const NotificationScheduleCalculator();
 
   final NotificationStore _store;
   final FlutterLocalNotificationsPlugin _plugin;
+  final NotificationScheduleCalculator _calculator;
   bool _initialised = false;
 
   Future<void> ensureInitialized() async {
@@ -32,11 +35,16 @@ class NotificationService {
     await ensureInitialized();
     final ids = <int>[];
     for (final time in schedule.times) {
-      final scheduled = _nextInstance(schedule.startDate, time);
-      if (scheduled == null) {
+      final candidate = _calculator.nextInstance(
+        startDate: schedule.startDate,
+        timeString: time,
+        now: DateTime.now(),
+      );
+      if (candidate == null) {
         continue;
       }
-      final id = _notificationId(schedule.id, time);
+      final scheduled = tz.TZDateTime.from(candidate, tz.local);
+      final id = _calculator.notificationId(schedule.id, time);
       final details = NotificationDetails(
         android: AndroidNotificationDetails(
           'schedule_reminders',
@@ -89,35 +97,6 @@ class NotificationService {
         await _store.removeSchedule(entry.key);
       }
     }
-  }
-
-  tz.TZDateTime? _nextInstance(DateTime startDate, String timeString) {
-    final parsed = _parseTime(timeString);
-    if (parsed == null) {
-      return null;
-    }
-    final start = DateTime(startDate.year, startDate.month, startDate.day, parsed.hour, parsed.minute);
-    final now = DateTime.now();
-    final candidate = start.isAfter(now) ? start : DateTime(now.year, now.month, now.day, parsed.hour, parsed.minute);
-    return tz.TZDateTime.from(candidate, tz.local);
-  }
-
-  DateTime? _parseTime(String value) {
-    final sanitized = value.trim().toUpperCase();
-    final formats = ['HH:mm', 'H:mm', 'h:mma', 'hh:mma'];
-    for (final format in formats) {
-      try {
-        return DateFormat(format).parseStrict(sanitized);
-      } catch (_) {
-        continue;
-      }
-    }
-    return null;
-  }
-
-  int _notificationId(String scheduleId, String time) {
-    final raw = '$scheduleId-$time';
-    return raw.hashCode.abs() % 2147483647;
   }
 }
 

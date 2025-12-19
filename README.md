@@ -1,5 +1,5 @@
 # Medicines for Children · Flutter Port
-![Coverage](https://img.shields.io/badge/coverage-28.6%25-yellow)
+![Coverage](https://img.shields.io/badge/coverage-28.9%25-yellow)
 
 This repository hosts the Flutter implementation of the Medicines for Children mobile and web client. The build now targets **Milestone 2 (Local Profiles & Offline Shell)**: the auth/controller stack is implemented with local profiles, and guarded navigation with placeholder screens is available for iterative UX work.
 

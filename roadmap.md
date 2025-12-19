@@ -49,7 +49,7 @@
 	- [x] Add undo actions for mark-as-given/skipped actions; optionally sync changes if a backend is configured.
 	- [x] Expand unit tests to cover mutation success/failure.
 	- [ ] Add integration tests for CRUD flows and notification scheduling.
-	- [ ] Add unit tests for notification scheduling logic.
+	- [x] Add unit tests for notification scheduling logic.
 - **Gate**: QA script proves user can add medicine, create schedule, receive local reminder, mark administration; automated integration test (using `integration_test`) passes for CRUD flows.
 
 ## Milestone 5 – Sharing Centre & Backend API Integration
