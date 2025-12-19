@@ -21,6 +21,7 @@
 	- [x] Implement local profile repository (create/select/unlock via passcode).
 	- [x] Build authentication controller (Riverpod/Bloc) with states: `unauthenticated`, `authenticating`, `authenticated`, `error`.
 	- [x] Create routing shell using `go_router` with guarded branches for onboarding/login, primary app tabs, and secondary-carer deep links.
+	- Add multi-child support foundations (child picker, per-child storage/selection, shared schedule scoping, and UI routing updates).
 	- [x] Ship profile selection + create profile flows with validation, loading states, and Riverpod wiring.
 	- [x] Implement onboarding + signup flows using shared form widgets, Riverpod wiring, and local persistence for draft profiles.
 	- [x] Persist auth session and user metadata in shared preferences so the home shell boots with cached context.
@@ -63,7 +64,6 @@
 
 ## Milestone 6 – Quality, Compliance, and Release Readiness
 - **Technical steps**:
-	- Add multi-child support (child picker, per-child storage/selection, shared schedule scoping, and UI updates across Home/Medicines/Share Centre).
 	- Implement accessibility pass (semantic labels, large text support, high-contrast themes, screen-reader flows) and add automated `flutter_gherkin` or `integration_test` scripts covering critical journeys.
 	- Add privacy/legal surfaces (consent modals, privacy policy links, data deletion request entry point) and telemetry opt-in settings.
 	- Harden offline behaviour (cache last N days of schedules/medicines, queue mutations for retry) and add background sync service.
