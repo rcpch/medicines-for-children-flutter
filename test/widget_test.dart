@@ -9,9 +9,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/app/app.dart';
 import 'package:medicines_for_children_flutter/core/config/app_config.dart';
+import 'package:medicines_for_children_flutter/core/data/storage/shared_preferences_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   testWidgets('renders splash placeholder', (tester) async {
+    TestWidgetsFlutterBinding.ensureInitialized();
     const config = AppConfig(
       environment: AppEnvironment.dev,
       firebaseProjectId: 'test-project',
@@ -22,16 +25,23 @@ void main() {
       firebaseWebAppId: 'web',
       sharedScheduleApiBaseUrl: 'https://api',
       sharedScheduleApiKey: 'key',
+      enableFirebase: false,
     );
+
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [appConfigProvider.overrideWithValue(config)],
+        overrides: [
+          appConfigProvider.overrideWithValue(config),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+        ],
         child: const MedicinesApp(),
       ),
     );
 
     expect(find.text('Medicines for Children'), findsOneWidget);
-    expect(find.textContaining('bootstrap'), findsOneWidget);
+    expect(find.text('Flutter port bootstrap in progress'), findsOneWidget);
   });
 }

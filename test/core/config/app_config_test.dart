@@ -14,6 +14,7 @@ FIREBASE_IOS_APP_ID=ios-app
 FIREBASE_WEB_APP_ID=web-app
 SHARED_SCHEDULE_API_BASE_URL=https://api.test
 SHARED_SCHEDULE_API_KEY=test-key
+ENABLE_FIREBASE=true
 ''');
     });
 
@@ -23,6 +24,7 @@ SHARED_SCHEDULE_API_KEY=test-key
       expect(config.environment, AppEnvironment.dev);
       expect(config.firebaseProjectId, 'test-project');
       expect(config.sharedScheduleApiBaseUrl, 'https://api.test');
+      expect(config.enableFirebase, isTrue);
     });
   });
 }

@@ -1,6 +1,17 @@
 # Medicines for Children · Flutter Port
 
-This repository hosts the Flutter implementation of the Medicines for Children mobile and web client. The project is currently at **Milestone 0 (bootstrap)** with Firebase-ready dependencies, baseline routing, and tooling in place for future feature work.
+This repository hosts the Flutter implementation of the Medicines for Children mobile and web client. The build now targets **Milestone 2 (Authentication & App Shell)**: Milestones 0–1 (bootstrap + Firebase wiring) are complete, the auth domain/controller stack is implemented, and guarded navigation with placeholder screens is available for iterative UX work.
+
+## Current status
+
+- ✅ Tooling, env management, and Firebase configuration hooks are live.
+- ✅ Auth repository (Firebase + mock), Riverpod controller, and GoRouter guard redirect users between splash/login/onboarding/home.
+- ✅ Splash, onboarding, and home placeholders exercise the auth state machine, while the login screen now includes validated forms, loading states, and a built-in password reset trigger.
+- ✅ Dedicated signup and multi-step onboarding flows capture primary carer + first-child context, persist onboarding data locally, and promote users into the authenticated shell once complete.
+- ✅ Dev flavor auto-authenticates against the mock repository so you can work on inner UI without real credentials.
+- ✅ Remember-me credential caching and biometric quick login are wired via secure storage/local_auth for parity with the iOS baseline.
+- ✅ Primary carer data now hydrates from secure local cache so the home shell can render immediately while remote data refreshes in the background.
+- 🚧 Remaining Milestone 2 work: deeper Firebase-backed auth/data wiring plus secondary-carer deep links.
 
 ## Prerequisites
 
@@ -13,6 +24,9 @@ This repository hosts the Flutter implementation of the Medicines for Children m
 ```bash
 # install dependencies
 make get
+
+# (re)generate freezed/json_serializable outputs
+make gen
 
 # run format, analyzer and tests
 make format
@@ -31,7 +45,7 @@ make run-prod
 
 - `lib/app/` – app shell, router, configuration
 - `lib/core/` – cross-cutting utilities (theme, environment helpers, etc.)
-- `lib/features/` – feature modules (currently splash placeholder)
+- `lib/features/` – feature modules (splash, auth/login/onboarding/home placeholders, future pods)
 - `lib/bootstrap.dart` – top-level initialization entry point
 - `test/` – widget/unit tests seeded with a splash smoke test
 
@@ -44,6 +58,8 @@ Environment variables live under `env/.env.<flavor>`. Sample files with placehol
 - `env/.env.prod`
 
 Replace the placeholder values with your Firebase project IDs, storage buckets, and backend URLs (never commit secrets). Flavor-specific entrypoints in `lib/main_<flavor>.dart` load the corresponding file.
+
+- `ENABLE_FIREBASE` can be set to `false` (default for the dev file) to skip Firebase initialization so the shell runs before credentials are available. When disabled, the mock auth repository automatically signs in a placeholder carer so guarded navigation and inner screens can be exercised end-to-end.
 
 ### Firebase config
 
@@ -63,4 +79,6 @@ Replace the placeholder values with your Firebase project IDs, storage buckets, 
 
 ## Next steps
 
-Milestone 1 will focus on wiring Firebase environments, flavor configuration, and higher-level navigation scaffolding based on the specification in `roadmap.md`.
+- Finish Milestone 2 polish focused on Firebase-backed data hydration, session edge cases, and secondary-carer deep-link handling.
+- Add deep-link handling for secondary-carer tokens and expand tests per `roadmap.md`.
+- Move into Milestone 3 (read-only primary experience) once the auth shell is complete.

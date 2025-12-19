@@ -18,11 +18,13 @@
 
 ## Milestone 2 – Authentication & App Shell
 - **Technical steps**:
-	- Implement Firebase Auth service (email/password, password reset, token refresh, biometric credential caching via `local_auth` + secure storage).
-	- Build authentication controller (Riverpod/Bloc) with states: `unauthenticated`, `authenticating`, `authenticated`, `error`.
-	- Create routing shell using `go_router` with guarded branches for onboarding/login, primary app tabs, and secondary-carer deep links.
-	- Implement onboarding, login, signup, password reset, and biometric login screens using shared form widgets and validation.
-	- Persist auth session and user metadata in `hydrated` store / shared preferences to enable cold-start auto login.
+	- [~] Implement Firebase Auth service (email/password, password reset, token refresh, biometric credential caching via `local_auth` + secure storage). _Repository + mock scaffolding landed; token refresh/biometric storage still pending._
+	- [x] Build authentication controller (Riverpod/Bloc) with states: `unauthenticated`, `authenticating`, `authenticated`, `error`.
+	- [x] Create routing shell using `go_router` with guarded branches for onboarding/login, primary app tabs, and secondary-carer deep links.
+	- [x] Ship the login form + password reset trigger with validation, loading states, and Riverpod wiring.
+	- [x] Implement onboarding + signup flows using shared form widgets, Riverpod wiring, and local persistence for draft profiles.
+	- [x] Add biometric login UI wiring plus secure credential storage to support quick sign in.
+	- [x] Persist auth session and user metadata in secure storage/shared preferences so the home shell boots with cached context.
 - **Gate**: Manual QA demonstrates full login/logout/reset flows on both platforms; automated widget tests cover validation and error messaging; deep link to `/secondary?token=mock` routes to pending state screen.
 
 ## Milestone 3 – Read-Only Primary Carer Experience

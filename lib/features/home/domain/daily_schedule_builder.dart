@@ -1,0 +1,172 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:medicines_for_children_flutter/core/domain/models/administration.dart';
+import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
+import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';
+import 'package:medicines_for_children_flutter/core/domain/models/schedule.dart';
+
+final dailyScheduleBuilderProvider = Provider<DailyScheduleBuilder>((ref) {
+  return DailyScheduleBuilder();
+});
+
+class DailyScheduleEntry {
+  const DailyScheduleEntry({
+    required this.id,
+    required this.medicine,
+    required this.scheduledDateTime,
+    required this.timeLabel,
+    required this.status,
+    this.notes,
+  });
+
+  final String id;
+  final Medicine medicine;
+  final DateTime scheduledDateTime;
+  final String timeLabel;
+  final AdministrationStatus status;
+  final String? notes;
+
+  bool get isInPast => scheduledDateTime.isBefore(DateTime.now());
+  bool get isUpcoming => !isInPast;
+}
+
+class AsNeededAdministrationEntry {
+  const AsNeededAdministrationEntry({
+    required this.medicine,
+    required this.administration,
+  });
+
+  final Medicine medicine;
+  final Administration administration;
+}
+
+class DailyScheduleBuilder {
+  List<DailyScheduleEntry> buildScheduledEntries(Child child, DateTime date) {
+    final Map<String, Medicine> medicineById = {
+      for (final medicine in child.medicines) medicine.id: medicine,
+    };
+
+    final List<DailyScheduleEntry> entries = [];
+    final int weekdayIndex = (date.weekday - 1) % 7;
+    final DateTime dateOnly = _asDateOnly(date);
+
+    for (final schedule in child.schedules) {
+      if (!_isDateInRange(schedule, dateOnly)) {
+        continue;
+      }
+      if (schedule.weekdaysActive.isNotEmpty &&
+          (weekdayIndex >= schedule.weekdaysActive.length ||
+              !schedule.weekdaysActive[weekdayIndex])) {
+        continue;
+      }
+      final medicine = medicineById[schedule.medicineId];
+      if (medicine == null) {
+        continue;
+      }
+
+      for (final time in schedule.times) {
+        final scheduledDateTime = _merge(dateOnly, time);
+        if (scheduledDateTime == null) {
+          continue;
+        }
+        final matchingAdministration = _findAdministration(schedule, scheduledDateTime);
+        final status = matchingAdministration?.status ?? AdministrationStatus.scheduled;
+        entries.add(
+          DailyScheduleEntry(
+            id: '${schedule.id}-$time',
+            medicine: medicine,
+            scheduledDateTime: scheduledDateTime,
+            timeLabel: DateFormat.jm().format(scheduledDateTime),
+            status: status,
+            notes: matchingAdministration?.notes,
+          ),
+        );
+      }
+    }
+
+    entries.sort((a, b) => a.scheduledDateTime.compareTo(b.scheduledDateTime));
+    return entries;
+  }
+
+  List<AsNeededAdministrationEntry> buildAsNeededEntries(Child child, DateTime date) {
+    final Map<String, Medicine> medicineById = {
+      for (final medicine in child.medicines) medicine.id: medicine,
+    };
+    final DateTime startOfDay = _asDateOnly(date);
+    final DateTime endOfDay = startOfDay.add(const Duration(days: 1));
+    final List<AsNeededAdministrationEntry> entries = [];
+
+    for (final schedule in child.asNeededSchedules) {
+      final medicine = medicineById[schedule.medicineId];
+      if (medicine == null) {
+        continue;
+      }
+      for (final administration in schedule.administrations) {
+        if (!administration.dateTime.isBefore(startOfDay) &&
+          administration.dateTime.isBefore(endOfDay)) {
+          entries.add(
+            AsNeededAdministrationEntry(
+              medicine: medicine,
+              administration: administration,
+            ),
+          );
+        }
+      }
+    }
+
+    entries.sort(
+      (a, b) => b.administration.dateTime.compareTo(a.administration.dateTime),
+    );
+    return entries;
+  }
+
+  bool _isDateInRange(MedicineSchedule schedule, DateTime dateOnly) {
+    final DateTime start = _asDateOnly(schedule.startDate);
+    final DateTime end = _asDateOnly(schedule.endDate);
+    return !dateOnly.isBefore(start) && !dateOnly.isAfter(end);
+  }
+
+  DateTime? _merge(DateTime date, String timeString) {
+    final sanitized = timeString.trim().toUpperCase();
+    final List<String> patterns = ['HH:mm', 'H:mm', 'h:mma', 'hh:mma'];
+    for (final pattern in patterns) {
+      try {
+        final parsed = DateFormat(pattern).parseStrict(sanitized);
+        return DateTime(
+          date.year,
+          date.month,
+          date.day,
+          parsed.hour,
+          parsed.minute,
+        );
+      } catch (_) {
+        continue;
+      }
+    }
+    return null;
+  }
+
+  Administration? _findAdministration(
+    MedicineSchedule schedule,
+    DateTime scheduledDateTime,
+  ) {
+    for (final administration in schedule.administrations) {
+      if (_isSameMinute(administration.dateTime, scheduledDateTime)) {
+        return administration;
+      }
+    }
+    return null;
+  }
+
+  bool _isSameMinute(DateTime a, DateTime b) {
+    return a.year == b.year &&
+        a.month == b.month &&
+        a.day == b.day &&
+        a.hour == b.hour &&
+        a.minute == b.minute;
+  }
+
+  DateTime _asDateOnly(DateTime dateTime) {
+    return DateTime(dateTime.year, dateTime.month, dateTime.day);
+  }
+}
