@@ -36,6 +36,7 @@ void main() {
       final entries = [
         DailyScheduleEntry(
           id: 'one',
+          scheduleId: 'sched-1',
           medicine: child.medicines.first,
           scheduledDateTime: DateTime(2025, 1, 6, 8),
           timeLabel: '8:00 AM',
@@ -43,6 +44,7 @@ void main() {
         ),
         DailyScheduleEntry(
           id: 'two',
+          scheduleId: 'sched-1',
           medicine: child.medicines.first,
           scheduledDateTime: DateTime(2025, 1, 6, 13),
           timeLabel: '1:00 PM',
@@ -50,6 +52,7 @@ void main() {
         ),
         DailyScheduleEntry(
           id: 'three',
+          scheduleId: 'sched-1',
           medicine: child.medicines.first,
           scheduledDateTime: DateTime(2025, 1, 6, 22),
           timeLabel: '10:00 PM',
@@ -57,6 +60,7 @@ void main() {
         ),
         DailyScheduleEntry(
           id: 'four',
+          scheduleId: 'sched-1',
           medicine: child.medicines.first,
           scheduledDateTime: DateTime(2025, 1, 6, 1),
           timeLabel: '1:00 AM',

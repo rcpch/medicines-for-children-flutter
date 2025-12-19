@@ -12,6 +12,7 @@ final dailyScheduleBuilderProvider = Provider<DailyScheduleBuilder>((ref) {
 class DailyScheduleEntry {
   const DailyScheduleEntry({
     required this.id,
+    required this.scheduleId,
     required this.medicine,
     required this.scheduledDateTime,
     required this.timeLabel,
@@ -20,6 +21,7 @@ class DailyScheduleEntry {
   });
 
   final String id;
+  final String scheduleId;
   final Medicine medicine;
   final DateTime scheduledDateTime;
   final String timeLabel;
@@ -99,6 +101,7 @@ class DailyScheduleBuilder {
         entries.add(
           DailyScheduleEntry(
             id: '${schedule.id}-$time',
+            scheduleId: schedule.id,
             medicine: medicine,
             scheduledDateTime: scheduledDateTime,
             timeLabel: DateFormat.jm().format(scheduledDateTime),

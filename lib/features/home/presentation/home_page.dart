@@ -13,6 +13,7 @@ import 'package:medicines_for_children_flutter/core/notifications/notification_s
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
+import 'package:medicines_for_children_flutter/features/home/application/administration_controller.dart';
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_controller.dart';
 import 'package:medicines_for_children_flutter/features/home/application/selected_date_provider.dart';
 import 'package:medicines_for_children_flutter/features/home/domain/daily_schedule_builder.dart';
@@ -651,7 +652,7 @@ class _ScheduleSection extends StatelessWidget {
   }
 }
 
-class _ScheduleTile extends StatelessWidget {
+class _ScheduleTile extends ConsumerWidget {
   const _ScheduleTile({required this.entry});
 
   final DailyScheduleEntry entry;
@@ -680,8 +681,9 @@ class _ScheduleTile extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final adminState = ref.watch(administrationControllerProvider);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -703,23 +705,116 @@ class _ScheduleTile extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: _statusColor(context).withOpacity(0.12),
-              borderRadius: BorderRadius.circular(32),
-            ),
-            child: Text(
-              _statusLabel(),
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: _statusColor(context),
-                fontWeight: FontWeight.bold,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: _statusColor(context).withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(32),
+                ),
+                child: Text(
+                  _statusLabel(),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: _statusColor(context),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(height: 6),
+              if (entry.status == AdministrationStatus.scheduled)
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: adminState.isSaving
+                          ? null
+                          : () => _markStatus(
+                                context,
+                                ref,
+                                AdministrationStatus.given,
+                              ),
+                      child: const Text('Given'),
+                    ),
+                    TextButton(
+                      onPressed: adminState.isSaving
+                          ? null
+                          : () => _markStatus(
+                                context,
+                                ref,
+                                AdministrationStatus.skipped,
+                              ),
+                      child: const Text('Skip'),
+                    ),
+                  ],
+                )
+              else
+                TextButton(
+                  onPressed: adminState.isSaving ? null : () => _undo(context, ref),
+                  child: const Text('Undo'),
+                ),
+            ],
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _markStatus(
+    BuildContext context,
+    WidgetRef ref,
+    AdministrationStatus status,
+  ) async {
+    final controller = ref.read(administrationControllerProvider.notifier);
+    final success = await controller.markScheduled(
+      scheduleId: entry.scheduleId,
+      dateTime: entry.scheduledDateTime,
+      status: status,
+    );
+    if (!context.mounted) {
+      return;
+    }
+    final message = status == AdministrationStatus.given ? 'Marked as given.' : 'Marked as skipped.';
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () => controller.undoScheduled(
+              scheduleId: entry.scheduleId,
+              dateTime: entry.scheduledDateTime,
+            ),
+          ),
+        ),
+      );
+    } else {
+      final error = ref.read(administrationControllerProvider).errorMessage;
+      if (error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      }
+    }
+  }
+
+  Future<void> _undo(BuildContext context, WidgetRef ref) async {
+    final controller = ref.read(administrationControllerProvider.notifier);
+    final success = await controller.undoScheduled(
+      scheduleId: entry.scheduleId,
+      dateTime: entry.scheduledDateTime,
+    );
+    if (!context.mounted) {
+      return;
+    }
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Update undone.')),
+      );
+    } else {
+      final error = ref.read(administrationControllerProvider).errorMessage;
+      if (error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      }
+    }
   }
 }
 

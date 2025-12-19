@@ -5,7 +5,7 @@
 	- [x] Initialize Flutter project (`flutter create medicines_for_children`) with sound null safety, Riverpod/Bloc-ready structure, and separate `lib/app`, `lib/features`, `lib/core` directories.
 	- [x] Add core dependencies (dio/http client, intl, freezed/json_serializable, flutter_local_notifications, go_router, shared_preferences, device_info_plus, cryptography, file_selector) and configure build flavors (`dev`, `staging`, `prod`).
 	- [x] Set up Melos or mono-repo tooling if needed, add Makefile/justfile with commands for `analyze`, `test`, `format`, `lint`.
-	- [ ] Configure CI pipeline (GitHub Actions) to run `flutter analyze`, `flutter test`, `flutter build apk --debug` on every pull request.
+	- [x] Configure CI pipeline (GitHub Actions) to run `flutter analyze`, `flutter test`, `flutter build apk --debug` on every pull request.
 - **Gate**: `main` branch build passes CI with green analyze/test status; repo contains README explaining run/build steps.
 
 ## Milestone 1 – Local Profiles + Environment Wiring
@@ -44,8 +44,10 @@
 	- [x] Build forms: AddSchedule, EditSchedule with validation (dosage, frequency, dates).
 	- [x] Build form: AsNeededRecord; include contextual help and validation.
 	- [x] Integrate `flutter_local_notifications` + timezone package to schedule reminders per recurrence; persist metadata in local store so reminders survive restarts.
-	- Add undo/confirmation dialogs for mark-as-given/skipped actions; optionally sync changes if a backend is configured.
-	- Expand unit/integration tests to cover mutation success/failure, optimistic rollback, and notification scheduling logic.
+	- [x] Add undo actions for mark-as-given/skipped actions; optionally sync changes if a backend is configured.
+	- [x] Expand unit tests to cover mutation success/failure.
+	- [ ] Add integration tests for CRUD flows and notification scheduling.
+	- [ ] Add unit tests for notification scheduling logic.
 - **Gate**: QA script proves user can add medicine, create schedule, receive local reminder, mark administration; automated integration test (using `integration_test`) passes for CRUD flows.
 
 ## Milestone 5 – Sharing Centre & Backend API Integration
