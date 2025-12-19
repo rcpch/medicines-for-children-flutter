@@ -23,7 +23,13 @@ class NotificationService {
     }
     tz.initializeTimeZones();
     const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initSettings = InitializationSettings(android: androidSettings);
+    const linuxSettings = LinuxInitializationSettings(
+      defaultActionName: 'Open notification',
+    );
+    const initSettings = InitializationSettings(
+      android: androidSettings,
+      linux: linuxSettings,
+    );
     await _plugin.initialize(initSettings);
     _initialised = true;
   }

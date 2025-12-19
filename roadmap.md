@@ -50,6 +50,7 @@
 	- [x] Expand unit tests to cover mutation success/failure.
 	- [~] Add integration tests for CRUD flows and notification scheduling.
 	- [x] Add integration test for medicine + schedule creation flow (notifications disabled).
+	- [x] Add integration test for schedule creation with notification metadata.
 	- [x] Add unit tests for notification scheduling logic.
 - **Gate**: QA script proves user can add medicine, create schedule, receive local reminder, mark administration; automated integration test (using `integration_test`) passes for CRUD flows.
 
