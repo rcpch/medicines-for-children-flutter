@@ -6,6 +6,9 @@ part 'medicine.g.dart';
 @JsonEnum()
 enum MedicineType { everyday, asNeeded, both }
 
+@JsonEnum()
+enum MedicineStatus { inUse, noLongerUsed }
+
 @freezed
 abstract class Medicine with _$Medicine {
   const factory Medicine({
@@ -17,6 +20,7 @@ abstract class Medicine with _$Medicine {
     required String doseUnit,
     required String route,
     required String frequency,
+    @Default(MedicineStatus.inUse) MedicineStatus status,
     String? notes,
     String? photoUrl,
     @Default(<String>[]) List<String> photoUrls,

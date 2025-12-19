@@ -8,6 +8,7 @@ import 'package:medicines_for_children_flutter/features/auth/presentation/signup
 import 'package:medicines_for_children_flutter/features/child_profile/presentation/child_profile_page.dart';
 import 'package:medicines_for_children_flutter/features/home/presentation/home_page.dart';
 import 'package:medicines_for_children_flutter/features/medicines/presentation/medicine_detail_page.dart';
+import 'package:medicines_for_children_flutter/features/medicines/presentation/medicine_form_page.dart';
 import 'package:medicines_for_children_flutter/features/medicines/presentation/medicines_page.dart';
 import 'package:medicines_for_children_flutter/features/onboarding/presentation/onboarding_page.dart';
 import 'package:medicines_for_children_flutter/features/shared_schedule/presentation/shared_schedule_link_page.dart';
@@ -24,7 +25,9 @@ enum AppRoute {
   onboarding('/onboarding'),
   home('/home'),
   medicines('/medicines'),
+  addMedicine('add'),
   medicineDetail(':medicineId'),
+  editMedicine('edit'),
   childProfile('/child-profile'),
   sharedScheduleLink('/auth/:token'),
   sharedSchedule('/shared-schedule/:apiId');
@@ -79,11 +82,25 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => const MedicinesPage(),
                 routes: [
                   GoRoute(
+                    path: AppRoute.addMedicine.path,
+                    name: AppRoute.addMedicine.name,
+                    builder: (context, state) => const MedicineFormPage(),
+                  ),
+                  GoRoute(
                     path: AppRoute.medicineDetail.path,
                     name: AppRoute.medicineDetail.name,
                     builder: (context, state) => MedicineDetailPage(
                       medicineId: state.pathParameters['medicineId'] ?? '',
                     ),
+                    routes: [
+                      GoRoute(
+                        path: AppRoute.editMedicine.path,
+                        name: AppRoute.editMedicine.name,
+                        builder: (context, state) => MedicineFormPage(
+                          medicineId: state.pathParameters['medicineId'] ?? '',
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

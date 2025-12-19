@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/core/domain/active_child_provider.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';
 import 'package:medicines_for_children_flutter/core/platform/image_provider.dart';
+import 'package:medicines_for_children_flutter/features/medicines/application/medicine_editor_controller.dart';
 
 class MedicineDetailPage extends ConsumerWidget {
   const MedicineDetailPage({super.key, required this.medicineId});
@@ -41,11 +44,38 @@ class MedicineDetailPage extends ConsumerWidget {
     final photos = _resolvePhotos(medicine);
 
     return Scaffold(
-      appBar: AppBar(title: Text(medicine.name)),
+      appBar: AppBar(
+        title: Text(medicine.name),
+        actions: [
+          IconButton(
+            tooltip: 'Edit medicine',
+            icon: const Icon(Icons.edit_outlined),
+            onPressed: () {
+              context.goNamed(
+                AppRoute.editMedicine.name,
+                pathParameters: {'medicineId': medicine.id},
+              );
+            },
+          ),
+          IconButton(
+            tooltip: 'Archive medicine',
+            icon: const Icon(Icons.archive_outlined),
+            onPressed: () => _archiveMedicine(context, ref, medicine),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            if (medicine.status == MedicineStatus.noLongerUsed)
+              Card(
+                color: Theme.of(context).colorScheme.surfaceVariant,
+                child: const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Text('This medicine is archived and no longer in active use.'),
+                ),
+              ),
             MedicinePhotoGallery(photos: photos),
             const SizedBox(height: 16),
             _SectionCard(
@@ -111,6 +141,52 @@ class MedicineDetailPage extends ConsumerWidget {
         return 'As-needed medicine';
       case MedicineType.both:
         return 'Everyday + as-needed';
+    }
+  }
+
+  Future<void> _archiveMedicine(
+    BuildContext context,
+    WidgetRef ref,
+    Medicine medicine,
+  ) async {
+    final shouldArchive = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Archive medicine?'),
+            content: const Text('This medicine will be moved to archived history.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Archive'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+
+    if (!shouldArchive) {
+      return;
+    }
+
+    final controller = ref.read(medicineEditorControllerProvider.notifier);
+    final success = await controller.archiveMedicine(medicine.id);
+    if (!context.mounted) {
+      return;
+    }
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Medicine archived.')),
+      );
+      context.pop();
+    } else {
+      final message = ref.read(medicineEditorControllerProvider).errorMessage;
+      if (message != null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      }
     }
   }
 }

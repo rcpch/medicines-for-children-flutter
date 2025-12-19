@@ -44,6 +44,11 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Medicines')),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.goNamed(AppRoute.addMedicine.name),
+        icon: const Icon(Icons.add),
+        label: const Text('Add medicine'),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -111,6 +116,9 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
 
   List<Medicine> _filterMedicines(List<Medicine> medicines) {
     return medicines.where((medicine) {
+      if (medicine.status == MedicineStatus.noLongerUsed) {
+        return false;
+      }
       switch (_filter) {
         case MedicineFilter.everyday:
           return medicine.type == MedicineType.everyday || medicine.type == MedicineType.both;

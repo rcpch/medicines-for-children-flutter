@@ -15,6 +15,9 @@ _Medicine _$MedicineFromJson(Map<String, dynamic> json) => _Medicine(
   doseUnit: json['doseUnit'] as String,
   route: json['route'] as String,
   frequency: json['frequency'] as String,
+  status:
+      $enumDecodeNullable(_$MedicineStatusEnumMap, json['status']) ??
+      MedicineStatus.inUse,
   notes: json['notes'] as String?,
   photoUrl: json['photoUrl'] as String?,
   photoUrls:
@@ -31,6 +34,7 @@ Map<String, dynamic> _$MedicineToJson(_Medicine instance) => <String, dynamic>{
   'doseUnit': instance.doseUnit,
   'route': instance.route,
   'frequency': instance.frequency,
+  'status': _$MedicineStatusEnumMap[instance.status]!,
   'notes': instance.notes,
   'photoUrl': instance.photoUrl,
   'photoUrls': instance.photoUrls,
@@ -40,4 +44,9 @@ const _$MedicineTypeEnumMap = {
   MedicineType.everyday: 'everyday',
   MedicineType.asNeeded: 'asNeeded',
   MedicineType.both: 'both',
+};
+
+const _$MedicineStatusEnumMap = {
+  MedicineStatus.inUse: 'inUse',
+  MedicineStatus.noLongerUsed: 'noLongerUsed',
 };

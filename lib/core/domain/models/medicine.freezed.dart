@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Medicine {
 
- String get id; String get name; String get alias; MedicineType get type; String get dose; String get doseUnit; String get route; String get frequency; String? get notes; String? get photoUrl; List<String> get photoUrls;
+ String get id; String get name; String get alias; MedicineType get type; String get dose; String get doseUnit; String get route; String get frequency; MedicineStatus get status; String? get notes; String? get photoUrl; List<String> get photoUrls;
 /// Create a copy of Medicine
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $MedicineCopyWith<Medicine> get copyWith => _$MedicineCopyWithImpl<Medicine>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Medicine&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.alias, alias) || other.alias == alias)&&(identical(other.type, type) || other.type == type)&&(identical(other.dose, dose) || other.dose == dose)&&(identical(other.doseUnit, doseUnit) || other.doseUnit == doseUnit)&&(identical(other.route, route) || other.route == route)&&(identical(other.frequency, frequency) || other.frequency == frequency)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.photoUrl, photoUrl) || other.photoUrl == photoUrl)&&const DeepCollectionEquality().equals(other.photoUrls, photoUrls));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Medicine&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.alias, alias) || other.alias == alias)&&(identical(other.type, type) || other.type == type)&&(identical(other.dose, dose) || other.dose == dose)&&(identical(other.doseUnit, doseUnit) || other.doseUnit == doseUnit)&&(identical(other.route, route) || other.route == route)&&(identical(other.frequency, frequency) || other.frequency == frequency)&&(identical(other.status, status) || other.status == status)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.photoUrl, photoUrl) || other.photoUrl == photoUrl)&&const DeepCollectionEquality().equals(other.photoUrls, photoUrls));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,alias,type,dose,doseUnit,route,frequency,notes,photoUrl,const DeepCollectionEquality().hash(photoUrls));
+int get hashCode => Object.hash(runtimeType,id,name,alias,type,dose,doseUnit,route,frequency,status,notes,photoUrl,const DeepCollectionEquality().hash(photoUrls));
 
 @override
 String toString() {
-  return 'Medicine(id: $id, name: $name, alias: $alias, type: $type, dose: $dose, doseUnit: $doseUnit, route: $route, frequency: $frequency, notes: $notes, photoUrl: $photoUrl, photoUrls: $photoUrls)';
+  return 'Medicine(id: $id, name: $name, alias: $alias, type: $type, dose: $dose, doseUnit: $doseUnit, route: $route, frequency: $frequency, status: $status, notes: $notes, photoUrl: $photoUrl, photoUrls: $photoUrls)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $MedicineCopyWith<$Res>  {
   factory $MedicineCopyWith(Medicine value, $Res Function(Medicine) _then) = _$MedicineCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String alias, MedicineType type, String dose, String doseUnit, String route, String frequency, String? notes, String? photoUrl, List<String> photoUrls
+ String id, String name, String alias, MedicineType type, String dose, String doseUnit, String route, String frequency, MedicineStatus status, String? notes, String? photoUrl, List<String> photoUrls
 });
 
 
@@ -65,7 +65,7 @@ class _$MedicineCopyWithImpl<$Res>
 
 /// Create a copy of Medicine
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? alias = null,Object? type = null,Object? dose = null,Object? doseUnit = null,Object? route = null,Object? frequency = null,Object? notes = freezed,Object? photoUrl = freezed,Object? photoUrls = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? alias = null,Object? type = null,Object? dose = null,Object? doseUnit = null,Object? route = null,Object? frequency = null,Object? status = null,Object? notes = freezed,Object? photoUrl = freezed,Object? photoUrls = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -75,7 +75,8 @@ as MedicineType,dose: null == dose ? _self.dose : dose // ignore: cast_nullable_
 as String,doseUnit: null == doseUnit ? _self.doseUnit : doseUnit // ignore: cast_nullable_to_non_nullable
 as String,route: null == route ? _self.route : route // ignore: cast_nullable_to_non_nullable
 as String,frequency: null == frequency ? _self.frequency : frequency // ignore: cast_nullable_to_non_nullable
-as String,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as MedicineStatus,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,photoUrl: freezed == photoUrl ? _self.photoUrl : photoUrl // ignore: cast_nullable_to_non_nullable
 as String?,photoUrls: null == photoUrls ? _self.photoUrls : photoUrls // ignore: cast_nullable_to_non_nullable
 as List<String>,
@@ -163,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String alias,  MedicineType type,  String dose,  String doseUnit,  String route,  String frequency,  String? notes,  String? photoUrl,  List<String> photoUrls)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String alias,  MedicineType type,  String dose,  String doseUnit,  String route,  String frequency,  MedicineStatus status,  String? notes,  String? photoUrl,  List<String> photoUrls)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Medicine() when $default != null:
-return $default(_that.id,_that.name,_that.alias,_that.type,_that.dose,_that.doseUnit,_that.route,_that.frequency,_that.notes,_that.photoUrl,_that.photoUrls);case _:
+return $default(_that.id,_that.name,_that.alias,_that.type,_that.dose,_that.doseUnit,_that.route,_that.frequency,_that.status,_that.notes,_that.photoUrl,_that.photoUrls);case _:
   return orElse();
 
 }
@@ -184,10 +185,10 @@ return $default(_that.id,_that.name,_that.alias,_that.type,_that.dose,_that.dose
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String alias,  MedicineType type,  String dose,  String doseUnit,  String route,  String frequency,  String? notes,  String? photoUrl,  List<String> photoUrls)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String alias,  MedicineType type,  String dose,  String doseUnit,  String route,  String frequency,  MedicineStatus status,  String? notes,  String? photoUrl,  List<String> photoUrls)  $default,) {final _that = this;
 switch (_that) {
 case _Medicine():
-return $default(_that.id,_that.name,_that.alias,_that.type,_that.dose,_that.doseUnit,_that.route,_that.frequency,_that.notes,_that.photoUrl,_that.photoUrls);case _:
+return $default(_that.id,_that.name,_that.alias,_that.type,_that.dose,_that.doseUnit,_that.route,_that.frequency,_that.status,_that.notes,_that.photoUrl,_that.photoUrls);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -204,10 +205,10 @@ return $default(_that.id,_that.name,_that.alias,_that.type,_that.dose,_that.dose
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String alias,  MedicineType type,  String dose,  String doseUnit,  String route,  String frequency,  String? notes,  String? photoUrl,  List<String> photoUrls)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String alias,  MedicineType type,  String dose,  String doseUnit,  String route,  String frequency,  MedicineStatus status,  String? notes,  String? photoUrl,  List<String> photoUrls)?  $default,) {final _that = this;
 switch (_that) {
 case _Medicine() when $default != null:
-return $default(_that.id,_that.name,_that.alias,_that.type,_that.dose,_that.doseUnit,_that.route,_that.frequency,_that.notes,_that.photoUrl,_that.photoUrls);case _:
+return $default(_that.id,_that.name,_that.alias,_that.type,_that.dose,_that.doseUnit,_that.route,_that.frequency,_that.status,_that.notes,_that.photoUrl,_that.photoUrls);case _:
   return null;
 
 }
@@ -219,7 +220,7 @@ return $default(_that.id,_that.name,_that.alias,_that.type,_that.dose,_that.dose
 @JsonSerializable()
 
 class _Medicine implements Medicine {
-  const _Medicine({required this.id, required this.name, required this.alias, required this.type, required this.dose, required this.doseUnit, required this.route, required this.frequency, this.notes, this.photoUrl, final  List<String> photoUrls = const <String>[]}): _photoUrls = photoUrls;
+  const _Medicine({required this.id, required this.name, required this.alias, required this.type, required this.dose, required this.doseUnit, required this.route, required this.frequency, this.status = MedicineStatus.inUse, this.notes, this.photoUrl, final  List<String> photoUrls = const <String>[]}): _photoUrls = photoUrls;
   factory _Medicine.fromJson(Map<String, dynamic> json) => _$MedicineFromJson(json);
 
 @override final  String id;
@@ -230,6 +231,7 @@ class _Medicine implements Medicine {
 @override final  String doseUnit;
 @override final  String route;
 @override final  String frequency;
+@override@JsonKey() final  MedicineStatus status;
 @override final  String? notes;
 @override final  String? photoUrl;
  final  List<String> _photoUrls;
@@ -253,16 +255,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Medicine&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.alias, alias) || other.alias == alias)&&(identical(other.type, type) || other.type == type)&&(identical(other.dose, dose) || other.dose == dose)&&(identical(other.doseUnit, doseUnit) || other.doseUnit == doseUnit)&&(identical(other.route, route) || other.route == route)&&(identical(other.frequency, frequency) || other.frequency == frequency)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.photoUrl, photoUrl) || other.photoUrl == photoUrl)&&const DeepCollectionEquality().equals(other._photoUrls, _photoUrls));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Medicine&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.alias, alias) || other.alias == alias)&&(identical(other.type, type) || other.type == type)&&(identical(other.dose, dose) || other.dose == dose)&&(identical(other.doseUnit, doseUnit) || other.doseUnit == doseUnit)&&(identical(other.route, route) || other.route == route)&&(identical(other.frequency, frequency) || other.frequency == frequency)&&(identical(other.status, status) || other.status == status)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.photoUrl, photoUrl) || other.photoUrl == photoUrl)&&const DeepCollectionEquality().equals(other._photoUrls, _photoUrls));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,alias,type,dose,doseUnit,route,frequency,notes,photoUrl,const DeepCollectionEquality().hash(_photoUrls));
+int get hashCode => Object.hash(runtimeType,id,name,alias,type,dose,doseUnit,route,frequency,status,notes,photoUrl,const DeepCollectionEquality().hash(_photoUrls));
 
 @override
 String toString() {
-  return 'Medicine(id: $id, name: $name, alias: $alias, type: $type, dose: $dose, doseUnit: $doseUnit, route: $route, frequency: $frequency, notes: $notes, photoUrl: $photoUrl, photoUrls: $photoUrls)';
+  return 'Medicine(id: $id, name: $name, alias: $alias, type: $type, dose: $dose, doseUnit: $doseUnit, route: $route, frequency: $frequency, status: $status, notes: $notes, photoUrl: $photoUrl, photoUrls: $photoUrls)';
 }
 
 
@@ -273,7 +275,7 @@ abstract mixin class _$MedicineCopyWith<$Res> implements $MedicineCopyWith<$Res>
   factory _$MedicineCopyWith(_Medicine value, $Res Function(_Medicine) _then) = __$MedicineCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String alias, MedicineType type, String dose, String doseUnit, String route, String frequency, String? notes, String? photoUrl, List<String> photoUrls
+ String id, String name, String alias, MedicineType type, String dose, String doseUnit, String route, String frequency, MedicineStatus status, String? notes, String? photoUrl, List<String> photoUrls
 });
 
 
@@ -290,7 +292,7 @@ class __$MedicineCopyWithImpl<$Res>
 
 /// Create a copy of Medicine
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? alias = null,Object? type = null,Object? dose = null,Object? doseUnit = null,Object? route = null,Object? frequency = null,Object? notes = freezed,Object? photoUrl = freezed,Object? photoUrls = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? alias = null,Object? type = null,Object? dose = null,Object? doseUnit = null,Object? route = null,Object? frequency = null,Object? status = null,Object? notes = freezed,Object? photoUrl = freezed,Object? photoUrls = null,}) {
   return _then(_Medicine(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -300,7 +302,8 @@ as MedicineType,dose: null == dose ? _self.dose : dose // ignore: cast_nullable_
 as String,doseUnit: null == doseUnit ? _self.doseUnit : doseUnit // ignore: cast_nullable_to_non_nullable
 as String,route: null == route ? _self.route : route // ignore: cast_nullable_to_non_nullable
 as String,frequency: null == frequency ? _self.frequency : frequency // ignore: cast_nullable_to_non_nullable
-as String,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as MedicineStatus,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,photoUrl: freezed == photoUrl ? _self.photoUrl : photoUrl // ignore: cast_nullable_to_non_nullable
 as String?,photoUrls: null == photoUrls ? _self._photoUrls : photoUrls // ignore: cast_nullable_to_non_nullable
 as List<String>,

@@ -2,18 +2,18 @@
 
 ## Milestone 0 – Repository Bootstrap
 - **Technical steps**:
-	- Initialize Flutter project (`flutter create medicines_for_children`) with sound null safety, Riverpod/Bloc-ready structure, and separate `lib/app`, `lib/features`, `lib/core` directories.
-	- Add core dependencies (dio/http client, intl, freezed/json_serializable, flutter_local_notifications, go_router, shared_preferences, device_info_plus, cryptography, file_selector) and configure build flavors (`dev`, `staging`, `prod`).
-	- Set up Melos or mono-repo tooling if needed, add Makefile/justfile with commands for `analyze`, `test`, `format`, `lint`.
-	- Configure CI pipeline (GitHub Actions) to run `flutter analyze`, `flutter test`, `flutter build apk --debug` on every pull request.
+	- [x] Initialize Flutter project (`flutter create medicines_for_children`) with sound null safety, Riverpod/Bloc-ready structure, and separate `lib/app`, `lib/features`, `lib/core` directories.
+	- [x] Add core dependencies (dio/http client, intl, freezed/json_serializable, flutter_local_notifications, go_router, shared_preferences, device_info_plus, cryptography, file_selector) and configure build flavors (`dev`, `staging`, `prod`).
+	- [x] Set up Melos or mono-repo tooling if needed, add Makefile/justfile with commands for `analyze`, `test`, `format`, `lint`.
+	- [ ] Configure CI pipeline (GitHub Actions) to run `flutter analyze`, `flutter test`, `flutter build apk --debug` on every pull request.
 - **Gate**: `main` branch build passes CI with green analyze/test status; repo contains README explaining run/build steps.
 
 ## Milestone 1 – Local Profiles + Environment Wiring
 - **Technical steps**:
-	- Implement secure config loader for API keys (shared-schedule API key, backend base URL) using `flutter_dotenv` + per-flavor `.env` files kept out of git.
-	- Implement local profile storage (JSON blob per profile) with optional passcode hashing.
-	- Add encrypted export/import (passphrase-based) for user-controlled backups.
-	- Build mocked data sources for unit testing (in-memory repos returning fake child/medicine/schedule data).
+	- [x] Implement secure config loader for API keys (shared-schedule API key, backend base URL) using `flutter_dotenv` + per-flavor `.env` files kept out of git.
+	- [x] Implement local profile storage (JSON blob per profile) with optional passcode hashing.
+	- [x] Add encrypted export/import (passphrase-based) for user-controlled backups.
+	- [x] Build mocked data sources for unit testing (in-memory repos returning fake child/medicine/schedule data).
 - **Gate**: Running `flutter test` executes data-layer unit tests; app boots to placeholder home without any backend configured on both iOS simulator and Android emulator.
 
 ## Milestone 2 – Local Profiles & App Shell
@@ -37,8 +37,10 @@
 
 ## Milestone 4 – Data Authoring & Notifications
 - **Technical steps**:
-	- Implement mutations for medicines (create/update/archive) and schedules (CRUD + as-needed administrations) with optimistic UI updates and rollback on failure.
-	- Build forms: AddMedicine, EditMedicine, AddSchedule, EditSchedule, AsNeededRecord; include contextual help and validation (dosage, frequency, dates).
+	- [x] Implement mutations for medicines (create/update/archive).
+	- [ ] Implement mutations for schedules (CRUD + as-needed administrations) with optimistic UI updates and rollback on failure.
+	- [x] Build forms: AddMedicine, EditMedicine with validation (dosage, frequency).
+	- [ ] Build forms: AddSchedule, EditSchedule, AsNeededRecord; include contextual help and validation (dosage, frequency, dates).
 	- Integrate `flutter_local_notifications` + timezone package to schedule reminders per recurrence; persist metadata in local store so reminders survive restarts.
 	- Add undo/confirmation dialogs for mark-as-given/skipped actions; optionally sync changes if a backend is configured.
 	- Expand unit/integration tests to cover mutation success/failure, optimistic rollback, and notification scheduling logic.
