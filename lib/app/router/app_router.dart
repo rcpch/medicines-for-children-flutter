@@ -11,6 +11,7 @@ import 'package:medicines_for_children_flutter/features/medicines/presentation/m
 import 'package:medicines_for_children_flutter/features/medicines/presentation/medicine_form_page.dart';
 import 'package:medicines_for_children_flutter/features/medicines/presentation/medicines_page.dart';
 import 'package:medicines_for_children_flutter/features/onboarding/presentation/onboarding_page.dart';
+import 'package:medicines_for_children_flutter/features/schedules/presentation/schedule_form_page.dart';
 import 'package:medicines_for_children_flutter/features/shared_schedule/presentation/shared_schedule_link_page.dart';
 import 'package:medicines_for_children_flutter/features/shared_schedule/presentation/shared_schedule_page.dart';
 import 'package:medicines_for_children_flutter/features/splash/presentation/splash_page.dart';
@@ -24,6 +25,7 @@ enum AppRoute {
   signup('/signup'),
   onboarding('/onboarding'),
   home('/home'),
+  addSchedule('schedule/add'),
   medicines('/medicines'),
   addMedicine('add'),
   medicineDetail(':medicineId'),
@@ -71,6 +73,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: AppRoute.home.path,
                 name: AppRoute.home.name,
                 builder: (context, state) => const HomePage(),
+                routes: [
+                  GoRoute(
+                    path: AppRoute.addSchedule.path,
+                    name: AppRoute.addSchedule.name,
+                    builder: (context, state) => const ScheduleFormPage(),
+                  ),
+                ],
               ),
             ],
           ),

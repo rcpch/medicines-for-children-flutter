@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:medicines_for_children_flutter/core/data/backup/backup_service.dart';
 import 'package:medicines_for_children_flutter/core/platform/backup_file_io.dart';
@@ -9,6 +10,7 @@ import 'package:medicines_for_children_flutter/core/domain/models/administration
 import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
+import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_controller.dart';
 import 'package:medicines_for_children_flutter/features/home/application/selected_date_provider.dart';
@@ -66,6 +68,9 @@ class HomePage extends ConsumerWidget {
             telemetry.trackEvent('home_date_selected', properties: {
               'date': DateFormat('yyyy-MM-dd').format(date),
             });
+          },
+          onAddSchedule: () {
+            context.goNamed(AppRoute.addSchedule.name);
           },
         ),
       ),
@@ -357,6 +362,7 @@ class _HomeBody extends StatelessWidget {
     required this.dailyScheduleBuilder,
     required this.selectedDate,
     required this.onSelectDate,
+    required this.onAddSchedule,
   });
 
   final PrimaryCarerState state;
@@ -365,6 +371,7 @@ class _HomeBody extends StatelessWidget {
   final DailyScheduleBuilder dailyScheduleBuilder;
   final DateTime selectedDate;
   final ValueChanged<DateTime> onSelectDate;
+  final VoidCallback onAddSchedule;
 
   @override
   Widget build(BuildContext context) {
@@ -429,6 +436,7 @@ class _HomeBody extends StatelessWidget {
             _ScheduleSection(
               sections: timeOfDaySections,
               isLoading: state.isLoading,
+              onAddSchedule: onAddSchedule,
             ),
             const SizedBox(height: 16),
             _AsNeededSection(
@@ -561,10 +569,12 @@ class _ScheduleSection extends StatelessWidget {
   const _ScheduleSection({
     required this.sections,
     required this.isLoading,
+    required this.onAddSchedule,
   });
 
   final List<TimeOfDaySection> sections;
   final bool isLoading;
+  final VoidCallback onAddSchedule;
 
   @override
   Widget build(BuildContext context) {
@@ -577,9 +587,20 @@ class _ScheduleSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Today\'s schedule',
-              style: Theme.of(context).textTheme.titleMedium,
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Today\'s schedule',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: onAddSchedule,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add'),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             if (sections.every((section) => section.entries.isEmpty))
