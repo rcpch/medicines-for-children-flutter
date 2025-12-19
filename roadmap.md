@@ -21,7 +21,8 @@
 	- [x] Implement local profile repository (create/select/unlock via passcode).
 	- [x] Build authentication controller (Riverpod/Bloc) with states: `unauthenticated`, `authenticating`, `authenticated`, `error`.
 	- [x] Create routing shell using `go_router` with guarded branches for onboarding/login, primary app tabs, and secondary-carer deep links.
-	- Add multi-child support foundations (child picker, per-child storage/selection, shared schedule scoping, and UI routing updates).
+	- [~] Add multi-child support foundations (child picker, per-child storage/selection, shared schedule scoping, and UI routing updates).
+	- [x] Add child picker UI with per-profile child selection persistence.
 	- [x] Ship profile selection + create profile flows with validation, loading states, and Riverpod wiring.
 	- [x] Implement onboarding + signup flows using shared form widgets, Riverpod wiring, and local persistence for draft profiles.
 	- [x] Persist auth session and user metadata in shared preferences so the home shell boots with cached context.
