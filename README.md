@@ -1,23 +1,21 @@
 # Medicines for Children · Flutter Port
 
-This repository hosts the Flutter implementation of the Medicines for Children mobile and web client. The build now targets **Milestone 2 (Authentication & App Shell)**: Milestones 0–1 (bootstrap + Firebase wiring) are complete, the auth domain/controller stack is implemented, and guarded navigation with placeholder screens is available for iterative UX work.
+This repository hosts the Flutter implementation of the Medicines for Children mobile and web client. The build now targets **Milestone 2 (Local Profiles & Offline Shell)**: the auth/controller stack is implemented with local profiles, and guarded navigation with placeholder screens is available for iterative UX work.
 
 ## Current status
 
-- ✅ Tooling, env management, and Firebase configuration hooks are live.
-- ✅ Auth repository (Firebase + mock), Riverpod controller, and GoRouter guard redirect users between splash/login/onboarding/home.
-- ✅ Splash, onboarding, and home placeholders exercise the auth state machine, while the login screen now includes validated forms, loading states, and a built-in password reset trigger.
+- ✅ Tooling, env management, and offline-first profile storage are live.
+- ✅ Local profile repository + Riverpod controller + GoRouter guard redirect users between splash/login/onboarding/home.
+- ✅ Splash, onboarding, and home placeholders exercise the auth state machine, with profile selection + optional passcode gating.
 - ✅ Dedicated signup and multi-step onboarding flows capture primary carer + first-child context, persist onboarding data locally, and promote users into the authenticated shell once complete.
-- ✅ Dev flavor auto-authenticates against the mock repository so you can work on inner UI without real credentials.
-- ✅ Remember-me credential caching and biometric quick login are wired via secure storage/local_auth for parity with the iOS baseline.
-- ✅ Primary carer data now hydrates from secure local cache so the home shell can render immediately while remote data refreshes in the background.
-- 🚧 Remaining Milestone 2 work: deeper Firebase-backed auth/data wiring plus secondary-carer deep links.
+- ✅ Primary carer data hydrates from local storage so the home shell can render immediately.
+- ✅ Encrypted export/import supports offline backups that can be stored in personal cloud/USB/email.
+- 🚧 Remaining Milestone 2 work: deeper offline data editing and secondary-carer deep links.
 
 ## Prerequisites
 
 - Flutter 3.27.0+ with Dart 3.8+
 - Xcode 15 / Android Studio Iguana+ for platform builds
-- Firebase CLI (optional for emulator work)
 
 ## Quick start
 
@@ -57,18 +55,11 @@ Environment variables live under `env/.env.<flavor>`. Sample files with placehol
 - `env/.env.staging`
 - `env/.env.prod`
 
-Replace the placeholder values with your Firebase project IDs, storage buckets, and backend URLs (never commit secrets). Flavor-specific entrypoints in `lib/main_<flavor>.dart` load the corresponding file.
-
-- `ENABLE_FIREBASE` can be set to `false` (default for the dev file) to skip Firebase initialization so the shell runs before credentials are available. When disabled, the mock auth repository automatically signs in a placeholder carer so guarded navigation and inner screens can be exercised end-to-end.
-
-### Firebase config
-
-- Run `flutterfire configure` per environment and update `lib/firebase_options.dart` with the generated values.
-- Place the matching `google-services.json` under `android/app/src/<flavor>/` and `GoogleService-Info.plist` under `ios/Runner/` flavor folders once those are provisioned.
+Replace the placeholder values with your backend URLs and API keys (never commit secrets). Flavor-specific entrypoints in `lib/main_<flavor>.dart` load the corresponding file.
 
 ### API keys
 
-- `SHARED_SCHEDULE_API_BASE_URL` and `SHARED_SCHEDULE_API_KEY` map to the Firebase Functions backend described in `spec.md`.
+- `SHARED_SCHEDULE_API_BASE_URL` and `SHARED_SCHEDULE_API_KEY` map to the shared schedule backend described in `spec.md`.
 - The Dio client attaches the `ApiKey` header automatically via `securedApiClientProvider`.
 
 ## Tooling
@@ -79,6 +70,6 @@ Replace the placeholder values with your Firebase project IDs, storage buckets, 
 
 ## Next steps
 
-- Finish Milestone 2 polish focused on Firebase-backed data hydration, session edge cases, and secondary-carer deep-link handling.
+- Finish Milestone 2 polish focused on offline data editing, session edge cases, and secondary-carer deep-link handling.
 - Add deep-link handling for secondary-carer tokens and expand tests per `roadmap.md`.
 - Move into Milestone 3 (read-only primary experience) once the auth shell is complete.
