@@ -3,13 +3,14 @@
 ## User Roles and Authentication
 
 - **Primary carer (account owner)**
-  - Uses the native iOS app to manage one or more children, their medicines, schedules, and care network.
-  - Authenticates via Firebase Auth email/password.
+  - Uses the native iOS app and Flutter app to manage one or more children, their medicines, schedules, and care network.
+  - Authenticates locally via a device profile with an optional passcode (no mandatory backend).
   - Can:
-    - Register a new account and create their child’s profile.
+    - Create a local profile and onboard their child’s profile.
     - Add/edit medicines and schedules.
     - Set up secondary carers and shared schedules.
     - Export schedules as PDFs or digital links.
+    - Export an encrypted backup file for personal cloud/USB/email storage.
 
 - **Secondary carer (invited carer)**
   - Accesses a web-based schedule and information view via a unique link sent by the primary carer.
@@ -26,31 +27,20 @@
     - Token-based auth (“Authorization: token …”) for secondary-carer operations (viewing schedule, confirming, recording administrations).
   - **Action tokens** (one-time link tokens) are issued and validated by backend repositories for secure access to shared schedules.
 
-- **Registration and onboarding (primary carer, iOS app)**
+- **Registration and onboarding (primary carer, Flutter app)**
   - **Signup flow**:
-    - User provides email/password to create a Firebase Auth user.
+    - User creates a local profile (name + optional passcode).
     - A guided onboarding flow collects primary carer profile (name, relationship, contact numbers) and initial child data (name, DOB, condition, allergies, etc.).
-    - Data is written into Firestore:
-      - A `user` document keyed by primary carer email for carer details.
-      - A  subdocument (“0”, “1”, …) under that user for each child.
+    - Data is written into a local, offline-first JSON store scoped to the profile.
   - **Onboarding screens** explain app purpose and set up the first child before reaching the home screen.
 
-- **Login / logout / password reset (iOS)**
+- **Login / logout (Flutter)**
   - **Login**:
-    - Email + password form using Firebase Auth `signIn`.
-    - On success, app loads:
-      - Primary carer profile.
-      - Children list (focusing heavily on child index 0).
-      - That child’s medicines and schedules.
-    - Email and password can be stored in local preferences to support faster future logins.
-  - **Biometric login**:
-    - If the device supports Touch ID / Face ID, user can authenticate with biometrics.
-    - On success, previously stored email/password are reused to sign in.
-  - **Password reset**:
-    - Login screen allows triggering a Firebase password reset email by entering an email address.
-    - User is shown success/failure messages based on Firebase’s response.
+    - Profile picker lists local profiles on this device.
+    - If a profile has a passcode, the user unlocks it locally.
+    - On success, app loads locally stored profile data (primary carer, children, medicines, schedules).
   - **Logout**:
-    - Not explicitly seen, but likely present in profile/settings; functionally it clears session state (loggedIn flag, stored credentials) and returns user to login.
+    - Clears the active profile selection and returns to the profile picker.
 
 - **Secondary carer web auth flow**
   - Secondary carer receives a **link containing a token** parameter.
@@ -77,8 +67,8 @@
 ### PrimaryCarer
 
 - **Represents**: The main account holder and legal guardian who manages the child’s medicines and care network.
-- **Key fields (iOS model + backend WcUser + Firestore)**
-  - Identification: `firebaseid` (user-UID), email (document ID), optional profile image path.
+- **Key fields (Flutter local model)**
+  - Identification: local profile ID, optional email, optional profile image path.
   - Personal: , , `childRelationship` (e.g. parent, guardian).
   - Contact: `mobilenumber`, `homenumber`, `worknumber`.
   - Relationships:
@@ -90,7 +80,7 @@
 ### Child
 
 - **Represents**: A child whose medications and care schedule are being managed.
-- **Key fields (iOS and backend)**
+- **Key fields (Flutter local model)**
   - Personal: , , `dob`, , `ageMonths`, , .
   - Medical:  (main condition/diagnosis), , ,  (important notes),  (personal preferences/notes), `nhs_number`.
   - Media:  for child photo.
@@ -100,13 +90,13 @@
   - `asNeededSchedules`: dictionary keyed by medicine ID → AsNeededSchedule.
   - `carers`: list of Carer entries (secondary carers who are part of the care network).
   - `sharedSchedules`: list of SharedSchedule objects representing sharing sessions with secondary carers.
-  - Backend side: each Child is a document under `user/{primaryEmail}/children/{childIndex}` with the above data, and subcollections for medicines, schedule, administered, and asneeded.
+  - Stored locally per profile; optional shared schedule backend uses a read-only subset.
 
 ### Medicine
 
 - **Represents**: A specific medication the child takes.
-- **Key fields (iOS + backend)**
-  - Identification:  (Firestore document ID), ,  (alias/brand/common name).
+- **Key fields (Flutter local model)**
+  - Identification: locally generated ID, ,  (alias/brand/common name).
   - Classification:  (e.g. “Everyday”, “As-needed”, “Both”),  (what condition/symptom it treats).
   - Dosage/frequency:
     -  (numeric or textual dose),  (displayed unit portion),  (e.g. daily, weekly).
@@ -186,7 +176,7 @@
   -  (e.g. grandparent, friend).
   - Contact: `emailAddress`, mobile/home phone, `photoURL`.
 - **Data storage**
-  - Secondary carers are stored in user documents in Firestore, with:
+  - Secondary carers are stored in backend documents, with:
     - `addedBy` (primary user UID).
     -  flag for soft delete.
     - Relationship and contact details.
@@ -302,14 +292,14 @@
   - Purpose:
     - Register new primary carers and set up initial child data.
   - Key UI:
-    - Email/password fields for Firebase registration.
+    - Profile name field and optional passcode entry.
     - Forms for primary carer details (name, relationship, contact).
     - Forms for first child’s details (name, DOB, condition, allergies, etc.).
     - WebView segments to show terms or guidance (via embedded web content).
   - Actions:
-    - Create Firebase user.
-    - Write PrimaryCarer record to Firestore.
-    - Create first Child record and attach to primary carer.
+    - Create a local profile.
+    - Write PrimaryCarer record to local JSON storage.
+    - Create first Child record and attach to the profile.
   - Navigation:
     - Reached from Login or onboarding.
     - On success, transitions to main tab bar with HomeViewController.
@@ -318,24 +308,15 @@
 
 - **LoginViewController**
   - Purpose:
-    - Authenticate existing primary carers and manage credential storage/biometric login.
+    - Select a local profile and optionally unlock it with a passcode.
   - Key UI:
-    - Email and password fields with validation.
-    - Login and sign-up buttons.
-    - “Forgot password” flow (passwordResetView) with enter-email box.
-    - Biometric login button with biometric icon (Face ID or Touch ID).
+    - Profile list with selection.
+    - Passcode prompt when required.
+    - Buttons to create a new profile.
   - Behaviour:
-    - Calls Firebase Auth signIn with email/password.
-    - On success:
-      - Stores email/password (unless auto-login flow).
-      - Loads primary carer and child data via NetworkHelper.
-      - Marks `loggedIn` true and navigates back to Home.
-    - On failure:
-      - Shows “Sign in Failed” alert.
-    - Password reset:
-      - Sends reset email via Firebase; shows success or error message.
-    - Biometric login:
-      - Prompts with Face ID / Touch ID and, on success, executes login using stored credentials.
+    - Selects a local profile and unlocks it if passcode-protected.
+    - Loads primary carer and child data from local storage.
+    - On failure (wrong passcode), shows an error message.
   - Navigation:
     - Shown when user not logged in (from Home).
     - Can push to Signup and Onboarding.
@@ -368,7 +349,7 @@
         - Clears content and pushes Login (and optionally Onboarding at first use).
       - If logged in:
         - Fetches shared schedules via backend API.
-        - Fetches child’s schedules and regular administrations from Firestore.
+        - Fetches child’s schedules and regular administrations from local storage (or backend if sync is enabled).
         - Fetches as-needed administrations.
         - Builds and presents the schedule view for the currently selected date.
     - Local notifications:
@@ -397,7 +378,7 @@
     - “Add medicine” button.
   - Behaviour:
     - On appear:
-      - Loads medicines via NetworkHelper from Firestore.
+      - Loads medicines via local storage (or backend if sync is enabled).
       - Applies the last used filter (“Everyday” or “As-needed”) from app state.
     - Filter logic:
       - Shows medicines whose  matches filter or is “Both”.
@@ -482,7 +463,7 @@
       - NHS number and other identifiers (possibly less prominently).
   - Behaviour:
     - Shows existing data from appDelegate.primaryCarer.children[0].
-    - Editing triggers NetworkHelper.updateChildData to save to Firestore.
+    - Editing triggers local persistence (and optional backend sync if configured).
   - Navigation:
     - Part of profile or settings section.
 
@@ -724,23 +705,22 @@
 
 ---
 
-## Backend and API Behaviour
+## Backend and API Behaviour (Optional)
 
 ### Technologies and Setup
 
-- **Platform**: Firebase Cloud Functions (v2 HTTPS functions) with Express.
+- **Platform**: Optional HTTP backend (implementation may vary; Flutter client treats it as an HTTP API).
 - **Services used**:
-  - Firestore (document DB).
-  - Firebase Storage (for PDFs).
-  - Firebase Admin SDK for auth and storage.
+  - Document database for shared schedule data.
+  - Object storage for PDFs (if PDF export is enabled).
 - **Deployment details**:
-  -  function exports the Express app under the region `europe-west2`.
+  - The backend exposes an Express-style API surface with API key + token-based auth.
   - Timezone is set to `Europe/London` for server-side date computations.
 
-### Data Collections and Structure (Firestorm)
+### Data Collections and Structure (Backend Store)
 
 - **Primary carer and children**
-  - Collection `user`:
+  - Collection `user` (legacy backend schema):
     - Document ID: primary carer’s email.
     - Fields: personal and contact info, relationship, profile image, etc.
     - Subcollection :
@@ -952,21 +932,22 @@
 ## Cross-Cutting Concerns
 
 - **Offline behaviour**
-  - iOS:
-    - Has an `offlineMode` concept, but the main flow uses live Firebase Auth and Firestore.
-    - Some older code suggests offline fallback if sign-in fails, but current usage primarily relies on successful authentication.
-    - Once data is loaded, much of the schedule display is driven from in-memory app state, so transient connectivity loss does not prevent viewing already fetched data.
+  - Flutter:
+    - Offline-first by default; all primary-carer data is stored locally per profile.
+    - Sign-in is local profile selection + optional passcode; no backend is required.
+    - Shared schedule links still require backend access for secondary carers.
   - Web:
-    - No explicit offline support; operates as online-only with calls to backend and no offline state persistence in the current code.
+    - Local profile storage is persisted in IndexedDB/local storage (via shared_preferences for now).
+    - Shared schedule view remains online-only.
 
 - **Local storage and caching**
   - iOS:
     - Uses UserDefaults for:
-      - , `password`, and `uid` for auto-login and biometric login.
+      - , `password`, and `uid` for auto-login (legacy iOS behaviour).
       - `firstuse` flag to show/hide first-use popups and onboarding.
       - `notifications` list of schedule IDs with notifications applied.
       - Per-schedule lists of notification IDs and end dates.
-    - Relies on Firestore client caching implicitly but primarily fetches fresh data on view appearance.
+    - Relies on backend fetches on view appearance (legacy iOS behaviour).
   - Web:
     - Uses Vuex store to retain:
       -  (shared schedule, carer, child, medicines, days, administrations).
@@ -1003,8 +984,9 @@
 
 - **Security and privacy**
   - Primary carers:
-    - Protected by Firebase Auth email/password.
-    - Sensitive child details (NHS number, religion, full profile) are stored in Firestore but, in shared contexts, only a subset is exposed.
+    - Protected by local profiles with an optional passcode.
+    - Encrypted backups require a user-defined passphrase and are safe to store in personal cloud storage.
+    - Sensitive child details are stored locally; in shared contexts, only a subset is exposed.
   - Shared schedules:
     - Secondary carers access data via:
       - One-time action tokens ().
@@ -1083,7 +1065,7 @@
   - For Flutter:
     - Treat this as a backend implementation detail:
       - All access is through documented HTTP endpoints.
-      - Client should not inspect Firestore paths directly.
+      - Client should not inspect backend data paths directly.
 
 - **Status states and lifecycle for shared schedules**
   - Observed statuses: “Pending”, “Approved”; “Declined” implied, as is an ended status after .
@@ -1098,11 +1080,11 @@
     - Flutter should support these states as separate conceptual statuses (Pending, Approved, Declined, Ended, Archived).
 
 - **Offline mode behaviour**
-  - There are hints of an `offlineMode` flag in iOS and previously considered offline behaviour, but the current login logic primarily uses online Firebase Auth.
+  - Flutter is offline-first by design.
   - Assumptions:
-    - Officially, the product behaves as online-first.
-    - Local data (e.g. child, medicines, schedules) is only as up-to-date as the last successful fetch.
-    - For the Flutter spec, offline features should be considered optional enhancements rather than required parity.
+    - Local data (child, medicines, schedules) is canonical for the primary carer profile on that device.
+    - Users can export/import encrypted backups to move data across devices or store in personal cloud storage.
+    - Shared schedule links remain online-only and may be unavailable without backend access.
 
 - **Privacy and data sharing scope**
   - MinChild model for shared schedules explicitly limits child information to:
@@ -1117,7 +1099,7 @@
   - Secondary Carer user records (care network) can exist even if no shared schedules are active.
   - Shared schedules reference carers primarily by email.
   - Ambiguity:
-    - It’s not guaranteed every carer user in Firestore is visible in the care network list (filters based on `addedBy` and  apply).
+    - It’s not guaranteed every carer user in the backend store is visible in the care network list (filters based on `addedBy` and  apply).
   - Assumption:
     - Flutter “Care Network” should:
       - Show non-deleted carers added by the logged-in primary.
