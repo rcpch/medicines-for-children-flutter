@@ -43,7 +43,7 @@
 	- [x] Build forms: AddMedicine, EditMedicine with validation (dosage, frequency).
 	- [x] Build forms: AddSchedule, EditSchedule with validation (dosage, frequency, dates).
 	- [x] Build form: AsNeededRecord; include contextual help and validation.
-	- Integrate `flutter_local_notifications` + timezone package to schedule reminders per recurrence; persist metadata in local store so reminders survive restarts.
+	- [x] Integrate `flutter_local_notifications` + timezone package to schedule reminders per recurrence; persist metadata in local store so reminders survive restarts.
 	- Add undo/confirmation dialogs for mark-as-given/skipped actions; optionally sync changes if a backend is configured.
 	- Expand unit/integration tests to cover mutation success/failure, optimistic rollback, and notification scheduling logic.
 - **Gate**: QA script proves user can add medicine, create schedule, receive local reminder, mark administration; automated integration test (using `integration_test`) passes for CRUD flows.

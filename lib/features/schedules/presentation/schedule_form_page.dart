@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:medicines_for_children_flutter/core/domain/active_child_provider.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/schedule.dart';
+import 'package:medicines_for_children_flutter/core/notifications/notification_store.dart';
 import 'package:medicines_for_children_flutter/features/schedules/application/schedule_editor_controller.dart';
 import 'package:medicines_for_children_flutter/features/schedules/domain/schedule_draft.dart';
 
@@ -25,6 +26,7 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
   List<bool> _weekdays = List<bool>.filled(7, true);
   List<TimeOfDay> _times = [];
   String? _selectedMedicineId;
+  bool _enableNotifications = true;
 
   @override
   void initState() {
@@ -39,6 +41,12 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
             .toList() ??
         [const TimeOfDay(hour: 8, minute: 0)];
     _selectedMedicineId = schedule?.medicineId;
+    if (schedule != null) {
+      final metadata = ref.read(notificationStoreProvider).readForSchedule(schedule.id);
+      _enableNotifications = metadata != null;
+    } else {
+      _enableNotifications = true;
+    }
   }
 
   @override
@@ -152,6 +160,17 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
                   ],
                 ),
                 const SizedBox(height: 20),
+                SwitchListTile(
+                  title: const Text('Enable reminders'),
+                  subtitle: const Text('Get notified for each scheduled dose.'),
+                  value: _enableNotifications,
+                  onChanged: (value) {
+                    setState(() {
+                      _enableNotifications = value;
+                    });
+                  },
+                ),
+                const SizedBox(height: 12),
                 ElevatedButton(
                   onPressed: editorState.isSaving ? null : _submit,
                   child: editorState.isSaving
@@ -199,16 +218,26 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
       if (schedule == null) {
         return;
       }
+      final medicine = _findMedicine();
+      if (medicine == null) {
+        return;
+      }
       success = await controller.updateSchedule(
-        schedule.copyWith(
+        schedule: schedule.copyWith(
           medicineId: _selectedMedicineId!,
           startDate: startDate,
           endDate: endDate,
           weekdaysActive: _weekdays,
           times: _times.map(_formatTime).toList(),
         ),
+        medicine: medicine,
+        enableNotifications: _enableNotifications,
       );
     } else {
+      final medicine = _findMedicine();
+      if (medicine == null) {
+        return;
+      }
       final draft = ScheduleDraft(
         medicineId: _selectedMedicineId!,
         startDate: startDate,
@@ -216,7 +245,13 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
         weekdaysActive: _weekdays,
         times: _times.map(_formatTime).toList(),
       );
-      success = await controller.createSchedule(draft) != null;
+      success = await controller
+              .createSchedule(
+                draft: draft,
+                medicine: medicine,
+                enableNotifications: _enableNotifications,
+              ) !=
+          null;
     }
 
     if (!mounted) {
@@ -263,6 +298,17 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
     return child.schedules.firstWhere(
       (schedule) => schedule.id == widget.scheduleId,
       orElse: () => child.schedules.first,
+    );
+  }
+
+  Medicine? _findMedicine() {
+    final child = ref.read(activeChildProvider);
+    if (child == null || _selectedMedicineId == null) {
+      return null;
+    }
+    return child.medicines.firstWhere(
+      (item) => item.id == _selectedMedicineId,
+      orElse: () => child.medicines.first,
     );
   }
 

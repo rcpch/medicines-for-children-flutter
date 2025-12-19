@@ -9,6 +9,7 @@ import 'package:medicines_for_children_flutter/core/platform/backup_file_io.dart
 import 'package:medicines_for_children_flutter/core/domain/models/administration.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.dart';
+import 'package:medicines_for_children_flutter/core/notifications/notification_service.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
@@ -25,6 +26,14 @@ class HomePage extends ConsumerWidget {
     final controller = ref.read(primaryCarerControllerProvider.notifier);
     final selectedDate = ref.watch(selectedDateProvider);
     final telemetry = ref.read(telemetryServiceProvider);
+    ref.listen<PrimaryCarerState>(
+      primaryCarerControllerProvider,
+      (_, next) {
+        if (next.carer != null) {
+          ref.read(notificationServiceProvider).pruneExpired();
+        }
+      },
+    );
     final theme = Theme.of(context);
 
     return Scaffold(
