@@ -72,6 +72,9 @@ class HomePage extends ConsumerWidget {
           onAddSchedule: () {
             context.goNamed(AppRoute.addSchedule.name);
           },
+          onManageSchedules: () {
+            context.goNamed(AppRoute.schedules.name);
+          },
         ),
       ),
     );
@@ -363,6 +366,7 @@ class _HomeBody extends StatelessWidget {
     required this.selectedDate,
     required this.onSelectDate,
     required this.onAddSchedule,
+    required this.onManageSchedules,
   });
 
   final PrimaryCarerState state;
@@ -372,6 +376,7 @@ class _HomeBody extends StatelessWidget {
   final DateTime selectedDate;
   final ValueChanged<DateTime> onSelectDate;
   final VoidCallback onAddSchedule;
+  final VoidCallback onManageSchedules;
 
   @override
   Widget build(BuildContext context) {
@@ -437,6 +442,7 @@ class _HomeBody extends StatelessWidget {
               sections: timeOfDaySections,
               isLoading: state.isLoading,
               onAddSchedule: onAddSchedule,
+              onManageSchedules: onManageSchedules,
             ),
             const SizedBox(height: 16),
             _AsNeededSection(
@@ -570,11 +576,13 @@ class _ScheduleSection extends StatelessWidget {
     required this.sections,
     required this.isLoading,
     required this.onAddSchedule,
+    required this.onManageSchedules,
   });
 
   final List<TimeOfDaySection> sections;
   final bool isLoading;
   final VoidCallback onAddSchedule;
+  final VoidCallback onManageSchedules;
 
   @override
   Widget build(BuildContext context) {
@@ -594,6 +602,11 @@ class _ScheduleSection extends StatelessWidget {
                     'Today\'s schedule',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
+                ),
+                IconButton(
+                  tooltip: 'Manage schedules',
+                  onPressed: onManageSchedules,
+                  icon: const Icon(Icons.tune_outlined),
                 ),
                 TextButton.icon(
                   onPressed: onAddSchedule,

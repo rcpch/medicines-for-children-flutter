@@ -12,6 +12,7 @@ import 'package:medicines_for_children_flutter/features/medicines/presentation/m
 import 'package:medicines_for_children_flutter/features/medicines/presentation/medicines_page.dart';
 import 'package:medicines_for_children_flutter/features/onboarding/presentation/onboarding_page.dart';
 import 'package:medicines_for_children_flutter/features/schedules/presentation/schedule_form_page.dart';
+import 'package:medicines_for_children_flutter/features/schedules/presentation/schedules_page.dart';
 import 'package:medicines_for_children_flutter/features/shared_schedule/presentation/shared_schedule_link_page.dart';
 import 'package:medicines_for_children_flutter/features/shared_schedule/presentation/shared_schedule_page.dart';
 import 'package:medicines_for_children_flutter/features/splash/presentation/splash_page.dart';
@@ -25,7 +26,9 @@ enum AppRoute {
   signup('/signup'),
   onboarding('/onboarding'),
   home('/home'),
-  addSchedule('schedule/add'),
+  schedules('schedule'),
+  addSchedule('add'),
+  editSchedule(':scheduleId/edit'),
   medicines('/medicines'),
   addMedicine('add'),
   medicineDetail(':medicineId'),
@@ -75,9 +78,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => const HomePage(),
                 routes: [
                   GoRoute(
-                    path: AppRoute.addSchedule.path,
-                    name: AppRoute.addSchedule.name,
-                    builder: (context, state) => const ScheduleFormPage(),
+                    path: AppRoute.schedules.path,
+                    name: AppRoute.schedules.name,
+                    builder: (context, state) => const SchedulesPage(),
+                    routes: [
+                      GoRoute(
+                        path: AppRoute.addSchedule.path,
+                        name: AppRoute.addSchedule.name,
+                        builder: (context, state) => const ScheduleFormPage(),
+                      ),
+                      GoRoute(
+                        path: AppRoute.editSchedule.path,
+                        name: AppRoute.editSchedule.name,
+                        builder: (context, state) => ScheduleFormPage(
+                          scheduleId: state.pathParameters['scheduleId'],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

@@ -38,9 +38,11 @@
 ## Milestone 4 – Data Authoring & Notifications
 - **Technical steps**:
 	- [x] Implement mutations for medicines (create/update/archive).
-	- [ ] Implement mutations for schedules (CRUD + as-needed administrations) with optimistic UI updates and rollback on failure.
+	- [x] Implement schedule CRUD mutations (create/update/delete) with optimistic UI updates.
+	- [ ] Implement as-needed administrations with optimistic UI updates and rollback on failure.
 	- [x] Build forms: AddMedicine, EditMedicine with validation (dosage, frequency).
-	- [ ] Build forms: AddSchedule, EditSchedule, AsNeededRecord; include contextual help and validation (dosage, frequency, dates).
+	- [x] Build forms: AddSchedule, EditSchedule with validation (dosage, frequency, dates).
+	- [ ] Build form: AsNeededRecord; include contextual help and validation.
 	- Integrate `flutter_local_notifications` + timezone package to schedule reminders per recurrence; persist metadata in local store so reminders survive restarts.
 	- Add undo/confirmation dialogs for mark-as-given/skipped actions; optionally sync changes if a backend is configured.
 	- Expand unit/integration tests to cover mutation success/failure, optimistic rollback, and notification scheduling logic.
