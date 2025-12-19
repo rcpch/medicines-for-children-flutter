@@ -114,6 +114,8 @@ class SharedScheduleViewModel {
     required this.dateTo,
     required this.days,
     required this.medicinesById,
+    required this.parentId,
+    required this.carerFirstName,
   });
 
   factory SharedScheduleViewModel.fromJson(Map<String, dynamic> json) {
@@ -146,6 +148,8 @@ class SharedScheduleViewModel {
       dateTo: dateTo ?? DateTime(1970, 1, 1),
       days: days,
       medicinesById: {for (final med in medicines) med.id: med},
+      parentId: (json['parentId'] ?? '').toString(),
+      carerFirstName: (json['carerFirstName'] ?? '').toString(),
     );
   }
 
@@ -155,6 +159,8 @@ class SharedScheduleViewModel {
   final DateTime dateTo;
   final List<SharedScheduleDay> days;
   final Map<String, SharedScheduleMedicineSummary> medicinesById;
+  final String parentId;
+  final String carerFirstName;
 
   SharedScheduleDay? get today => days.cast<SharedScheduleDay?>().firstWhere(
         (day) => day?.isToday == true,
@@ -167,6 +173,24 @@ abstract class SharedScheduleRepository {
   Future<SharedScheduleViewModel> fetchSharedSchedule({
     required String apiId,
     required String authToken,
+  });
+  Future<void> confirmSchedule({
+    required String apiId,
+    required String authToken,
+    required bool approved,
+    String? reason,
+  });
+  Future<void> recordAdministration({
+    required String apiId,
+    required String authToken,
+    required String parentId,
+    required String adminBy,
+    required DateTime dateTime,
+    required bool isAsNeeded,
+    required bool skipped,
+    String? scheduledItemId,
+    String? medicineId,
+    String? notes,
   });
 }
 
@@ -210,5 +234,55 @@ class HttpSharedScheduleRepository implements SharedScheduleRepository {
     }
 
     return SharedScheduleViewModel.fromJson(first);
+  }
+
+  @override
+  Future<void> confirmSchedule({
+    required String apiId,
+    required String authToken,
+    required bool approved,
+    String? reason,
+  }) async {
+    await _dio.post<Map<String, dynamic>>(
+      '/confirm/$apiId',
+      data: <String, dynamic>{
+        'approved': approved,
+        'reason': reason ?? '',
+      },
+      options: Options(
+        headers: <String, dynamic>{'Authorization': 'token $authToken'},
+      ),
+    );
+  }
+
+  @override
+  Future<void> recordAdministration({
+    required String apiId,
+    required String authToken,
+    required String parentId,
+    required String adminBy,
+    required DateTime dateTime,
+    required bool isAsNeeded,
+    required bool skipped,
+    String? scheduledItemId,
+    String? medicineId,
+    String? notes,
+  }) async {
+    await _dio.post<Map<String, dynamic>>(
+      '/administration/$apiId',
+      data: <String, dynamic>{
+        'admin_by': adminBy,
+        'dateTimeId': dateTime.toIso8601String(),
+        'notes': notes ?? '',
+        'isAsNeeded': isAsNeeded,
+        'scheduledItemId': scheduledItemId,
+        'medicineId': medicineId,
+        'skipped': skipped,
+        'parentId': parentId,
+      },
+      options: Options(
+        headers: <String, dynamic>{'Authorization': 'token $authToken'},
+      ),
+    );
   }
 }

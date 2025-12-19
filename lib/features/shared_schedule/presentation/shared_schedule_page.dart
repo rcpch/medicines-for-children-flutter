@@ -23,6 +23,7 @@ class SharedSchedulePage extends ConsumerWidget {
     }
 
     final modelAsync = ref.watch(sharedScheduleViewModelProvider(session));
+    final repository = ref.read(sharedScheduleRepositoryProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -50,6 +51,73 @@ class SharedSchedulePage extends ConsumerWidget {
             children: [
               Text(dateRange, style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 12),
+              if (model.status.toLowerCase() == 'pending')
+                Card(
+                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Awaiting confirmation',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 8),
+                        const Text('Let the primary carer know if you can cover this period.'),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () async {
+                                try {
+                                  await repository.confirmSchedule(
+                                    apiId: model.apiId,
+                                    authToken: session.authToken,
+                                    approved: true,
+                                  );
+                                  ref.invalidate(sharedScheduleViewModelProvider(session));
+                                } catch (error) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Unable to approve: $error')),
+                                    );
+                                  }
+                                }
+                              },
+                              child: const Text('Approve'),
+                            ),
+                            const SizedBox(width: 12),
+                            TextButton(
+                              onPressed: () async {
+                                final reason = await _promptDeclineReason(context);
+                                if (reason == null) {
+                                  return;
+                                }
+                                try {
+                                  await repository.confirmSchedule(
+                                    apiId: model.apiId,
+                                    authToken: session.authToken,
+                                    approved: false,
+                                    reason: reason,
+                                  );
+                                  ref.invalidate(sharedScheduleViewModelProvider(session));
+                                } catch (error) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Unable to decline: $error')),
+                                    );
+                                  }
+                                }
+                              },
+                              child: const Text('Decline'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               Text(
                 'Today',
                 style: Theme.of(context).textTheme.titleLarge,
@@ -61,11 +129,89 @@ class SharedSchedulePage extends ConsumerWidget {
                 ...today.scheduledItemsForDay.map((item) {
                   final medicine = model.medicinesById[item.medicineId];
                   final title = medicine?.displayName ?? 'Medicine';
-                  final times = item.times.join(', ');
                   return Card(
                     child: ListTile(
                       title: Text(title),
-                      subtitle: Text(times),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          for (final time in item.times)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Row(
+                                children: [
+                                  Expanded(child: Text(time)),
+                                  TextButton(
+                                    onPressed: () async {
+                                      final dateTime = _mergeDateAndTime(today.date, time);
+                                      if (dateTime == null) {
+                                        return;
+                                      }
+                                      try {
+                                        await repository.recordAdministration(
+                                          apiId: model.apiId,
+                                          authToken: session.authToken,
+                                          parentId: model.parentId,
+                                          adminBy: model.carerFirstName.isEmpty ? 'Carer' : model.carerFirstName,
+                                          dateTime: dateTime,
+                                          isAsNeeded: false,
+                                          skipped: false,
+                                          scheduledItemId: item.id,
+                                        );
+                                        ref.invalidate(sharedScheduleViewModelProvider(session));
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(content: Text('Recorded as given.')),
+                                          );
+                                        }
+                                      } catch (error) {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Unable to record: $error')),
+                                          );
+                                        }
+                                      }
+                                    },
+                                    child: const Text('Given'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      final dateTime = _mergeDateAndTime(today.date, time);
+                                      if (dateTime == null) {
+                                        return;
+                                      }
+                                      try {
+                                        await repository.recordAdministration(
+                                          apiId: model.apiId,
+                                          authToken: session.authToken,
+                                          parentId: model.parentId,
+                                          adminBy: model.carerFirstName.isEmpty ? 'Carer' : model.carerFirstName,
+                                          dateTime: dateTime,
+                                          isAsNeeded: false,
+                                          skipped: true,
+                                          scheduledItemId: item.id,
+                                        );
+                                        ref.invalidate(sharedScheduleViewModelProvider(session));
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(content: Text('Recorded as skipped.')),
+                                          );
+                                        }
+                                      } catch (error) {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Unable to record: $error')),
+                                          );
+                                        }
+                                      }
+                                    },
+                                    child: const Text('Skip'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   );
                 }),
@@ -74,5 +220,45 @@ class SharedSchedulePage extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  Future<String?> _promptDeclineReason(BuildContext context) async {
+    final controller = TextEditingController();
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Decline schedule'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(labelText: 'Reason (optional)'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
+            child: const Text('Submit'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    return result;
+  }
+
+  DateTime? _mergeDateAndTime(DateTime date, String timeString) {
+    final sanitized = timeString.trim().toUpperCase();
+    const patterns = ['HH:mm', 'H:mm', 'h:mma', 'hh:mma'];
+    for (final pattern in patterns) {
+      try {
+        final parsed = DateFormat(pattern).parseStrict(sanitized);
+        return DateTime(date.year, date.month, date.day, parsed.hour, parsed.minute);
+      } catch (_) {
+        continue;
+      }
+    }
+    return null;
   }
 }
