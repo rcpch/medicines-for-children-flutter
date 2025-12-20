@@ -1,8 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicines_for_children_flutter/core/data/storage/profile_data_local_data_source.dart';
+import 'package:medicines_for_children_flutter/core/domain/models/administration.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.dart';
+import 'package:medicines_for_children_flutter/core/domain/models/schedule.dart';
 import 'package:medicines_for_children_flutter/features/auth/data/auth_repository.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/auth_status.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/auth_user.dart';
@@ -63,7 +65,8 @@ void main() {
       profileData: profileData,
     );
 
-    final now = DateTime(2025, 1, 6, 10, 30);
+    final current = DateTime.now();
+    final now = DateTime(current.year, current.month, current.day, current.hour, current.minute);
     await repository.recordAdministration(
       medicineId: medicine.id,
       dateTime: now,
@@ -77,6 +80,86 @@ void main() {
     expect(schedule.medicineId, medicine.id);
     expect(schedule.administrations, hasLength(1));
     expect(schedule.administrations.first.notes, 'After PE');
+  });
+
+  test('prunes old as-needed administrations on save', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final profileData = ProfileDataLocalDataSource(prefs);
+    const profileId = 'profile-2';
+
+    final medicine = Medicine(
+      id: 'med-2',
+      name: 'Salbutamol',
+      alias: 'Blue inhaler',
+      type: MedicineType.asNeeded,
+      dose: '2',
+      doseUnit: 'puffs',
+      route: 'inhaled',
+      frequency: 'As needed',
+    );
+
+    final oldDate = DateTime.now().subtract(const Duration(days: 120));
+    final recentDate = DateTime.now();
+
+    final carer = PrimaryCarer(
+      id: profileId,
+      firstName: 'Morgan',
+      lastName: 'Taylor',
+      email: 'morgan@example.com',
+      relationshipToChild: 'Dad',
+      children: [
+        Child(
+          id: 'child-2',
+          firstName: 'Ava',
+          lastName: 'Taylor',
+          dateOfBirth: DateTime(2018, 5, 12),
+          condition: 'Asthma',
+          allergies: const [],
+          medicines: [medicine],
+          schedules: const [],
+          asNeededSchedules: [
+            AsNeededSchedule(
+              id: 'asneeded-${medicine.id}',
+              medicineId: medicine.id,
+              administrations: [
+                Administration(
+                  id: 'admin-old',
+                  dateTime: oldDate,
+                  status: AdministrationStatus.given,
+                  isAsNeeded: true,
+                  administeredBy: 'Tester',
+                  notes: null,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+
+    await profileData.writePrimaryCarer(profileId, carer);
+    final repository = LocalAsNeededRepository(
+      authRepository: _TestAuthRepository(
+        AuthUser(
+          uid: profileId,
+          email: 'morgan@example.com',
+          displayName: 'Morgan',
+        ),
+      ),
+      profileData: profileData,
+    );
+
+    await repository.recordAdministration(
+      medicineId: medicine.id,
+      dateTime: recentDate,
+      notes: null,
+    );
+
+    final updated = profileData.readPrimaryCarer(profileId);
+    final schedule = updated!.children.first.asNeededSchedules.first;
+    expect(schedule.administrations.length, 1);
+    expect(schedule.administrations.first.dateTime, recentDate);
   });
 }
 

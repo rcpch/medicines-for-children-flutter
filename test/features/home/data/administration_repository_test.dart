@@ -35,8 +35,8 @@ void main() {
     final schedule = MedicineSchedule(
       id: 'sched-1',
       medicineId: medicine.id,
-      startDate: DateTime(2025, 1, 1),
-      endDate: DateTime(2025, 1, 31),
+      startDate: DateTime.now().subtract(const Duration(days: 7)),
+      endDate: DateTime.now().add(const Duration(days: 7)),
       times: const ['08:00'],
       weekdaysActive: List<bool>.filled(7, true),
       administrations: const [],
@@ -75,7 +75,8 @@ void main() {
       profileData: profileData,
     );
 
-    final date = DateTime(2025, 1, 6, 8);
+    final now = DateTime.now();
+    final date = DateTime(now.year, now.month, now.day, 8);
     await repository.recordScheduledAdministration(
       scheduleId: schedule.id,
       dateTime: date,
@@ -94,6 +95,90 @@ void main() {
     final cleared = profileData.readPrimaryCarer(profileId);
     final clearedSchedule = cleared!.children.first.schedules.first;
     expect(clearedSchedule.administrations, isEmpty);
+  });
+
+  test('prunes old scheduled administrations on save', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final profileData = ProfileDataLocalDataSource(prefs);
+    const profileId = 'profile-2';
+
+    final medicine = Medicine(
+      id: 'med-2',
+      name: 'Ibuprofen',
+      alias: '',
+      type: MedicineType.everyday,
+      dose: '5',
+      doseUnit: 'ml',
+      route: 'oral',
+      frequency: 'Twice daily',
+    );
+
+    final oldDate = DateTime.now().subtract(const Duration(days: 120));
+    final recentDate = DateTime.now();
+
+    final schedule = MedicineSchedule(
+      id: 'sched-2',
+      medicineId: medicine.id,
+      startDate: DateTime(2024, 1, 1),
+      endDate: DateTime(2026, 1, 1),
+      times: const ['08:00'],
+      weekdaysActive: List<bool>.filled(7, true),
+      administrations: [
+        Administration(
+          id: 'admin-old',
+          dateTime: oldDate,
+          status: AdministrationStatus.given,
+          isAsNeeded: false,
+          administeredBy: 'Tester',
+          notes: null,
+        ),
+      ],
+    );
+
+    final carer = PrimaryCarer(
+      id: profileId,
+      firstName: 'Morgan',
+      lastName: 'Taylor',
+      email: 'morgan@example.com',
+      relationshipToChild: 'Dad',
+      children: [
+        Child(
+          id: 'child-2',
+          firstName: 'Ava',
+          lastName: 'Taylor',
+          dateOfBirth: DateTime(2018, 5, 12),
+          condition: 'Asthma',
+          allergies: const [],
+          medicines: [medicine],
+          schedules: [schedule],
+          asNeededSchedules: const [],
+        ),
+      ],
+    );
+
+    await profileData.writePrimaryCarer(profileId, carer);
+    final repository = LocalAdministrationRepository(
+      authRepository: _TestAuthRepository(
+        AuthUser(
+          uid: profileId,
+          email: 'morgan@example.com',
+          displayName: 'Morgan',
+        ),
+      ),
+      profileData: profileData,
+    );
+
+    await repository.recordScheduledAdministration(
+      scheduleId: schedule.id,
+      dateTime: recentDate,
+      status: AdministrationStatus.given,
+    );
+
+    final updated = profileData.readPrimaryCarer(profileId);
+    final updatedSchedule = updated!.children.first.schedules.first;
+    expect(updatedSchedule.administrations.length, 1);
+    expect(updatedSchedule.administrations.first.dateTime, recentDate);
   });
 }
 

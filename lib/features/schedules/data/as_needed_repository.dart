@@ -7,6 +7,8 @@ import 'package:medicines_for_children_flutter/core/domain/models/schedule.dart'
 import 'package:medicines_for_children_flutter/features/auth/data/auth_repository.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/auth_user.dart';
 
+const _administrationRetentionDays = 90;
+
 abstract class AsNeededRepository {
   Future<void> recordAdministration({
     required String medicineId,
@@ -55,8 +57,9 @@ class LocalAsNeededRepository implements AsNeededRepository {
       );
     } else {
       final existing = schedules[index];
+      final pruned = _pruneAdministrations(existing.administrations);
       schedules[index] = existing.copyWith(
-        administrations: [...existing.administrations, administration],
+        administrations: [...pruned, administration],
       );
     }
 
@@ -87,6 +90,11 @@ class LocalAsNeededRepository implements AsNeededRepository {
 
   String _generateId() {
     return 'admin-${DateTime.now().millisecondsSinceEpoch}';
+  }
+
+  List<Administration> _pruneAdministrations(List<Administration> administrations) {
+    final cutoff = DateTime.now().subtract(const Duration(days: _administrationRetentionDays));
+    return administrations.where((admin) => !admin.dateTime.isBefore(cutoff)).toList();
   }
 }
 

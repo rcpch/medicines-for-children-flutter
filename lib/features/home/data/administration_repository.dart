@@ -7,6 +7,8 @@ import 'package:medicines_for_children_flutter/core/domain/models/schedule.dart'
 import 'package:medicines_for_children_flutter/features/auth/data/auth_repository.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/auth_user.dart';
 
+const _administrationRetentionDays = 90;
+
 abstract class AdministrationRepository {
   Future<void> recordScheduledAdministration({
     required String scheduleId,
@@ -104,8 +106,10 @@ class LocalAdministrationRepository implements AdministrationRepository {
   }
 
   Future<void> _saveSchedule(_AdministrationContext context, MedicineSchedule schedule) async {
+    final prunedAdministrations = _pruneAdministrations(schedule.administrations);
+    final prunedSchedule = schedule.copyWith(administrations: prunedAdministrations);
     final updatedSchedules = context.child.schedules
-        .map((item) => item.id == schedule.id ? schedule : item)
+        .map((item) => item.id == schedule.id ? prunedSchedule : item)
         .toList();
     final updatedChild = context.child.copyWith(schedules: updatedSchedules);
     final updatedCarer = context.carer.copyWith(children: [
@@ -121,6 +125,11 @@ class LocalAdministrationRepository implements AdministrationRepository {
         a.day == b.day &&
         a.hour == b.hour &&
         a.minute == b.minute;
+  }
+
+  List<Administration> _pruneAdministrations(List<Administration> administrations) {
+    final cutoff = DateTime.now().subtract(const Duration(days: _administrationRetentionDays));
+    return administrations.where((admin) => !admin.dateTime.isBefore(cutoff)).toList();
   }
 
   String _generateId() {
