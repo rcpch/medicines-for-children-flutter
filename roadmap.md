@@ -80,3 +80,12 @@
 - **Technical steps**:
 	- [x] Prepare contribution guidelines, code of conduct, and issue/PR templates.
 	- [x] Add open source license (GPL3)
+
+## Milestone 8 – Snagging & Review Fixes
+- **Technical steps**:
+	- [x] Fix Android flavor run issue by using explicit flavor entrypoints and document the commands.
+	- [x] Enable Android core library desugaring for flutter_local_notifications builds.
+	- [x] Add background sync processing for queued share actions with tests.
+	- [x] Extend accessibility coverage for schedule semantics in integration tests.
+	- [x] Update coverage badge after running standard coverage tool.
+	- [x] Improve child date-of-birth picker defaults (year-first view, under-18 bounds).
