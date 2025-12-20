@@ -18,7 +18,7 @@ class MedicinesApp extends ConsumerStatefulWidget {
   ConsumerState<MedicinesApp> createState() => _MedicinesAppState();
 }
 
-class _MedicinesAppState extends ConsumerState<MedicinesApp> {
+class _MedicinesAppState extends ConsumerState<MedicinesApp> with WidgetsBindingObserver {
   late final GoRouter _router;
   ProviderSubscription<AuthState>? _authSubscription;
   bool _reportedSlowFrame = false;
@@ -27,6 +27,7 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> {
   void initState() {
     super.initState();
     _router = ref.read(appRouterProvider);
+    WidgetsBinding.instance.addObserver(this);
     _configureErrorHandling();
     _authSubscription = ref.listenManual<AuthState>(
       authControllerProvider,
@@ -83,8 +84,20 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _authSubscription?.close();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) {
+      return;
+    }
+    final authState = ref.read(authControllerProvider);
+    if (authState.status == AuthStatus.authenticated) {
+      ref.read(primaryCarerControllerProvider.notifier).refresh();
+    }
   }
 
   @override
