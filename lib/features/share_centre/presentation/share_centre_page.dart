@@ -63,7 +63,7 @@ class ShareCentrePage extends ConsumerWidget {
                       return const Center(
                         child: Padding(
                           padding: EdgeInsets.all(16),
-                          child: Text('No shared schedules yet. Tap “New share” to invite a carer.'),
+                          child: Text('There are no shared schedules.'),
                         ),
                       );
                     }
