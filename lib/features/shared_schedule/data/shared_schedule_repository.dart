@@ -116,6 +116,8 @@ class SharedScheduleViewModel {
     required this.medicinesById,
     required this.parentId,
     required this.carerFirstName,
+    required this.pdfUrl,
+    required this.scheduleUrl,
   });
 
   factory SharedScheduleViewModel.fromJson(Map<String, dynamic> json) {
@@ -150,6 +152,8 @@ class SharedScheduleViewModel {
       medicinesById: {for (final med in medicines) med.id: med},
       parentId: (json['parentId'] ?? '').toString(),
       carerFirstName: (json['carerFirstName'] ?? '').toString(),
+      pdfUrl: _readString(json, ['pdfUrl', 'pdfURL']),
+      scheduleUrl: _readString(json, ['scheduleUrl', 'scheduleURL', 'url']),
     );
   }
 
@@ -161,11 +165,27 @@ class SharedScheduleViewModel {
   final Map<String, SharedScheduleMedicineSummary> medicinesById;
   final String parentId;
   final String carerFirstName;
+  final String pdfUrl;
+  final String scheduleUrl;
 
   SharedScheduleDay? get today => days.cast<SharedScheduleDay?>().firstWhere(
         (day) => day?.isToday == true,
         orElse: () => null,
       );
+}
+
+String _readString(Map<String, dynamic> json, List<String> keys) {
+  for (final key in keys) {
+    final value = json[key];
+    if (value == null) {
+      continue;
+    }
+    final text = value.toString().trim();
+    if (text.isNotEmpty) {
+      return text;
+    }
+  }
+  return '';
 }
 
 abstract class SharedScheduleRepository {

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 import 'package:medicines_for_children_flutter/features/shared_schedule/application/shared_schedule_providers.dart';
+import 'package:share_plus/share_plus.dart';
 
 class SharedSchedulePage extends ConsumerWidget {
   const SharedSchedulePage({super.key, required this.apiId});
@@ -53,6 +54,16 @@ class SharedSchedulePage extends ConsumerWidget {
             children: [
               Text(dateRange, style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 12),
+              if (model.pdfUrl.isNotEmpty)
+                OutlinedButton.icon(
+                  onPressed: () => Share.share(
+                    model.pdfUrl,
+                    subject: 'Shared schedule PDF',
+                  ),
+                  icon: const Icon(Icons.picture_as_pdf_outlined),
+                  label: const Text('Share schedule PDF'),
+                ),
+              if (model.pdfUrl.isNotEmpty) const SizedBox(height: 12),
               if (model.status.toLowerCase() == 'pending')
                 Card(
                   color: Theme.of(context).colorScheme.surfaceVariant,
