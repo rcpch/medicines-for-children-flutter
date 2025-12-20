@@ -1,7 +1,7 @@
 # Medicines for Children · Flutter Port
 ![Coverage](https://img.shields.io/badge/coverage-28.9%25-yellow)
 
-This repository hosts the Flutter implementation of the Medicines for Children mobile and web client. The build now targets **Milestone 2 (Local Profiles & Offline Shell)**: the auth/controller stack is implemented with local profiles, and guarded navigation with placeholder screens is available for iterative UX work.
+This repository hosts the Flutter implementation of the Medicines for Children mobile and web client. The build now targets **Milestone 5 (Sharing Centre & Backend API Integration)** with secondary-carer flows and share management delivered.
 
 ## Current status
 
@@ -11,7 +11,8 @@ This repository hosts the Flutter implementation of the Medicines for Children m
 - ✅ Dedicated signup and multi-step onboarding flows capture primary carer + first-child context, persist onboarding data locally, and promote users into the authenticated shell once complete.
 - ✅ Primary carer data hydrates from local storage so the home shell can render immediately.
 - ✅ Encrypted export/import supports offline backups that can be stored in personal cloud/USB/email.
-- 🚧 Remaining Milestone 2 work: deeper offline data editing and secondary-carer deep links.
+- ✅ Multi-child selection, offline CRUD, and notification scheduling are in place.
+- 🚧 Remaining Milestone 5 work: harden secondary-carer info view and finish backend-driven deep link hosting.
 
 ## Prerequisites
 
@@ -60,6 +61,13 @@ Shared-schedule API configuration is optional. The app boots without env files (
 
 - `SHARED_SCHEDULE_API_BASE_URL` and `SHARED_SCHEDULE_API_KEY` map to the shared schedule backend described in `spec.md`.
 - The Dio client attaches the `ApiKey` header automatically via `securedApiClientProvider`.
+
+## Deep links (App Links / Universal Links)
+
+The app routes secondary-carer links to `/auth/:token` and `/shared-schedule/:apiId`. Configure platform link domains:
+
+- Android: update `appLinkHost` in `android/app/build.gradle.kts` to your link host.
+- iOS: update `applinks:example.com` in `ios/Runner/Runner.entitlements`.
 
 ## Tooling
 

@@ -62,7 +62,7 @@
 	- [x] Build Share Centre UI: list of shares, detail view, create/extend/end flows, PDF export, digital link presentation (including native share sheet integration).
 	- [x] Add Share Centre list, create form, detail management, and link copy actions.
 	- [x] Implement secondary-carer experience inside Flutter as WebView or Flutter web target: token-based auth, pending confirmation, schedule view, record/append administration note flows using backend endpoints.
-	- Add secure link ingestion (App Links / Universal Links) to route invite tokens directly into the secondary-carer flow.
+	- [x] Add secure link ingestion (App Links / Universal Links) to route invite tokens directly into the secondary-carer flow.
 	- [x] Record all share actions (creation, approval, decline) in analytics breadcrumbs.
 - **Gate**: End-to-end test with mocked HTTP verifies carer can create digital share, invitee opens link on mobile browser/Flutter web, approves, records administration, and both parties see updates; regression suite includes API error handling cases.
 
