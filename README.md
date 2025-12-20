@@ -49,6 +49,10 @@ make run-prod
 - `lib/bootstrap.dart` – top-level initialization entry point
 - `test/` – widget/unit tests seeded with a splash smoke test
 
+## Backups
+
+Backups are encrypted. Importing a backup creates a new local profile; you can optionally rename it during import.
+
 ## Environment configuration
 
 Shared-schedule API configuration is optional. The app boots without env files (values default to empty strings). If you need the backend integration:
