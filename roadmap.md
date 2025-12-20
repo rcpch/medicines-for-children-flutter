@@ -78,5 +78,5 @@
 
 ## Milestone 7 – Open Source Contribution & Community Engagement
 - **Technical steps**:
-	- [ ] Prepare contribution guidelines, code of conduct, and issue/PR templates.
-	- [ ] Add open source license (GPL3)
+	- [x] Prepare contribution guidelines, code of conduct, and issue/PR templates.
+	- [x] Add open source license (GPL3)
