@@ -21,6 +21,7 @@ class MedicinesApp extends ConsumerStatefulWidget {
 class _MedicinesAppState extends ConsumerState<MedicinesApp> {
   late final GoRouter _router;
   ProviderSubscription<AuthState>? _authSubscription;
+  bool _reportedSlowFrame = false;
 
   @override
   void initState() {
@@ -60,6 +61,24 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> {
       });
       return false;
     };
+
+    WidgetsBinding.instance.addTimingsCallback((timings) {
+      if (_reportedSlowFrame) {
+        return;
+      }
+      for (final timing in timings) {
+        final buildMs = timing.buildDuration.inMilliseconds;
+        final rasterMs = timing.rasterDuration.inMilliseconds;
+        if (buildMs > 16 || rasterMs > 16) {
+          _reportedSlowFrame = true;
+          telemetry.trackEvent('slow_frame_detected', properties: {
+            'buildMs': buildMs,
+            'rasterMs': rasterMs,
+          });
+          break;
+        }
+      }
+    });
   }
 
   @override
