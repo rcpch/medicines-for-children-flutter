@@ -17,41 +17,45 @@ class ChildSwitcherAction extends ConsumerWidget {
     final selectedId = ref.watch(selectedChildIdProvider);
     final selected = _resolveSelected(carer.children, selectedId);
 
-    return PopupMenuButton<String>(
-      tooltip: 'Select child',
-      initialValue: selected.id,
-      onSelected: (childId) {
-        ref.read(selectedChildIdProvider.notifier).selectChild(childId);
-      },
-      itemBuilder: (context) => [
-        for (final child in carer.children)
-          PopupMenuItem<String>(
-            value: child.id,
-            child: Row(
-              children: [
-                if (child.id == selected.id)
-                  Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.primary)
-                else
-                  const SizedBox(width: 18),
-                const SizedBox(width: 8),
-                Expanded(child: Text('${child.firstName} ${child.lastName}'.trim())),
-              ],
+    return Semantics(
+      button: true,
+      label: 'Select child profile',
+      child: PopupMenuButton<String>(
+        tooltip: 'Select child',
+        initialValue: selected.id,
+        onSelected: (childId) {
+          ref.read(selectedChildIdProvider.notifier).selectChild(childId);
+        },
+        itemBuilder: (context) => [
+          for (final child in carer.children)
+            PopupMenuItem<String>(
+              value: child.id,
+              child: Row(
+                children: [
+                  if (child.id == selected.id)
+                    Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.primary)
+                  else
+                    const SizedBox(width: 18),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text('${child.firstName} ${child.lastName}'.trim())),
+                ],
+              ),
             ),
+        ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.people_alt_outlined),
+              const SizedBox(width: 6),
+              Text(
+                selected.firstName.isEmpty ? 'Child' : selected.firstName,
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+              const Icon(Icons.arrow_drop_down),
+            ],
           ),
-      ],
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.people_alt_outlined),
-            const SizedBox(width: 6),
-            Text(
-              selected.firstName.isEmpty ? 'Child' : selected.firstName,
-              style: Theme.of(context).textTheme.labelLarge,
-            ),
-            const Icon(Icons.arrow_drop_down),
-          ],
         ),
       ),
     );
