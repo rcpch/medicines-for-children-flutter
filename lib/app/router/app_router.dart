@@ -5,6 +5,7 @@ import 'package:medicines_for_children_flutter/features/auth/application/auth_co
 import 'package:medicines_for_children_flutter/features/auth/domain/auth_status.dart';
 import 'package:medicines_for_children_flutter/features/auth/presentation/login_page.dart';
 import 'package:medicines_for_children_flutter/features/auth/presentation/signup_page.dart';
+import 'package:medicines_for_children_flutter/features/child_profile/presentation/add_child_page.dart';
 import 'package:medicines_for_children_flutter/features/child_profile/presentation/child_profile_page.dart';
 import 'package:medicines_for_children_flutter/features/home/presentation/home_page.dart';
 import 'package:medicines_for_children_flutter/features/medicines/presentation/medicine_detail_page.dart';
@@ -40,6 +41,7 @@ enum AppRoute {
   medicineDetail(':medicineId'),
   editMedicine('edit'),
   childProfile('/child-profile'),
+  addChild('add-child'),
   shareCentre('share-centre'),
   shareCentreCreate('create'),
   shareCentreDetail(':shareId'),
@@ -154,6 +156,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 name: AppRoute.childProfile.name,
                 builder: (context, state) => const ChildProfilePage(),
                 routes: [
+                  GoRoute(
+                    path: AppRoute.addChild.path,
+                    name: AppRoute.addChild.name,
+                    builder: (context, state) => const AddChildPage(),
+                  ),
                   GoRoute(
                     path: AppRoute.shareCentre.path,
                     name: AppRoute.shareCentre.name,

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/data/storage/primary_carer_local_data_source.dart';
+import 'package:medicines_for_children_flutter/core/domain/active_child_provider.dart';
+import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 import 'package:medicines_for_children_flutter/features/home/data/primary_carer_repository.dart';
@@ -125,6 +127,31 @@ class PrimaryCarerController extends StateNotifier<PrimaryCarerState> {
       return;
     }
     state = const PrimaryCarerState();
+  }
+
+  Future<bool> addChild(Child child) async {
+    final profileId = _activeProfileId;
+    if (profileId == null || profileId.isEmpty) {
+      state = state.copyWith(errorMessage: 'Select a profile before adding a child.');
+      return false;
+    }
+    final current = state.carer ?? _localDataSource.readForProfile(profileId);
+    if (current == null) {
+      state = state.copyWith(errorMessage: 'Unable to access your profile data.');
+      return false;
+    }
+    final updated = current.copyWith(children: [...current.children, child]);
+    await _localDataSource.writeForProfile(profileId, updated);
+    if (!mounted) {
+      return false;
+    }
+    state = state.copyWith(
+      carer: updated,
+      isStale: false,
+      clearError: true,
+    );
+    await _ref.read(selectedChildIdProvider.notifier).selectChild(child.id);
+    return true;
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medicines_for_children_flutter/core/data/storage/active_child_local_data_source.dart';
 import 'package:medicines_for_children_flutter/core/data/storage/profile_data_local_data_source.dart';
 import 'package:medicines_for_children_flutter/core/data/storage/shared_preferences_provider.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
@@ -102,6 +103,38 @@ void main() {
       expect(state.carer, isNull);
       final profileData = ProfileDataLocalDataSource(preferences);
       expect(profileData.readPrimaryCarer(profileId), isNull);
+    });
+
+    test('addChild appends child and selects it', () async {
+      final controller =
+          container.read(primaryCarerControllerProvider.notifier);
+      await _awaitAuthenticated(container);
+      await controller.refresh();
+
+      final child = Child(
+        id: 'child-2',
+        firstName: 'Leo',
+        lastName: 'Taylor',
+        dateOfBirth: DateTime(2020, 6, 10),
+        condition: 'Diabetes',
+        allergies: const [],
+        notes: null,
+        medicines: const [],
+        schedules: const [],
+        asNeededSchedules: const [],
+      );
+
+      final success = await controller.addChild(child);
+      expect(success, isTrue);
+      final state = container.read(primaryCarerControllerProvider);
+      expect(state.carer?.children.length, 2);
+
+      final profileData = ProfileDataLocalDataSource(preferences);
+      final cachedCarer = profileData.readPrimaryCarer(profileId);
+      expect(cachedCarer?.children.length, 2);
+
+      final activeChildStorage = ActiveChildLocalDataSource(preferences);
+      expect(activeChildStorage.readActiveChildId(profileId), 'child-2');
     });
   });
 }

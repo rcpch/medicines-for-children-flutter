@@ -17,11 +17,29 @@ class ChildProfilePage extends ConsumerWidget {
       return Scaffold(
         appBar: AppBar(
           title: const Text('Child profile'),
-          actions: const [ChildSwitcherAction()],
+          actions: [
+            IconButton(
+              tooltip: 'Add child',
+              icon: const Icon(Icons.person_add_alt),
+              onPressed: () => context.pushNamed(AppRoute.addChild.name),
+            ),
+            const ChildSwitcherAction(),
+          ],
         ),
-        body: const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text('No child profile available yet.'),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('No child profile available yet.'),
+              const SizedBox(height: 16),
+              FilledButton.icon(
+                onPressed: () => context.pushNamed(AppRoute.addChild.name),
+                icon: const Icon(Icons.person_add_alt),
+                label: const Text('Add child'),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -33,7 +51,14 @@ class ChildProfilePage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Child profile'),
-        actions: const [ChildSwitcherAction()],
+        actions: [
+          IconButton(
+            tooltip: 'Add child',
+            icon: const Icon(Icons.person_add_alt),
+            onPressed: () => context.pushNamed(AppRoute.addChild.name),
+          ),
+          const ChildSwitcherAction(),
+        ],
       ),
       body: SafeArea(
         child: ListView(
