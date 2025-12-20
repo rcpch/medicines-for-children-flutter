@@ -32,7 +32,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   DateTime? _childDob;
   int _currentStep = 0;
-  bool _confirmAccuracy = false;
 
   @override
   void initState() {
@@ -156,13 +155,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       });
       return;
     }
-    if (!_confirmAccuracy) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Confirm the details before continuing.')),
-      );
-      return;
-    }
-
     final authState = ref.read(authControllerProvider);
     final profileId = authState.user?.uid;
     if (profileId == null || profileId.isEmpty) {
@@ -414,19 +406,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                                       if (_childAllergiesController.text.trim().isNotEmpty)
                                         'Allergies: ${_childAllergiesController.text.trim()}',
                                     ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  CheckboxListTile(
-                                    value: _confirmAccuracy,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _confirmAccuracy = value ?? false;
-                                      });
-                                    },
-                                    controlAffinity: ListTileControlAffinity.leading,
-                                    title: const Text(
-                                      'I confirm these details are accurate and understand I can edit them later in the app.',
-                                    ),
                                   ),
                                 ],
                               ),
