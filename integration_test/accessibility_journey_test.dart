@@ -67,6 +67,7 @@ void main() {
     await profilesStore.writeActiveProfileId(profile.id);
 
     final profileData = ProfileDataLocalDataSource(prefs);
+    final now = DateTime.now();
     final child = Child(
       id: 'child-1',
       firstName: 'Ava',
@@ -87,7 +88,17 @@ void main() {
           frequency: 'Twice daily',
         ),
       ],
-      schedules: const [],
+      schedules: [
+        MedicineSchedule(
+          id: 'schedule-1',
+          medicineId: 'med-1',
+          startDate: now.subtract(const Duration(days: 1)),
+          endDate: now.add(const Duration(days: 1)),
+          times: const ['08:00'],
+          weekdaysActive: List<bool>.filled(7, true),
+          administrations: const [],
+        ),
+      ],
       asNeededSchedules: const [],
     );
     final carer = PrimaryCarer(
@@ -122,11 +133,19 @@ void main() {
 
     final container = ProviderScope.containerOf(tester.element(find.byType(MedicinesApp)));
     final router = container.read(appRouterProvider);
-    router.goNamed(AppRoute.addSchedule.name);
-    await tester.pumpAndSettle();
-
     final semantics = tester.ensureSemantics();
     addTearDown(semantics.dispose);
+
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is Semantics &&
+            widget.properties.label?.contains('Scheduled Amoxicillin') == true,
+      ),
+      findsWidgets,
+    );
+
+    router.goNamed(AppRoute.addSchedule.name);
+    await tester.pumpAndSettle();
 
     expect(
       find.byWidgetPredicate(
