@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cryptography/cryptography.dart';
 import 'package:intl/intl.dart';
 import 'package:medicines_for_children_flutter/core/data/backup/backup_service.dart';
 import 'package:medicines_for_children_flutter/core/config/app_config.dart';
@@ -220,27 +221,41 @@ class _HomePageState extends ConsumerState<HomePage> {
       return;
     }
 
-    try {
-      final backupService = ref.read(backupServiceProvider);
-      await backupService.restoreBackup(
-        bytes: bytes,
-        passphrase: details.passphrase,
-        newProfileName: details.profileName,
-        newPasscode: details.passcode,
-      );
-      if (!context.mounted) {
+    final backupService = ref.read(backupServiceProvider);
+    while (true) {
+      final passphrase = await _promptImportPassphrase(context);
+      if (passphrase == null) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Backup imported.')),
-      );
-    } catch (error) {
-      if (!context.mounted) {
+      try {
+        await backupService.restoreBackup(
+          bytes: bytes,
+          passphrase: passphrase,
+          newProfileName: details.profileName,
+          newPasscode: details.passcode,
+        );
+        if (!context.mounted) {
+          return;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Backup imported as a new profile.')),
+        );
+        return;
+      } catch (error) {
+        if (!context.mounted) {
+          return;
+        }
+        if (_isInvalidPassphrase(error)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Incorrect passphrase. Try again.')),
+          );
+          continue;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Unable to import backup: $error')),
+        );
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Unable to import backup: $error')),
-      );
     }
   }
 
@@ -315,12 +330,56 @@ class _HomePageState extends ConsumerState<HomePage> {
     return result;
   }
 
-  Future<_ImportDetails?> _promptImportDetails(BuildContext context) async {
+  Future<String?> _promptImportPassphrase(BuildContext context) async {
     final formKey = GlobalKey<FormState>();
     var passphrase = '';
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Enter backup passphrase'),
+          content: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: TextFormField(
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Passphrase'),
+                onChanged: (value) => passphrase = value,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Enter the backup passphrase';
+                  }
+                  return null;
+                },
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                if (formKey.currentState?.validate() ?? false) {
+                  Navigator.of(context).pop(passphrase.trim());
+                }
+              },
+              child: const Text('Continue'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result;
+  }
+
+  Future<_ImportDetails?> _promptImportDetails(BuildContext context) async {
+    final formKey = GlobalKey<FormState>();
     var profileName = '';
     var passcode = '';
-    var confirmPasscode = '';
 
     final result = await showDialog<_ImportDetails>(
       context: context,
@@ -333,33 +392,28 @@ class _HomePageState extends ConsumerState<HomePage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextFormField(
-                    obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Backup passphrase'),
-                    onChanged: (value) => passphrase = value,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Enter the backup passphrase';
-                      }
-                      return null;
-                    },
+                  Text(
+                    'Import creates a new profile on this device.',
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
-                    decoration: const InputDecoration(labelText: 'Profile name (optional)'),
+                    decoration: const InputDecoration(
+                      labelText: 'Import as (optional)',
+                      helperText: 'Leave blank to use the original profile name.',
+                    ),
                     onChanged: (value) => profileName = value,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Passcode (optional)'),
+                    decoration: const InputDecoration(labelText: 'New passcode (optional)'),
                     onChanged: (value) => passcode = value,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Confirm passcode'),
-                    onChanged: (value) => confirmPasscode = value,
+                    decoration: const InputDecoration(labelText: 'Confirm new passcode'),
                     validator: (value) {
                       if (passcode.trim().isEmpty) {
                         return null;
@@ -387,7 +441,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                 if (formKey.currentState?.validate() ?? false) {
                   Navigator.of(context).pop(
                     _ImportDetails(
-                      passphrase: passphrase.trim(),
                       profileName: profileName.trim().isEmpty ? null : profileName.trim(),
                       passcode: passcode.trim().isEmpty ? null : passcode.trim(),
                     ),
@@ -409,14 +462,16 @@ enum _HomeAction { exportBackup, importBackup, signOut }
 
 class _ImportDetails {
   const _ImportDetails({
-    required this.passphrase,
     this.profileName,
     this.passcode,
   });
 
-  final String passphrase;
   final String? profileName;
   final String? passcode;
+}
+
+bool _isInvalidPassphrase(Object error) {
+  return error is SecretBoxAuthenticationError;
 }
 
 class _HomeBody extends StatelessWidget {
