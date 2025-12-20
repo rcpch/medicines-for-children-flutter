@@ -1,8 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:medicines_for_children_flutter/core/config/app_config.dart';
+import 'package:medicines_for_children_flutter/core/data/storage/shared_preferences_provider.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 import 'package:medicines_for_children_flutter/features/share_centre/application/share_centre_providers.dart';
 import 'package:medicines_for_children_flutter/features/share_centre/data/share_centre_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FakeShareCentreRepository implements ShareCentreRepository {
   FakeShareCentreRepository(this.schedule);
@@ -77,6 +80,29 @@ class TestTelemetryService implements TelemetryService {
   void trackScreen(String name, {Map<String, Object?>? properties}) {}
 }
 
+Future<ProviderContainer> _createContainer({
+  required ShareCentreSchedule schedule,
+  required TestTelemetryService telemetry,
+}) async {
+  SharedPreferences.setMockInitialValues({});
+  final prefs = await SharedPreferences.getInstance();
+  const config = AppConfig(
+    environment: AppEnvironment.dev,
+    sharedScheduleApiBaseUrl: '',
+    sharedScheduleApiKey: '',
+  );
+  return ProviderContainer(
+    overrides: [
+      shareCentreRepositoryProvider.overrideWithValue(
+        FakeShareCentreRepository(schedule),
+      ),
+      telemetryServiceProvider.overrideWithValue(telemetry),
+      sharedPreferencesProvider.overrideWithValue(prefs),
+      appConfigProvider.overrideWithValue(config),
+    ],
+  );
+}
+
 void main() {
   test('share centre controller tracks create event', () async {
     final schedule = ShareCentreSchedule(
@@ -93,13 +119,9 @@ void main() {
       notes: '',
     );
     final telemetry = TestTelemetryService();
-    final container = ProviderContainer(
-      overrides: [
-        shareCentreRepositoryProvider.overrideWithValue(
-          FakeShareCentreRepository(schedule),
-        ),
-        telemetryServiceProvider.overrideWithValue(telemetry),
-      ],
+    final container = await _createContainer(
+      schedule: schedule,
+      telemetry: telemetry,
     );
     addTearDown(container.dispose);
 
@@ -135,13 +157,9 @@ void main() {
       notes: '',
     );
     final telemetry = TestTelemetryService();
-    final container = ProviderContainer(
-      overrides: [
-        shareCentreRepositoryProvider.overrideWithValue(
-          FakeShareCentreRepository(schedule),
-        ),
-        telemetryServiceProvider.overrideWithValue(telemetry),
-      ],
+    final container = await _createContainer(
+      schedule: schedule,
+      telemetry: telemetry,
     );
     addTearDown(container.dispose);
 
@@ -175,13 +193,9 @@ void main() {
       notes: '',
     );
     final telemetry = TestTelemetryService();
-    final container = ProviderContainer(
-      overrides: [
-        shareCentreRepositoryProvider.overrideWithValue(
-          FakeShareCentreRepository(schedule),
-        ),
-        telemetryServiceProvider.overrideWithValue(telemetry),
-      ],
+    final container = await _createContainer(
+      schedule: schedule,
+      telemetry: telemetry,
     );
     addTearDown(container.dispose);
 
