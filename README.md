@@ -78,6 +78,12 @@ The app routes secondary-carer links to `/auth/:token` and `/shared-schedule/:ap
 - `analysis_options.yaml` uses `flutter_lints` 5.x; prefer fixing lint violations over suppressing them.
 - `roadmap.md` tracks milestone definitions; `spec.md` contains the functional spec used to shape upcoming work.
 
+## Release automation
+
+- `fastlane/` contains TestFlight and Play internal lanes (see `fastlane/README.md` for required env vars).
+- `scripts/generate_release_checklist.sh` generates `build/release_checklist.md`.
+- Monitoring dashboard guidance lives in `docs/monitoring.md`.
+
 ## Next steps
 
 - Finish Milestone 2 polish focused on offline data editing, session edge cases, and secondary-carer deep-link handling.
