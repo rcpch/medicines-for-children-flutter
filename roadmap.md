@@ -99,7 +99,7 @@
 ## Milestone 9 – iOS/Webapp Parity (Non-Firebase)
 - **Technical steps**:
 	- [ ] Secondary-carer "Important information" view that mirrors the webapp (condition, notes, allergies, care period summary, download schedule).
-	- [ ] Secondary-carer guidance banner with dismiss state (webapp guidance copy parity).
-	- [ ] Secondary-carer schedule download action that can generate PDF if one is not already available.
-	- [ ] Share centre export flow for medicine summary PDF (iOS Export Medicine view parity).
-	- [ ] Local/offline schedule PDF export option for primary carers when backend is unavailable (iOS local PDF share parity).
+	- [x] Secondary-carer guidance banner with dismiss state (webapp guidance copy parity).
+	- [x] Secondary-carer schedule download action that can generate PDF if one is not already available.
+	- [x] Share centre export flow for medicine summary PDF (iOS Export Medicine view parity).
+	- [x] Local/offline schedule PDF export option for primary carers when backend is unavailable (iOS local PDF share parity).
