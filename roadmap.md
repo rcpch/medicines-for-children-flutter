@@ -68,7 +68,7 @@
 
 ## Milestone 6 – Quality, Compliance, and Release Readiness
 - **Technical steps**:
-	- Implement accessibility pass (semantic labels, large text support, high-contrast themes, screen-reader flows) and add automated `flutter_gherkin` or `integration_test` scripts covering critical journeys.
+	- [~] Implement accessibility pass (semantic labels, large text support, high-contrast themes, screen-reader flows) and add automated `flutter_gherkin` or `integration_test` scripts covering critical journeys.
 	- [x] Add privacy/legal surfaces (consent modals, privacy policy links, data deletion request entry point) and telemetry opt-in settings.
 	- Harden offline behaviour (cache last N days of schedules/medicines, queue mutations for retry) and add background sync service.
 	- Configure performance monitoring, error reporting, and in-app update prompts.

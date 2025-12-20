@@ -74,6 +74,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
       appBar: AppBar(
         title: const Text('Create a profile'),
         leading: IconButton(
+          tooltip: 'Back to login',
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.goNamed(AppRoute.login.name),
         ),
@@ -118,6 +119,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                         labelText: 'Passcode (optional)',
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
+                          tooltip: _obscurePasscode ? 'Show passcode' : 'Hide passcode',
                           onPressed: () {
                             setState(() {
                               _obscurePasscode = !_obscurePasscode;
@@ -139,6 +141,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                         labelText: 'Confirm passcode',
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
+                          tooltip: _obscureConfirmPasscode ? 'Show passcode' : 'Hide passcode',
                           onPressed: () {
                             setState(() {
                               _obscureConfirmPasscode = !_obscureConfirmPasscode;
@@ -185,4 +188,3 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     );
   }
 }
-
