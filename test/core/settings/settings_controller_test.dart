@@ -23,4 +23,25 @@ void main() {
     expect(state.telemetryEnabled, isFalse);
     expect(prefs.getBool('telemetry_enabled'), isFalse);
   });
+
+  test('settings controller records telemetry consent', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final container = ProviderContainer(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final controller = container.read(settingsControllerProvider.notifier);
+
+    await controller.setTelemetryConsent(enabled: true);
+
+    final state = container.read(settingsControllerProvider);
+    expect(state.telemetryEnabled, isTrue);
+    expect(state.telemetryConsentShown, isTrue);
+    expect(prefs.getBool('telemetry_enabled'), isTrue);
+    expect(prefs.getBool('telemetry_consent_shown'), isTrue);
+  });
 }

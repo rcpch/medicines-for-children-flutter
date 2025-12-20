@@ -11,6 +11,7 @@ import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.dart';
 import 'package:medicines_for_children_flutter/core/notifications/notification_service.dart';
 import 'package:medicines_for_children_flutter/core/presentation/child_switcher_action.dart';
+import 'package:medicines_for_children_flutter/core/settings/settings_controller.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
@@ -19,11 +20,58 @@ import 'package:medicines_for_children_flutter/features/home/application/primary
 import 'package:medicines_for_children_flutter/features/home/application/selected_date_provider.dart';
 import 'package:medicines_for_children_flutter/features/home/domain/daily_schedule_builder.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _maybeShowTelemetryConsent();
+    });
+  }
+
+  Future<void> _maybeShowTelemetryConsent() async {
+    final settings = ref.read(settingsControllerProvider);
+    if (settings.telemetryConsentShown) {
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
+    final controller = ref.read(settingsControllerProvider.notifier);
+    final allow = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Share anonymous analytics?'),
+        content: const Text(
+          'Help improve the app by sharing anonymous usage data. You can change this later in Settings.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('No thanks'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Allow'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted) {
+      return;
+    }
+    await controller.setTelemetryConsent(enabled: allow == true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(primaryCarerControllerProvider);
     final controller = ref.read(primaryCarerControllerProvider.notifier);
     final selectedDate = ref.watch(selectedDateProvider);
