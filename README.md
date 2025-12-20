@@ -23,22 +23,22 @@ This repository hosts the Flutter implementation of the Medicines for Children m
 
 ```bash
 # install dependencies
-make get
+flutter pub get
 
 # (re)generate freezed/json_serializable outputs
-make gen
+dart run build_runner build --delete-conflicting-outputs
 
 # run format, analyzer and tests
-make format
-make analyze
-make test
+dart format lib test
+flutter analyze
+flutter test --coverage
 
 # launch the dev flavor (uses lib/main_dev.dart)
-make run-dev
+flutter run --flavor dev --target lib/main_dev.dart
 
 # launch staging/prod flavors
-make run-staging
-make run-prod
+flutter run --flavor staging --target lib/main_staging.dart
+flutter run --flavor prod --target lib/main_prod.dart
 ```
 
 ## Project layout
@@ -80,7 +80,6 @@ The app routes secondary-carer links to `/auth/:token` and `/shared-schedule/:ap
 
 ## Tooling
 
-- `Makefile` shortcuts for common tasks (`get`, `gen`, `analyze`, `test`, `run-dev`)
 - `analysis_options.yaml` uses `flutter_lints` 5.x; prefer fixing lint violations over suppressing them.
 - `roadmap.md` tracks milestone definitions; `spec.md` contains the functional spec used to shape upcoming work.
 
