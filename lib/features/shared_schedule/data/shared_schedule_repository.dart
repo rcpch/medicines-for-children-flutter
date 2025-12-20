@@ -106,6 +106,42 @@ class SharedScheduleDay {
   final List<SharedScheduledItem> scheduledItemsForDay;
 }
 
+class SharedScheduleChildSummary {
+  const SharedScheduleChildSummary({
+    required this.firstName,
+    required this.lastName,
+    required this.condition,
+    required this.notes,
+    required this.allergies,
+  });
+
+  factory SharedScheduleChildSummary.fromJson(Map<String, dynamic> json) {
+    final allergiesValue = json['allergies'];
+    final allergies = allergiesValue is List
+        ? allergiesValue.map((item) => item.toString().trim()).where((item) => item.isNotEmpty).toList()
+        : _parseAllergies(allergiesValue?.toString() ?? '');
+
+    return SharedScheduleChildSummary(
+      firstName: _readString(json, ['firstName', 'firstname', 'givenName']),
+      lastName: _readString(json, ['lastName', 'surname', 'familyName']),
+      condition: _readString(json, ['condition']),
+      notes: _readString(json, ['notes', 'importantNotes']),
+      allergies: allergies,
+    );
+  }
+
+  final String firstName;
+  final String lastName;
+  final String condition;
+  final String notes;
+  final List<String> allergies;
+
+  String get displayName {
+    final name = '$firstName $lastName'.trim();
+    return name.isEmpty ? 'Child' : name;
+  }
+}
+
 class SharedScheduleViewModel {
   const SharedScheduleViewModel({
     required this.apiId,
@@ -116,6 +152,7 @@ class SharedScheduleViewModel {
     required this.medicinesById,
     required this.parentId,
     required this.carerFirstName,
+    required this.child,
     required this.pdfUrl,
     required this.scheduleUrl,
   });
@@ -142,6 +179,16 @@ class SharedScheduleViewModel {
 
     final dateFrom = rawFrom is String ? DateTime.tryParse(rawFrom) : null;
     final dateTo = rawTo is String ? DateTime.tryParse(rawTo) : null;
+    final rawChild = json['child'];
+    final child = rawChild is Map<String, dynamic>
+        ? SharedScheduleChildSummary.fromJson(rawChild)
+        : const SharedScheduleChildSummary(
+            firstName: '',
+            lastName: '',
+            condition: '',
+            notes: '',
+            allergies: <String>[],
+          );
 
     return SharedScheduleViewModel(
       apiId: (json['apiId'] ?? '').toString(),
@@ -152,6 +199,7 @@ class SharedScheduleViewModel {
       medicinesById: {for (final med in medicines) med.id: med},
       parentId: (json['parentId'] ?? '').toString(),
       carerFirstName: (json['carerFirstName'] ?? '').toString(),
+      child: child,
       pdfUrl: _readString(json, ['pdfUrl', 'pdfURL']),
       scheduleUrl: _readString(json, ['scheduleUrl', 'scheduleURL', 'url']),
     );
@@ -165,6 +213,7 @@ class SharedScheduleViewModel {
   final Map<String, SharedScheduleMedicineSummary> medicinesById;
   final String parentId;
   final String carerFirstName;
+  final SharedScheduleChildSummary child;
   final String pdfUrl;
   final String scheduleUrl;
 
@@ -188,11 +237,26 @@ String _readString(Map<String, dynamic> json, List<String> keys) {
   return '';
 }
 
+List<String> _parseAllergies(String raw) {
+  return raw
+      .split(',')
+      .map((item) => item.trim())
+      .where((item) => item.isNotEmpty)
+      .toList();
+}
+
 abstract class SharedScheduleRepository {
   Future<SharedScheduleAuthResult> exchangeLinkToken(String linkToken);
   Future<SharedScheduleViewModel> fetchSharedSchedule({
     required String apiId,
     required String authToken,
+  });
+  Future<String> exportSharedSchedulePdf({
+    required String apiId,
+    required String authToken,
+    required DateTime dateFrom,
+    required DateTime dateTo,
+    required String primaryCarerEmail,
   });
   Future<void> confirmSchedule({
     required String apiId,
@@ -254,6 +318,37 @@ class HttpSharedScheduleRepository implements SharedScheduleRepository {
     }
 
     return SharedScheduleViewModel.fromJson(first);
+  }
+
+  @override
+  Future<String> exportSharedSchedulePdf({
+    required String apiId,
+    required String authToken,
+    required DateTime dateFrom,
+    required DateTime dateTo,
+    required String primaryCarerEmail,
+  }) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/exportSharedSchedulePdf/$apiId',
+      data: <String, dynamic>{
+        'dateFrom': dateFrom.toIso8601String(),
+        'dateTo': dateTo.toIso8601String(),
+        'primaryCarerEmail': primaryCarerEmail,
+      },
+      options: Options(
+        headers: <String, dynamic>{'Authorization': 'token $authToken'},
+      ),
+    );
+
+    final json = response.data;
+    if (json == null) {
+      throw StateError('Empty PDF export response');
+    }
+    final pdfUrl = _readString(json, ['pdfUrl', 'pdfURL', 'url']);
+    if (pdfUrl.isEmpty) {
+      throw StateError('PDF export returned empty url');
+    }
+    return pdfUrl;
   }
 
   @override

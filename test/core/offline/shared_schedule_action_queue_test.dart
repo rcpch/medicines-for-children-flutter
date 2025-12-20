@@ -31,6 +31,17 @@ class FakeSharedScheduleRepository implements SharedScheduleRepository {
   }
 
   @override
+  Future<String> exportSharedSchedulePdf({
+    required String apiId,
+    required String authToken,
+    required DateTime dateFrom,
+    required DateTime dateTo,
+    required String primaryCarerEmail,
+  }) async {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<void> recordAdministration({
     required String apiId,
     required String authToken,
