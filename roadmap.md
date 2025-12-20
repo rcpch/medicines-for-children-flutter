@@ -89,10 +89,17 @@
 	- [x] Extend accessibility coverage for schedule semantics in integration tests.
 	- [x] Update coverage badge after running standard coverage tool.
 	- [x] Improve child date-of-birth picker defaults (year-first view, under-18 bounds).
-	- [ ] Share schedule text amended to "there are no shared schedules" when none exist.
 	- [x] Share schedule text amended to "there are no shared schedules" when none exist.
 	- [x] remove the confirmation checkbox when onboarding - there's no need for it.
 	- [x] put the "anonymous analytics" dialog behind a feature flag, we don't need it yet.
 	- [x] Import: on importing a backup, the dialog asks for the passphrase three times, I'm not sure why. It should ask once, and if it's wrong, show an error and ask again.
 	- [x] Import: It should be made clear that import creates a new profile.
 	- [x] Import: The Profile Name (optional) should make it clear that this "Import As <Profile Name>" or the original profile name will be used.
+
+## Milestone 9 – iOS/Webapp Parity (Non-Firebase)
+- **Technical steps**:
+	- [ ] Secondary-carer "Important information" view that mirrors the webapp (condition, notes, allergies, care period summary, download schedule).
+	- [ ] Secondary-carer guidance banner with dismiss state (webapp guidance copy parity).
+	- [ ] Secondary-carer schedule download action that can generate PDF if one is not already available.
+	- [ ] Share centre export flow for medicine summary PDF (iOS Export Medicine view parity).
+	- [ ] Local/offline schedule PDF export option for primary carers when backend is unavailable (iOS local PDF share parity).
