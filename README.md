@@ -64,6 +64,8 @@ Shared-schedule API configuration is optional. The app boots without env files (
 - Optional update prompt config:
   - `LATEST_APP_VERSION` and `MINIMUM_APP_VERSION` control update prompts.
   - `APP_UPDATE_URL` is copied to clipboard for update instructions.
+- Optional telemetry prompt config:
+  - `TELEMETRY_CONSENT_ENABLED` set to `true` to show the analytics consent dialog.
 
 ## Deep links (App Links / Universal Links)
 

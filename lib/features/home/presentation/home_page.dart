@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:medicines_for_children_flutter/core/data/backup/backup_service.dart';
+import 'package:medicines_for_children_flutter/core/config/app_config.dart';
 import 'package:medicines_for_children_flutter/core/platform/backup_file_io.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/administration.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
@@ -37,6 +38,10 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Future<void> _maybeShowTelemetryConsent() async {
+    final config = ref.read(appConfigProvider);
+    if (!config.telemetryConsentEnabled) {
+      return;
+    }
     final settings = ref.read(settingsControllerProvider);
     if (settings.telemetryConsentShown) {
       return;
