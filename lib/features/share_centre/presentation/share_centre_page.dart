@@ -8,6 +8,7 @@ import 'package:medicines_for_children_flutter/core/platform/backup_file_io.dart
 import 'package:medicines_for_children_flutter/core/pdf/medicine_summary_pdf_service.dart';
 import 'package:medicines_for_children_flutter/core/pdf/schedule_pdf_service.dart';
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_controller.dart';
+import 'package:medicines_for_children_flutter/features/home/application/primary_carer_state_provider.dart';
 import 'package:medicines_for_children_flutter/features/share_centre/application/share_centre_providers.dart';
 import 'package:medicines_for_children_flutter/features/share_centre/data/share_centre_repository.dart';
 
@@ -37,7 +38,7 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
 
     final actionState = ref.watch(shareCentreControllerProvider);
     final schedulesAsync = ref.watch(shareCentreSchedulesProvider(child.id));
-    final carerState = ref.watch(primaryCarerControllerProvider);
+    final carerState = ref.watch(primaryCarerStateProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Share centre')),

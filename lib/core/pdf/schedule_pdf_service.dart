@@ -25,7 +25,7 @@ class SchedulePdfService {
     final medicinesById = {
       for (final med in child.medicines) med.id: med,
     };
-    final dateRange = '${DateFormat.yMMMd().format(dateFrom)} – ${DateFormat.yMMMd().format(dateTo)}';
+    final dateRange = '${DateFormat.yMMMd().format(dateFrom)} - ${DateFormat.yMMMd().format(dateTo)}';
 
     doc.addPage(
       pw.MultiPage(
@@ -52,7 +52,7 @@ class SchedulePdfService {
             pw.SizedBox(height: 6),
             ...child.asNeededSchedules.map((schedule) {
               final medicine = medicinesById[schedule.medicineId];
-              return pw.Text(medicine?.displayName ?? 'Medicine');
+              return pw.Text(medicine == null ? 'Medicine' : _medicineName(medicine));
             }),
           ],
         ],
@@ -64,8 +64,8 @@ class SchedulePdfService {
 
   pw.Widget _scheduleBlock(MedicineSchedule schedule, Medicine? medicine) {
     final times = schedule.times.isEmpty ? 'No times recorded' : schedule.times.join(', ');
-    final dateRange = '${DateFormat.yMMMd().format(schedule.startDate)} – ${DateFormat.yMMMd().format(schedule.endDate)}';
-    final title = medicine?.displayName ?? 'Medicine';
+    final dateRange = '${DateFormat.yMMMd().format(schedule.startDate)} - ${DateFormat.yMMMd().format(schedule.endDate)}';
+    final title = medicine == null ? 'Medicine' : _medicineName(medicine);
 
     return pw.Container(
       margin: const pw.EdgeInsets.only(bottom: 12),
@@ -94,6 +94,13 @@ class SchedulePdfService {
   String _childName(Child child) {
     final name = '${child.firstName} ${child.lastName}'.trim();
     return name.isEmpty ? 'Child' : name;
+  }
+
+  String _medicineName(Medicine medicine) {
+    if (medicine.alias.trim().isEmpty) {
+      return medicine.name;
+    }
+    return '${medicine.name} (${medicine.alias})';
   }
 }
 

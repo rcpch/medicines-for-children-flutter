@@ -413,8 +413,8 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                                                       : 'Unable to record: $error',
                                                 ),
                                               ),
-                                            ),
-                                          );
+                                            );
+                                          }
                                         }
                                       },
                                       child: const Text('Skip'),

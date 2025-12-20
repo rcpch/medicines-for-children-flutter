@@ -61,7 +61,7 @@ class MedicineSummaryPdfService {
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
           pw.Text(
-            medicine.displayName,
+            _medicineName(medicine),
             style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
           ),
           pw.SizedBox(height: 6),
@@ -74,6 +74,13 @@ class MedicineSummaryPdfService {
   String _childName(Child child) {
     final name = '${child.firstName} ${child.lastName}'.trim();
     return name.isEmpty ? 'Child' : name;
+  }
+
+  String _medicineName(Medicine medicine) {
+    if (medicine.alias.trim().isEmpty) {
+      return medicine.name;
+    }
+    return '${medicine.name} (${medicine.alias})';
   }
 }
 
