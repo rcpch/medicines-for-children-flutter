@@ -100,12 +100,20 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   Future<void> _pickDateOfBirth() async {
     final now = DateTime.now();
-    final initial = _childDob ?? DateTime(now.year - 6);
+    final firstDate = DateTime(now.year - 18, now.month, now.day);
+    final lastDate = DateTime(now.year, now.month, now.day);
+    var initial = _childDob ?? DateTime(now.year - 8, now.month, now.day);
+    if (initial.isBefore(firstDate)) {
+      initial = firstDate;
+    } else if (initial.isAfter(lastDate)) {
+      initial = lastDate;
+    }
     final selected = await showDatePicker(
       context: context,
       initialDate: initial,
-      firstDate: DateTime(now.year - 25),
-      lastDate: now,
+      firstDate: firstDate,
+      lastDate: lastDate,
+      initialDatePickerMode: DatePickerMode.year,
     );
     if (selected != null) {
       setState(() {
