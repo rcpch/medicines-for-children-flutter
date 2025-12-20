@@ -14,6 +14,7 @@ import 'package:medicines_for_children_flutter/features/onboarding/presentation/
 import 'package:medicines_for_children_flutter/features/schedules/presentation/as_needed_record_page.dart';
 import 'package:medicines_for_children_flutter/features/schedules/presentation/schedule_form_page.dart';
 import 'package:medicines_for_children_flutter/features/schedules/presentation/schedules_page.dart';
+import 'package:medicines_for_children_flutter/features/settings/presentation/settings_page.dart';
 import 'package:medicines_for_children_flutter/features/shared_schedule/presentation/shared_schedule_link_page.dart';
 import 'package:medicines_for_children_flutter/features/shared_schedule/presentation/shared_schedule_page.dart';
 import 'package:medicines_for_children_flutter/features/share_centre/presentation/share_centre_detail_page.dart';
@@ -42,6 +43,7 @@ enum AppRoute {
   shareCentre('share-centre'),
   shareCentreCreate('create'),
   shareCentreDetail(':shareId'),
+  settings('settings'),
   sharedScheduleLink('/auth/:token'),
   sharedSchedule('/shared-schedule/:apiId');
 
@@ -170,6 +172,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                         ),
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: AppRoute.settings.path,
+                    name: AppRoute.settings.name,
+                    builder: (context, state) => const SettingsPage(),
                   ),
                 ],
               ),

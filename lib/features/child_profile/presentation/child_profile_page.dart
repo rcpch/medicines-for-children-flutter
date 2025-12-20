@@ -116,6 +116,15 @@ class ChildProfilePage extends ConsumerWidget {
                 onTap: () => context.pushNamed(AppRoute.shareCentre.name),
               ),
             ),
+            const SizedBox(height: 12),
+            Card(
+              child: ListTile(
+                title: const Text('Settings'),
+                subtitle: const Text('Privacy, analytics, and data deletion.'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.pushNamed(AppRoute.settings.name),
+              ),
+            ),
           ],
         ),
       ),

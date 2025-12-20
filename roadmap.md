@@ -21,7 +21,7 @@
 	- [x] Implement local profile repository (create/select/unlock via passcode).
 	- [x] Build authentication controller (Riverpod/Bloc) with states: `unauthenticated`, `authenticating`, `authenticated`, `error`.
 	- [x] Create routing shell using `go_router` with guarded branches for onboarding/login, primary app tabs, and secondary-carer deep links.
-	- [~] Add multi-child support foundations (child picker, per-child storage/selection, shared schedule scoping, and UI routing updates).
+	- [x] Add multi-child support foundations (child picker, per-child storage/selection, shared schedule scoping, and UI routing updates).
 	- [x] Add child picker UI with per-profile child selection persistence.
 	- [x] Ship profile selection + create profile flows with validation, loading states, and Riverpod wiring.
 	- [x] Implement onboarding + signup flows using shared form widgets, Riverpod wiring, and local persistence for draft profiles.
@@ -69,7 +69,7 @@
 ## Milestone 6 – Quality, Compliance, and Release Readiness
 - **Technical steps**:
 	- Implement accessibility pass (semantic labels, large text support, high-contrast themes, screen-reader flows) and add automated `flutter_gherkin` or `integration_test` scripts covering critical journeys.
-	- Add privacy/legal surfaces (consent modals, privacy policy links, data deletion request entry point) and telemetry opt-in settings.
+	- [~] Add privacy/legal surfaces (consent modals, privacy policy links, data deletion request entry point) and telemetry opt-in settings.
 	- Harden offline behaviour (cache last N days of schedules/medicines, queue mutations for retry) and add background sync service.
 	- Configure performance monitoring, error reporting, and in-app update prompts.
 	- Finalize CI/CD: automated beta builds (Fastlane) to TestFlight/Internal App Sharing, artifact signing, release checklist automation, and monitoring dashboards.
