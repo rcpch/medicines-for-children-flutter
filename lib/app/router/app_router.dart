@@ -23,6 +23,7 @@ import 'package:medicines_for_children_flutter/features/share_centre/presentatio
 import 'package:medicines_for_children_flutter/features/share_centre/presentation/share_centre_page.dart';
 import 'package:medicines_for_children_flutter/features/splash/presentation/splash_page.dart';
 import 'package:medicines_for_children_flutter/features/user_guide/presentation/user_guide_page.dart';
+import 'package:medicines_for_children_flutter/features/user_guide/presentation/user_guide_detail_page.dart';
 import 'package:medicines_for_children_flutter/app/router/primary_shell.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_observer.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
@@ -48,6 +49,7 @@ enum AppRoute {
   shareCentreDetail(':shareId'),
   settings('settings'),
   userGuide('/guide'),
+  userGuideDetail('guide/:sectionId'),
   sharedScheduleLink('/auth/:token'),
   sharedSchedule('/shared-schedule/:apiId');
 
@@ -197,6 +199,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: AppRoute.userGuide.path,
                 name: AppRoute.userGuide.name,
                 builder: (context, state) => const UserGuidePage(),
+                routes: [
+                  GoRoute(
+                    path: ':sectionId',
+                    name: AppRoute.userGuideDetail.name,
+                    builder: (context, state) => UserGuideDetailPage(
+                      sectionId: state.pathParameters['sectionId'] ?? '',
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
