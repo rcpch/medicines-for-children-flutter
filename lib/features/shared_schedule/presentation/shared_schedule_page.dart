@@ -351,19 +351,21 @@ class SharedSchedulePage extends ConsumerWidget {
   }
 
   Future<String?> _promptDeclineReason(BuildContext context) async {
-    final controller = TextEditingController();
+    var reason = '';
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Decline schedule'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Reason (optional)',
-            hintText: 'Add a note for the primary carer',
+        content: SingleChildScrollView(
+          child: TextField(
+            decoration: const InputDecoration(
+              labelText: 'Reason (optional)',
+              hintText: 'Add a note for the primary carer',
+            ),
+            onChanged: (value) => reason = value,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => Navigator.of(context).pop(reason.trim()),
           ),
-          textInputAction: TextInputAction.done,
-          onSubmitted: (_) => Navigator.of(context).pop(controller.text.trim()),
         ),
         actions: [
           TextButton(
@@ -371,13 +373,12 @@ class SharedSchedulePage extends ConsumerWidget {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
+            onPressed: () => Navigator.of(context).pop(reason.trim()),
             child: const Text('Submit'),
           ),
         ],
       ),
     );
-    controller.dispose();
     return result;
   }
 
