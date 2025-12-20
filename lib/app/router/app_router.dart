@@ -22,6 +22,7 @@ import 'package:medicines_for_children_flutter/features/share_centre/presentatio
 import 'package:medicines_for_children_flutter/features/share_centre/presentation/share_centre_form_page.dart';
 import 'package:medicines_for_children_flutter/features/share_centre/presentation/share_centre_page.dart';
 import 'package:medicines_for_children_flutter/features/splash/presentation/splash_page.dart';
+import 'package:medicines_for_children_flutter/features/user_guide/presentation/user_guide_page.dart';
 import 'package:medicines_for_children_flutter/app/router/primary_shell.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_observer.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
@@ -46,6 +47,7 @@ enum AppRoute {
   shareCentreCreate('create'),
   shareCentreDetail(':shareId'),
   settings('settings'),
+  userGuide('/guide'),
   sharedScheduleLink('/auth/:token'),
   sharedSchedule('/shared-schedule/:apiId');
 
@@ -186,6 +188,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     builder: (context, state) => const SettingsPage(),
                   ),
                 ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoute.userGuide.path,
+                name: AppRoute.userGuide.name,
+                builder: (context, state) => const UserGuidePage(),
               ),
             ],
           ),

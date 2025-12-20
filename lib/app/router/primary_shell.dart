@@ -34,6 +34,11 @@ class PrimaryShell extends StatelessWidget {
             selectedIcon: Icon(Icons.child_care),
             label: 'Child',
           ),
+          NavigationDestination(
+            icon: Icon(Icons.menu_book_outlined),
+            selectedIcon: Icon(Icons.menu_book),
+            label: 'Guide',
+          ),
         ],
       ),
     );
