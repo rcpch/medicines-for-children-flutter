@@ -8,6 +8,9 @@ class AppConfig {
     required this.environment,
     required this.sharedScheduleApiBaseUrl,
     required this.sharedScheduleApiKey,
+    this.appUpdateUrl = '',
+    this.latestAppVersion = '',
+    this.minimumAppVersion = '',
   });
 
   factory AppConfig.fromEnvironment(AppEnvironment environment) {
@@ -22,12 +25,18 @@ class AppConfig {
       environment: environment,
       sharedScheduleApiBaseUrl: read('SHARED_SCHEDULE_API_BASE_URL'),
       sharedScheduleApiKey: read('SHARED_SCHEDULE_API_KEY'),
+      appUpdateUrl: read('APP_UPDATE_URL'),
+      latestAppVersion: read('LATEST_APP_VERSION'),
+      minimumAppVersion: read('MINIMUM_APP_VERSION'),
     );
   }
 
   final AppEnvironment environment;
   final String sharedScheduleApiBaseUrl;
   final String sharedScheduleApiKey;
+  final String appUpdateUrl;
+  final String latestAppVersion;
+  final String minimumAppVersion;
 }
 
 final appConfigProvider = Provider<AppConfig>((ref) {

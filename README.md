@@ -61,6 +61,9 @@ Shared-schedule API configuration is optional. The app boots without env files (
 
 - `SHARED_SCHEDULE_API_BASE_URL` and `SHARED_SCHEDULE_API_KEY` map to the shared schedule backend described in `spec.md`.
 - The Dio client attaches the `ApiKey` header automatically via `securedApiClientProvider`.
+- Optional update prompt config:
+  - `LATEST_APP_VERSION` and `MINIMUM_APP_VERSION` control update prompts.
+  - `APP_UPDATE_URL` is copied to clipboard for update instructions.
 
 ## Deep links (App Links / Universal Links)
 

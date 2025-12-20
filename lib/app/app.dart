@@ -9,6 +9,7 @@ import 'package:medicines_for_children_flutter/core/config/app_config.dart';
 import 'package:medicines_for_children_flutter/core/config/app_theme.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/auth_status.dart';
+import 'package:medicines_for_children_flutter/core/update/update_prompt_service.dart';
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_controller.dart';
 
 class MedicinesApp extends ConsumerStatefulWidget {
@@ -22,6 +23,7 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> with WidgetsBinding
   late final GoRouter _router;
   ProviderSubscription<AuthState>? _authSubscription;
   bool _reportedSlowFrame = false;
+  bool _checkedForUpdates = false;
 
   @override
   void initState() {
@@ -29,6 +31,7 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> with WidgetsBinding
     _router = ref.read(appRouterProvider);
     WidgetsBinding.instance.addObserver(this);
     _configureErrorHandling();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybePromptForUpdate());
     _authSubscription = ref.listenManual<AuthState>(
       authControllerProvider,
       (previous, next) {
@@ -44,6 +47,14 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> with WidgetsBinding
       },
       fireImmediately: true,
     );
+  }
+
+  Future<void> _maybePromptForUpdate() async {
+    if (_checkedForUpdates) {
+      return;
+    }
+    _checkedForUpdates = true;
+    await ref.read(updatePromptServiceProvider).maybePrompt(context);
   }
 
   void _configureErrorHandling() {
