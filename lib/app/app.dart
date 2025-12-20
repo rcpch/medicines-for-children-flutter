@@ -8,6 +8,7 @@ import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/core/config/app_config.dart';
 import 'package:medicines_for_children_flutter/core/config/app_theme.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
+import 'package:medicines_for_children_flutter/core/offline/share_action_queue.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/auth_status.dart';
 import 'package:medicines_for_children_flutter/core/update/update_prompt_service.dart';
@@ -25,6 +26,7 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> with WidgetsBinding
   ProviderSubscription<AuthState>? _authSubscription;
   bool _reportedSlowFrame = false;
   bool _checkedForUpdates = false;
+  bool _processedQueue = false;
 
   @override
   void initState() {
@@ -32,7 +34,10 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> with WidgetsBinding
     _router = ref.read(appRouterProvider);
     WidgetsBinding.instance.addObserver(this);
     _configureErrorHandling();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _maybePromptForUpdate());
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _maybePromptForUpdate();
+      await _processQueuedActions();
+    });
     _authSubscription = ref.listenManual<AuthState>(
       authControllerProvider,
       (previous, next) {
@@ -56,6 +61,14 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> with WidgetsBinding
     }
     _checkedForUpdates = true;
     await ref.read(updatePromptServiceProvider).maybePrompt(context);
+  }
+
+  Future<void> _processQueuedActions() async {
+    if (_processedQueue) {
+      return;
+    }
+    _processedQueue = true;
+    await ref.read(shareActionQueueServiceProvider).processQueue();
   }
 
   void _configureErrorHandling() {
@@ -109,6 +122,8 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> with WidgetsBinding
     final authState = ref.read(authControllerProvider);
     if (authState.status == AuthStatus.authenticated) {
       ref.read(primaryCarerControllerProvider.notifier).refresh();
+      _processedQueue = false;
+      unawaited(_processQueuedActions());
     }
   }
 

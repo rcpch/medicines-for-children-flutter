@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/network/api_client.dart';
+import 'package:medicines_for_children_flutter/core/offline/share_action_queue.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 import 'package:medicines_for_children_flutter/features/share_centre/data/share_centre_repository.dart';
 
@@ -27,11 +29,13 @@ class ShareCentreActionState {
 class ShareCentreController extends StateNotifier<ShareCentreActionState> {
   ShareCentreController(this._ref, this._repository)
       : _telemetry = _ref.read(telemetryServiceProvider),
+        _queue = _ref.read(shareActionQueueServiceProvider),
         super(const ShareCentreActionState());
 
   final Ref _ref;
   final ShareCentreRepository _repository;
   final TelemetryService _telemetry;
+  final ShareActionQueueService _queue;
 
   Future<ShareCentreSchedule?> createSchedule({
     required String childId,
@@ -59,10 +63,29 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
       _ref.invalidate(shareCentreSchedulesProvider(childId));
       state = state.copyWith(isSaving: false, clearError: true);
       return schedule;
-    } catch (_) {
+    } catch (error) {
+      if (_isNetworkError(error)) {
+        await _queue.enqueue(
+          PendingShareAction(
+            id: 'share-create-${DateTime.now().millisecondsSinceEpoch}',
+            type: ShareActionType.create,
+            payload: {
+              'childId': childId,
+              'email': email,
+              'dateFrom': dateFrom.toIso8601String(),
+              'dateTo': dateTo.toIso8601String(),
+              'digital': digital,
+              'notes': notes,
+            },
+            queuedAt: DateTime.now(),
+          ),
+        );
+      }
       state = state.copyWith(
         isSaving: false,
-        errorMessage: 'Unable to create this share right now.',
+        errorMessage: _isNetworkError(error)
+            ? 'No connection. Share creation queued for retry.'
+            : 'Unable to create this share right now.',
       );
       return null;
     }
@@ -93,10 +116,29 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
       _ref.invalidate(shareCentreSchedulesProvider(childId));
       state = state.copyWith(isSaving: false, clearError: true);
       return schedule;
-    } catch (_) {
+    } catch (error) {
+      if (_isNetworkError(error)) {
+        await _queue.enqueue(
+          PendingShareAction(
+            id: 'share-update-${DateTime.now().millisecondsSinceEpoch}',
+            type: ShareActionType.update,
+            payload: {
+              'apiId': apiId,
+              'childId': childId,
+              'dateFrom': dateFrom.toIso8601String(),
+              'dateTo': dateTo.toIso8601String(),
+              'digital': digital,
+              'notes': notes,
+            },
+            queuedAt: DateTime.now(),
+          ),
+        );
+      }
       state = state.copyWith(
         isSaving: false,
-        errorMessage: 'Unable to update this share right now.',
+        errorMessage: _isNetworkError(error)
+            ? 'No connection. Share update queued for retry.'
+            : 'Unable to update this share right now.',
       );
       return null;
     }
@@ -144,10 +186,24 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
       _ref.invalidate(shareCentreSchedulesProvider(childId));
       state = state.copyWith(isSaving: false, clearError: true);
       return schedule;
-    } catch (_) {
+    } catch (error) {
+      if (_isNetworkError(error)) {
+        await _queue.enqueue(
+          PendingShareAction(
+            id: 'share-end-${DateTime.now().millisecondsSinceEpoch}',
+            type: ShareActionType.end,
+            payload: {
+              'apiId': apiId,
+            },
+            queuedAt: DateTime.now(),
+          ),
+        );
+      }
       state = state.copyWith(
         isSaving: false,
-        errorMessage: 'Unable to end this share right now.',
+        errorMessage: _isNetworkError(error)
+            ? 'No connection. Share end queued for retry.'
+            : 'Unable to end this share right now.',
       );
       return null;
     }
@@ -174,14 +230,40 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
       _ref.invalidate(shareCentreSchedulesProvider(childId));
       state = state.copyWith(isSaving: false, clearError: true);
       return schedule;
-    } catch (_) {
+    } catch (error) {
+      if (_isNetworkError(error)) {
+        await _queue.enqueue(
+          PendingShareAction(
+            id: 'share-delete-${DateTime.now().millisecondsSinceEpoch}',
+            type: ShareActionType.delete,
+            payload: {
+              'apiId': apiId,
+              'childId': childId,
+              'dateFrom': dateFrom.toIso8601String(),
+              'dateTo': dateTo.toIso8601String(),
+            },
+            queuedAt: DateTime.now(),
+          ),
+        );
+      }
       state = state.copyWith(
         isSaving: false,
-        errorMessage: 'Unable to delete this share right now.',
+        errorMessage: _isNetworkError(error)
+            ? 'No connection. Share delete queued for retry.'
+            : 'Unable to delete this share right now.',
       );
       return null;
     }
   }
+}
+
+bool _isNetworkError(Object error) {
+  if (error is DioException) {
+    return error.type == DioExceptionType.connectionError ||
+        error.type == DioExceptionType.connectionTimeout ||
+        error.type == DioExceptionType.unknown;
+  }
+  return false;
 }
 
 final shareCentreRepositoryProvider = Provider<ShareCentreRepository>((ref) {
