@@ -70,7 +70,13 @@
 - **Technical steps**:
 	- [~] Implement accessibility pass (semantic labels, large text support, high-contrast themes, screen-reader flows) and add automated `flutter_gherkin` or `integration_test` scripts covering critical journeys.
 	- [x] Add privacy/legal surfaces (consent modals, privacy policy links, data deletion request entry point) and telemetry opt-in settings.
+	- Add dark theme support aligned to brand palette and accessibility guidance.
 	- Harden offline behaviour (cache last N days of schedules/medicines, queue mutations for retry) and add background sync service.
 	- Configure performance monitoring, error reporting, and in-app update prompts.
 	- Finalize CI/CD: automated beta builds (Fastlane) to TestFlight/Internal App Sharing, artifact signing, release checklist automation, and monitoring dashboards.
 - **Gate**: Release candidate build passes full regression + accessibility audit, automated integration suite, penetration/security review, and is accepted by pilot carers; monitoring dashboard shows zero critical crashes over pilot week.
+
+## Milestone 7 – Open Source Contribution & Community Engagement
+- **Technical steps**:
+	- [ ] Prepare contribution guidelines, code of conduct, and issue/PR templates.
+	- [ ] Add open source license (GPL3)

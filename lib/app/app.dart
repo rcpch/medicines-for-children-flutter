@@ -55,6 +55,8 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> {
     return MaterialApp.router(
       title: 'Medicines for Children (${config.environment.name})',
       theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      highContrastTheme: AppTheme.highContrast,
       routerConfig: _router,
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
