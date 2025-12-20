@@ -27,6 +27,16 @@ class FakeShareCentreRepository implements ShareCentreRepository {
   }
 
   @override
+  Future<String> exportSchedulePdf({
+    required String childId,
+    required DateTime dateFrom,
+    required DateTime dateTo,
+    required String primaryCarerEmail,
+  }) async {
+    return 'https://example.com/schedule.pdf';
+  }
+
+  @override
   Future<ShareCentreSchedule> updateSharedSchedule({
     required String apiId,
     required String childId,
@@ -146,6 +156,46 @@ void main() {
     expect(result, isNotNull);
     final tracked = telemetry.events.any(
       (event) => event.name == 'share_centre_deleted' && event.properties?['shareId'] == 'share-2',
+    );
+    expect(tracked, isTrue);
+  });
+
+  test('share centre controller tracks pdf export event', () async {
+    final schedule = ShareCentreSchedule(
+      apiId: 'share-3',
+      status: 'active',
+      dateFrom: DateTime(2024, 1, 1),
+      dateTo: DateTime(2024, 1, 10),
+      isDigital: false,
+      isDeleted: false,
+      carerEmail: 'carer@example.com',
+      carerName: 'Morgan',
+      scheduleUrl: '',
+      pdfUrl: '',
+      notes: '',
+    );
+    final telemetry = TestTelemetryService();
+    final container = ProviderContainer(
+      overrides: [
+        shareCentreRepositoryProvider.overrideWithValue(
+          FakeShareCentreRepository(schedule),
+        ),
+        telemetryServiceProvider.overrideWithValue(telemetry),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final controller = container.read(shareCentreControllerProvider.notifier);
+    final result = await controller.exportPdf(
+      childId: 'child-1',
+      dateFrom: DateTime(2024, 1, 1),
+      dateTo: DateTime(2024, 1, 10),
+      primaryCarerEmail: 'primary@example.com',
+    );
+
+    expect(result, isNotNull);
+    final tracked = telemetry.events.any(
+      (event) => event.name == 'share_centre_pdf_exported' && event.properties?['childId'] == 'child-1',
     );
     expect(tracked, isTrue);
   });

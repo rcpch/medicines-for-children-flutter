@@ -102,6 +102,34 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
     }
   }
 
+  Future<String?> exportPdf({
+    required String childId,
+    required DateTime dateFrom,
+    required DateTime dateTo,
+    required String primaryCarerEmail,
+  }) async {
+    state = state.copyWith(isSaving: true, clearError: true);
+    try {
+      final pdfUrl = await _repository.exportSchedulePdf(
+        childId: childId,
+        dateFrom: dateFrom,
+        dateTo: dateTo,
+        primaryCarerEmail: primaryCarerEmail,
+      );
+      _telemetry.trackEvent('share_centre_pdf_exported', properties: {
+        'childId': childId,
+      });
+      state = state.copyWith(isSaving: false, clearError: true);
+      return pdfUrl;
+    } catch (_) {
+      state = state.copyWith(
+        isSaving: false,
+        errorMessage: 'Unable to generate a PDF right now.',
+      );
+      return null;
+    }
+  }
+
   Future<ShareCentreSchedule?> endSchedule({
     required String childId,
     required String apiId,

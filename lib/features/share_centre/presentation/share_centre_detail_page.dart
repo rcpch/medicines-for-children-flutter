@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:medicines_for_children_flutter/core/domain/active_child_provider.dart';
 import 'package:medicines_for_children_flutter/features/share_centre/application/share_centre_providers.dart';
 import 'package:medicines_for_children_flutter/features/share_centre/data/share_centre_repository.dart';
+import 'package:medicines_for_children_flutter/features/home/application/primary_carer_state_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ShareCentreDetailPage extends ConsumerWidget {
@@ -27,6 +28,7 @@ class ShareCentreDetailPage extends ConsumerWidget {
 
     final actionState = ref.watch(shareCentreControllerProvider);
     final controller = ref.read(shareCentreControllerProvider.notifier);
+    final carerEmail = ref.watch(primaryCarerStateProvider).carer?.email ?? '';
     final schedulesAsync = ref.watch(shareCentreSchedulesProvider(child.id));
 
     return Scaffold(
@@ -123,6 +125,32 @@ class ShareCentreDetailPage extends ConsumerWidget {
                         : () => _shareLink(schedule.pdfUrl, subject: 'Shared schedule PDF'),
                     icon: const Icon(Icons.share_outlined),
                     label: const Text('Share PDF link'),
+                  ),
+                ],
+                if (schedule.pdfUrl.isEmpty) ...[
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: actionState.isSaving
+                        ? null
+                        : () async {
+                            if (carerEmail.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Add a primary carer email to export a PDF.')),
+                              );
+                              return;
+                            }
+                            final pdfUrl = await controller.exportPdf(
+                              childId: child.id,
+                              dateFrom: schedule.dateFrom,
+                              dateTo: schedule.dateTo,
+                              primaryCarerEmail: carerEmail,
+                            );
+                            if (pdfUrl != null && context.mounted) {
+                              await _shareLink(pdfUrl, subject: 'Shared schedule PDF');
+                            }
+                          },
+                    icon: const Icon(Icons.picture_as_pdf_outlined),
+                    label: const Text('Generate PDF'),
                   ),
                 ],
                 const SizedBox(height: 24),

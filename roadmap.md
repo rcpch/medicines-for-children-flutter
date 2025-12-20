@@ -57,7 +57,7 @@
 
 ## Milestone 5 – Sharing Centre & Backend API Integration
 - **Technical steps**:
-	- [~] Implement HTTP client for shared schedule endpoints (`/sharedSchedule`, `/mySharedSchedules`, `/exportSchedulePdf`, `/auth/:token`, `/administration/:apiId` etc.) with ApiKey/token headers.
+	- [x] Implement HTTP client for shared schedule endpoints (`/sharedSchedule`, `/mySharedSchedules`, `/exportSchedulePdf`, `/auth/:token`, `/administration/:apiId` etc.) with ApiKey/token headers.
 	- [x] Add shared schedule confirm/decline + administration recording endpoints.
 	- [x] Build Share Centre UI: list of shares, detail view, create/extend/end flows, PDF export, digital link presentation (including native share sheet integration).
 	- [x] Add Share Centre list, create form, detail management, and link copy actions.

@@ -76,6 +76,12 @@ abstract class ShareCentreRepository {
     required bool digital,
     String? notes,
   });
+  Future<String> exportSchedulePdf({
+    required String childId,
+    required DateTime dateFrom,
+    required DateTime dateTo,
+    required String primaryCarerEmail,
+  });
   Future<ShareCentreSchedule> updateSharedSchedule({
     required String apiId,
     required String childId,
@@ -140,6 +146,35 @@ class HttpShareCentreRepository implements ShareCentreRepository {
       throw StateError('Empty shared schedule response');
     }
     return ShareCentreSchedule.fromJson(json);
+  }
+
+  @override
+  Future<String> exportSchedulePdf({
+    required String childId,
+    required DateTime dateFrom,
+    required DateTime dateTo,
+    required String primaryCarerEmail,
+  }) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/exportSchedulePdf',
+      data: <String, dynamic>{
+        'childId': childId,
+        'primaryCarerEmail': primaryCarerEmail,
+        'dateFrom': dateFrom.toIso8601String(),
+        'dateTo': dateTo.toIso8601String(),
+      },
+    );
+
+    final json = response.data;
+    if (json == null) {
+      throw StateError('Empty PDF export response');
+    }
+
+    final pdfUrl = _readString(json, ['pdfUrl', 'pdfURL', 'url']);
+    if (pdfUrl.isEmpty) {
+      throw StateError('PDF export returned empty url');
+    }
+    return pdfUrl;
   }
 
   @override
