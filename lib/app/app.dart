@@ -26,6 +26,7 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> {
   void initState() {
     super.initState();
     _router = ref.read(appRouterProvider);
+    _configureErrorHandling();
     _authSubscription = ref.listenManual<AuthState>(
       authControllerProvider,
       (previous, next) {
@@ -41,6 +42,24 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> {
       },
       fireImmediately: true,
     );
+  }
+
+  void _configureErrorHandling() {
+    final telemetry = ref.read(telemetryServiceProvider);
+    FlutterError.onError = (details) {
+      telemetry.trackEvent('app_error', properties: {
+        'exception': details.exceptionAsString(),
+        'context': details.context?.toDescription(),
+      });
+      FlutterError.presentError(details);
+    };
+    WidgetsBinding.instance.platformDispatcher.onError = (error, stack) {
+      telemetry.trackEvent('app_error', properties: {
+        'exception': error.toString(),
+        'stack': stack.toString(),
+      });
+      return false;
+    };
   }
 
   @override
