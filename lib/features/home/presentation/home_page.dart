@@ -244,47 +244,49 @@ class _HomePageState extends ConsumerState<HomePage> {
     required String title,
     required String confirmLabel,
   }) async {
-    final passphraseController = TextEditingController();
-    final confirmController = TextEditingController();
     final formKey = GlobalKey<FormState>();
+    var passphrase = '';
+    var confirmPassphrase = '';
 
     final result = await showDialog<String>(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: Text(title),
-          content: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: passphraseController,
-                  obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Passphrase'),
-                  validator: (value) {
-                    if (value == null || value.trim().length < 8) {
-                      return 'Use at least 8 characters';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: confirmController,
-                  obscureText: true,
-                  decoration: InputDecoration(labelText: confirmLabel),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Confirm your passphrase';
-                    }
-                    if (value != passphraseController.text) {
-                      return 'Passphrases do not match';
-                    }
-                    return null;
-                  },
-                ),
-              ],
+          content: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    obscureText: true,
+                    decoration: const InputDecoration(labelText: 'Passphrase'),
+                    onChanged: (value) => passphrase = value,
+                    validator: (value) {
+                      if (value == null || value.trim().length < 8) {
+                        return 'Use at least 8 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    obscureText: true,
+                    decoration: InputDecoration(labelText: confirmLabel),
+                    onChanged: (value) => confirmPassphrase = value,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Confirm your passphrase';
+                      }
+                      if (value != passphrase) {
+                        return 'Passphrases do not match';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
@@ -295,7 +297,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             ElevatedButton(
               onPressed: () {
                 if (formKey.currentState?.validate() ?? false) {
-                  Navigator.of(context).pop(passphraseController.text.trim());
+                  Navigator.of(context).pop(passphrase.trim());
                 }
               },
               child: const Text('Continue'),
@@ -305,69 +307,69 @@ class _HomePageState extends ConsumerState<HomePage> {
       },
     );
 
-    passphraseController.dispose();
-    confirmController.dispose();
     return result;
   }
 
   Future<_ImportDetails?> _promptImportDetails(BuildContext context) async {
-    final passphraseController = TextEditingController();
-    final profileNameController = TextEditingController();
-    final passcodeController = TextEditingController();
-    final confirmController = TextEditingController();
     final formKey = GlobalKey<FormState>();
+    var passphrase = '';
+    var profileName = '';
+    var passcode = '';
+    var confirmPasscode = '';
 
     final result = await showDialog<_ImportDetails>(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Import backup'),
-          content: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: passphraseController,
-                  obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Backup passphrase'),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Enter the backup passphrase';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: profileNameController,
-                  decoration: const InputDecoration(labelText: 'Profile name (optional)'),
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: passcodeController,
-                  obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Passcode (optional)'),
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: confirmController,
-                  obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Confirm passcode'),
-                  validator: (value) {
-                    if (passcodeController.text.trim().isEmpty) {
+          content: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    obscureText: true,
+                    decoration: const InputDecoration(labelText: 'Backup passphrase'),
+                    onChanged: (value) => passphrase = value,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Enter the backup passphrase';
+                      }
                       return null;
-                    }
-                    if (value == null || value.isEmpty) {
-                      return 'Confirm your passcode';
-                    }
-                    if (value != passcodeController.text) {
-                      return 'Passcodes do not match';
-                    }
-                    return null;
-                  },
-                ),
-              ],
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    decoration: const InputDecoration(labelText: 'Profile name (optional)'),
+                    onChanged: (value) => profileName = value,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    obscureText: true,
+                    decoration: const InputDecoration(labelText: 'Passcode (optional)'),
+                    onChanged: (value) => passcode = value,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    obscureText: true,
+                    decoration: const InputDecoration(labelText: 'Confirm passcode'),
+                    onChanged: (value) => confirmPasscode = value,
+                    validator: (value) {
+                      if (passcode.trim().isEmpty) {
+                        return null;
+                      }
+                      if (value == null || value.isEmpty) {
+                        return 'Confirm your passcode';
+                      }
+                      if (value != passcode) {
+                        return 'Passcodes do not match';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
@@ -380,13 +382,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                 if (formKey.currentState?.validate() ?? false) {
                   Navigator.of(context).pop(
                     _ImportDetails(
-                      passphrase: passphraseController.text.trim(),
-                      profileName: profileNameController.text.trim().isEmpty
-                          ? null
-                          : profileNameController.text.trim(),
-                      passcode: passcodeController.text.trim().isEmpty
-                          ? null
-                          : passcodeController.text.trim(),
+                      passphrase: passphrase.trim(),
+                      profileName: profileName.trim().isEmpty ? null : profileName.trim(),
+                      passcode: passcode.trim().isEmpty ? null : passcode.trim(),
                     ),
                   );
                 }
@@ -398,10 +396,6 @@ class _HomePageState extends ConsumerState<HomePage> {
       },
     );
 
-    passphraseController.dispose();
-    profileNameController.dispose();
-    passcodeController.dispose();
-    confirmController.dispose();
     return result;
   }
 }
