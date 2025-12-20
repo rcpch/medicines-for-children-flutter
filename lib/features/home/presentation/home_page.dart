@@ -734,78 +734,94 @@ class _ScheduleTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final adminState = ref.watch(administrationControllerProvider);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(entry.timeLabel, style: theme.textTheme.titleMedium),
-              const SizedBox(height: 4),
-              Text(
-                entry.medicine.name,
-                style: theme.textTheme.bodyLarge,
-              ),
-              Text(
-                '${entry.medicine.dose} ${entry.medicine.doseUnit} · ${entry.medicine.route}',
-                style: theme.textTheme.bodySmall,
-              ),
-            ],
-          ),
-          const Spacer(),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: _statusColor(context).withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(32),
+    return Semantics(
+      label:
+          'Scheduled ${entry.medicine.name} at ${entry.timeLabel}. Dose ${entry.medicine.dose} ${entry.medicine.doseUnit}. Status ${_statusLabel()}.',
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(entry.timeLabel, style: theme.textTheme.titleMedium),
+                const SizedBox(height: 4),
+                Text(
+                  entry.medicine.name,
+                  style: theme.textTheme.bodyLarge,
                 ),
-                child: Text(
-                  _statusLabel(),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: _statusColor(context),
-                    fontWeight: FontWeight.bold,
+                Text(
+                  '${entry.medicine.dose} ${entry.medicine.doseUnit} · ${entry.medicine.route}',
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
+            const Spacer(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: _statusColor(context).withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(32),
+                  ),
+                  child: Text(
+                    _statusLabel(),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: _statusColor(context),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 6),
-              if (entry.status == AdministrationStatus.scheduled)
-                Row(
-                  children: [
-                    TextButton(
-                      onPressed: adminState.isSaving
-                          ? null
-                          : () => _markStatus(
-                                context,
-                                ref,
-                                AdministrationStatus.given,
-                              ),
-                      child: const Text('Given'),
+                const SizedBox(height: 6),
+                if (entry.status == AdministrationStatus.scheduled)
+                  Row(
+                    children: [
+                      Semantics(
+                        button: true,
+                        label: 'Mark ${entry.medicine.name} as given',
+                        child: TextButton(
+                          onPressed: adminState.isSaving
+                              ? null
+                              : () => _markStatus(
+                                    context,
+                                    ref,
+                                    AdministrationStatus.given,
+                                  ),
+                          child: const Text('Given'),
+                        ),
+                      ),
+                      Semantics(
+                        button: true,
+                        label: 'Mark ${entry.medicine.name} as skipped',
+                        child: TextButton(
+                          onPressed: adminState.isSaving
+                              ? null
+                              : () => _markStatus(
+                                    context,
+                                    ref,
+                                    AdministrationStatus.skipped,
+                                  ),
+                          child: const Text('Skip'),
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Semantics(
+                    button: true,
+                    label: 'Undo status for ${entry.medicine.name}',
+                    child: TextButton(
+                      onPressed: adminState.isSaving ? null : () => _undo(context, ref),
+                      child: const Text('Undo'),
                     ),
-                    TextButton(
-                      onPressed: adminState.isSaving
-                          ? null
-                          : () => _markStatus(
-                                context,
-                                ref,
-                                AdministrationStatus.skipped,
-                              ),
-                      child: const Text('Skip'),
-                    ),
-                  ],
-                )
-              else
-                TextButton(
-                  onPressed: adminState.isSaving ? null : () => _undo(context, ref),
-                  child: const Text('Undo'),
-                ),
-            ],
-          ),
-        ],
+                  ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
