@@ -14,7 +14,7 @@
 	- [x] Implement local profile storage (JSON blob per profile) with optional passcode hashing.
 	- [x] Add encrypted export/import (passphrase-based) for user-controlled backups.
 	- [x] Build mocked data sources for unit testing (in-memory repos returning fake child/medicine/schedule data).
-- **Gate**: Running `flutter test` executes data-layer unit tests; app boots to placeholder home without any backend configured on both iOS simulator and Android emulator.
+- **Gate**: Running `flutter test` executes data-layer unit tests; app boots to the home dashboard without any backend configured on both iOS simulator and Android emulator.
 
 ## Milestone 2 – Local Profiles & App Shell
 - **Technical steps**:
@@ -26,7 +26,7 @@
 	- [x] Ship profile selection + create profile flows with validation, loading states, and Riverpod wiring.
 	- [x] Implement onboarding + signup flows using shared form widgets, Riverpod wiring, and local persistence for draft profiles.
 	- [x] Persist auth session and user metadata in shared preferences so the home shell boots with cached context.
-- **Gate**: Manual QA demonstrates profile create/select/unlock flows on both platforms; automated widget tests cover validation and error messaging; deep link to `/secondary?token=mock` routes to pending state screen.
+- **Gate**: Manual QA demonstrates profile create/select/unlock flows on both platforms; automated widget tests cover validation and error messaging; deep link to `/auth/:token` routes to pending state screen.
 
 ## Milestone 3 – Read-Only Primary Carer Experience
 - **Technical steps**:
