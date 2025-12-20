@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:medicines_for_children_flutter/core/offline/shared_schedule_action_queue.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 import 'package:medicines_for_children_flutter/features/shared_schedule/application/shared_schedule_providers.dart';
 import 'package:share_plus/share_plus.dart';
@@ -14,6 +16,7 @@ class SharedSchedulePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final session = ref.watch(sharedScheduleSessionProvider);
     final telemetry = ref.read(telemetryServiceProvider);
+    final actionQueue = ref.read(sharedScheduleActionQueueServiceProvider);
 
     if (session == null || session.apiId != apiId) {
       return Scaffold(
@@ -94,9 +97,30 @@ class SharedSchedulePage extends ConsumerWidget {
                                   });
                                   ref.invalidate(sharedScheduleViewModelProvider(session));
                                 } catch (error) {
+                                  if (_isNetworkError(error)) {
+                                    await actionQueue.enqueue(
+                                      PendingSharedScheduleAction(
+                                        id: 'shared-confirm-${DateTime.now().millisecondsSinceEpoch}',
+                                        type: SharedScheduleActionType.confirm,
+                                        payload: {
+                                          'apiId': model.apiId,
+                                          'authToken': session.authToken,
+                                          'approved': true,
+                                          'reason': null,
+                                        },
+                                        queuedAt: DateTime.now(),
+                                      ),
+                                    );
+                                  }
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Unable to approve: $error')),
+                                      SnackBar(
+                                        content: Text(
+                                          _isNetworkError(error)
+                                              ? 'No connection. Approval queued for retry.'
+                                              : 'Unable to approve: $error',
+                                        ),
+                                      ),
                                     );
                                   }
                                 }
@@ -122,9 +146,30 @@ class SharedSchedulePage extends ConsumerWidget {
                                   });
                                   ref.invalidate(sharedScheduleViewModelProvider(session));
                                 } catch (error) {
+                                  if (_isNetworkError(error)) {
+                                    await actionQueue.enqueue(
+                                      PendingSharedScheduleAction(
+                                        id: 'shared-decline-${DateTime.now().millisecondsSinceEpoch}',
+                                        type: SharedScheduleActionType.confirm,
+                                        payload: {
+                                          'apiId': model.apiId,
+                                          'authToken': session.authToken,
+                                          'approved': false,
+                                          'reason': reason,
+                                        },
+                                        queuedAt: DateTime.now(),
+                                      ),
+                                    );
+                                  }
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Unable to decline: $error')),
+                                      SnackBar(
+                                        content: Text(
+                                          _isNetworkError(error)
+                                              ? 'No connection. Decline queued for retry.'
+                                              : 'Unable to decline: $error',
+                                        ),
+                                      ),
                                     );
                                   }
                                 }
@@ -189,9 +234,36 @@ class SharedSchedulePage extends ConsumerWidget {
                                           );
                                         }
                                       } catch (error) {
+                                        if (_isNetworkError(error)) {
+                                          await actionQueue.enqueue(
+                                            PendingSharedScheduleAction(
+                                              id: 'shared-record-${DateTime.now().millisecondsSinceEpoch}',
+                                              type: SharedScheduleActionType.record,
+                                              payload: {
+                                                'apiId': model.apiId,
+                                                'authToken': session.authToken,
+                                                'parentId': model.parentId,
+                                                'adminBy': model.carerFirstName.isEmpty ? 'Carer' : model.carerFirstName,
+                                                'dateTime': dateTime.toIso8601String(),
+                                                'isAsNeeded': false,
+                                                'skipped': false,
+                                                'scheduledItemId': item.id,
+                                                'medicineId': null,
+                                                'notes': null,
+                                              },
+                                              queuedAt: DateTime.now(),
+                                            ),
+                                          );
+                                        }
                                         if (context.mounted) {
                                           ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text('Unable to record: $error')),
+                                            SnackBar(
+                                              content: Text(
+                                                _isNetworkError(error)
+                                                    ? 'No connection. Record queued for retry.'
+                                                    : 'Unable to record: $error',
+                                              ),
+                                            ),
                                           );
                                         }
                                       }
@@ -227,9 +299,36 @@ class SharedSchedulePage extends ConsumerWidget {
                                           );
                                         }
                                       } catch (error) {
+                                        if (_isNetworkError(error)) {
+                                          await actionQueue.enqueue(
+                                            PendingSharedScheduleAction(
+                                              id: 'shared-skip-${DateTime.now().millisecondsSinceEpoch}',
+                                              type: SharedScheduleActionType.record,
+                                              payload: {
+                                                'apiId': model.apiId,
+                                                'authToken': session.authToken,
+                                                'parentId': model.parentId,
+                                                'adminBy': model.carerFirstName.isEmpty ? 'Carer' : model.carerFirstName,
+                                                'dateTime': dateTime.toIso8601String(),
+                                                'isAsNeeded': false,
+                                                'skipped': true,
+                                                'scheduledItemId': item.id,
+                                                'medicineId': null,
+                                                'notes': null,
+                                              },
+                                              queuedAt: DateTime.now(),
+                                            ),
+                                          );
+                                        }
                                         if (context.mounted) {
                                           ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text('Unable to record: $error')),
+                                            SnackBar(
+                                              content: Text(
+                                                _isNetworkError(error)
+                                                    ? 'No connection. Record queued for retry.'
+                                                    : 'Unable to record: $error',
+                                              ),
+                                            ),
                                           );
                                         }
                                       }
@@ -295,4 +394,13 @@ class SharedSchedulePage extends ConsumerWidget {
     }
     return null;
   }
+}
+
+bool _isNetworkError(Object error) {
+  if (error is DioException) {
+    return error.type == DioExceptionType.connectionError ||
+        error.type == DioExceptionType.connectionTimeout ||
+        error.type == DioExceptionType.unknown;
+  }
+  return false;
 }
