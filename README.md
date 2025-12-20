@@ -1,22 +1,21 @@
 # Medicines for Children · Flutter Port
 ![Coverage](https://img.shields.io/badge/coverage-32.7%25-yellow)
 
-This repository hosts the Flutter implementation of the Medicines for Children mobile and web client. The build now targets **Milestone 5 (Sharing Centre & Backend API Integration)** with secondary-carer flows and share management delivered.
+This repository hosts the Flutter implementation of the Medicines for Children mobile and web client. The app delivers the sharing centre, secondary-carer flows, offline-first storage, and release readiness milestones.
 
 ## Current status
 
 - ✅ Tooling and offline-first profile storage are live.
 - ✅ Local profile repository + Riverpod controller + GoRouter guard redirect users between splash/login/onboarding/home.
-- ✅ Splash, onboarding, and home placeholders exercise the auth state machine, with profile selection + optional passcode gating.
-- ✅ Dedicated signup and multi-step onboarding flows capture primary carer + first-child context, persist onboarding data locally, and promote users into the authenticated shell once complete.
+- ✅ Onboarding flows capture primary carer + first-child context, persist onboarding data locally, and promote users into the authenticated shell once complete.
 - ✅ Primary carer data hydrates from local storage so the home shell can render immediately.
 - ✅ Encrypted export/import supports offline backups that can be stored in personal cloud/USB/email.
 - ✅ Multi-child selection, offline CRUD, and notification scheduling are in place.
-- 🚧 Remaining Milestone 5 work: harden secondary-carer info view and finish backend-driven deep link hosting.
+- ✅ Share centre, secondary-carer experience, and deep-link routing are implemented.
 
 ## Prerequisites
 
-- Flutter 3.27.0+ with Dart 3.8+
+- Flutter 3.32.0+ with Dart 3.8+
 - Xcode 15 / Android Studio Iguana+ for platform builds
 
 ## Quick start
@@ -45,7 +44,7 @@ flutter run --flavor prod --target lib/main_prod.dart
 
 - `lib/app/` – app shell, router, configuration
 - `lib/core/` – cross-cutting utilities (theme, environment helpers, etc.)
-- `lib/features/` – feature modules (splash, auth/login/onboarding/home placeholders, future pods)
+- `lib/features/` – feature modules (auth, onboarding, home, medicines, schedules, sharing, settings)
 - `lib/bootstrap.dart` – top-level initialization entry point
 - `test/` – widget/unit tests seeded with a splash smoke test
 
@@ -91,6 +90,6 @@ The app routes secondary-carer links to `/auth/:token` and `/shared-schedule/:ap
 
 ## Next steps
 
-- Finish Milestone 2 polish focused on offline data editing, session edge cases, and secondary-carer deep-link handling.
-- Add deep-link handling for secondary-carer tokens and expand tests per `roadmap.md`.
-- Move into Milestone 3 (read-only primary experience) once the auth shell is complete.
+- Expand integration coverage for multi-child flows and backup import validation.
+- Harden platform deep-link configuration for production hosts.
+- Continue iteration from `roadmap.md` as new milestones are added.
