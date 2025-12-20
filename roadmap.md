@@ -48,9 +48,10 @@
 	- [x] Integrate `flutter_local_notifications` + timezone package to schedule reminders per recurrence; persist metadata in local store so reminders survive restarts.
 	- [x] Add undo actions for mark-as-given/skipped actions; optionally sync changes if a backend is configured.
 	- [x] Expand unit tests to cover mutation success/failure.
-	- [~] Add integration tests for CRUD flows and notification scheduling.
+	- [x] Add integration tests for CRUD flows and notification scheduling.
 	- [x] Add integration test for medicine + schedule creation flow (notifications disabled).
 	- [x] Add integration test for schedule creation with notification metadata.
+	- [x] Add integration test for medicine edit and schedule delete flows.
 	- [x] Add unit tests for notification scheduling logic.
 - **Gate**: QA script proves user can add medicine, create schedule, receive local reminder, mark administration; automated integration test (using `integration_test`) passes for CRUD flows.
 
