@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/core/config/app_config.dart';
 import 'package:medicines_for_children_flutter/core/config/app_theme.dart';
+import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/auth_status.dart';
 import 'package:medicines_for_children_flutter/core/update/update_prompt_service.dart';

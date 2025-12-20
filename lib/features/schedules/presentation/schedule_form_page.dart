@@ -346,25 +346,29 @@ class _DateField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = value == null ? 'Select date' : DateFormat.yMMMd().format(value!);
-    return InkWell(
-      onTap: () async {
-        final now = DateTime.now();
-        final picked = await showDatePicker(
-          context: context,
-          initialDate: value ?? now,
-          firstDate: DateTime(now.year - 2),
-          lastDate: DateTime(now.year + 5),
-        );
-        if (picked != null) {
-          onPick(picked);
-        }
-      },
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: const Icon(Icons.event_outlined),
+    return Semantics(
+      button: true,
+      label: '$label. ${value == null ? 'No date selected' : text}.',
+      child: InkWell(
+        onTap: () async {
+          final now = DateTime.now();
+          final picked = await showDatePicker(
+            context: context,
+            initialDate: value ?? now,
+            firstDate: DateTime(now.year - 2),
+            lastDate: DateTime(now.year + 5),
+          );
+          if (picked != null) {
+            onPick(picked);
+          }
+        },
+        child: InputDecorator(
+          decoration: InputDecoration(
+            labelText: label,
+            prefixIcon: const Icon(Icons.event_outlined),
+          ),
+          child: Text(text),
         ),
-        child: Text(text),
       ),
     );
   }

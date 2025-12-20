@@ -259,7 +259,12 @@ class SharedSchedulePage extends ConsumerWidget {
         title: const Text('Decline schedule'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(labelText: 'Reason (optional)'),
+          decoration: const InputDecoration(
+            labelText: 'Reason (optional)',
+            hintText: 'Add a note for the primary carer',
+          ),
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) => Navigator.of(context).pop(controller.text.trim()),
         ),
         actions: [
           TextButton(

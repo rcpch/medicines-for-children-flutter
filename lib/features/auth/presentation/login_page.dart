@@ -58,7 +58,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             obscureText: true,
             decoration: const InputDecoration(
               labelText: 'Passcode',
+              hintText: 'Enter passcode to unlock',
             ),
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) async {
+              await ref
+                  .read(authControllerProvider.notifier)
+                  .unlockWithPasscode(_passcodeController.text.trim());
+              if (!context.mounted) {
+                return;
+              }
+              Navigator.of(context).pop();
+            },
           ),
           actions: [
             TextButton(
@@ -178,4 +189,3 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 }
-

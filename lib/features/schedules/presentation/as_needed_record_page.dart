@@ -152,32 +152,36 @@ class _DateTimeField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final formatted = DateFormat('d MMM y · h:mm a').format(value);
-    return InkWell(
-      onTap: () async {
-        final date = await showDatePicker(
-          context: context,
-          initialDate: value,
-          firstDate: DateTime(value.year - 2),
-          lastDate: DateTime(value.year + 2),
-        );
-        if (date == null) {
-          return;
-        }
-        final time = await showTimePicker(
-          context: context,
-          initialTime: TimeOfDay.fromDateTime(value),
-        );
-        if (time == null) {
-          return;
-        }
-        onPick(DateTime(date.year, date.month, date.day, time.hour, time.minute));
-      },
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: const Icon(Icons.access_time_outlined),
+    return Semantics(
+      button: true,
+      label: '$label. Selected $formatted.',
+      child: InkWell(
+        onTap: () async {
+          final date = await showDatePicker(
+            context: context,
+            initialDate: value,
+            firstDate: DateTime(value.year - 2),
+            lastDate: DateTime(value.year + 2),
+          );
+          if (date == null) {
+            return;
+          }
+          final time = await showTimePicker(
+            context: context,
+            initialTime: TimeOfDay.fromDateTime(value),
+          );
+          if (time == null) {
+            return;
+          }
+          onPick(DateTime(date.year, date.month, date.day, time.hour, time.minute));
+        },
+        child: InputDecorator(
+          decoration: InputDecoration(
+            labelText: label,
+            prefixIcon: const Icon(Icons.access_time_outlined),
+          ),
+          child: Text(formatted),
         ),
-        child: Text(formatted),
       ),
     );
   }
