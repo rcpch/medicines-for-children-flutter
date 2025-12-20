@@ -4,14 +4,26 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/core/domain/active_child_provider.dart';
+import 'package:medicines_for_children_flutter/core/platform/backup_file_io.dart';
+import 'package:medicines_for_children_flutter/core/pdf/medicine_summary_pdf_service.dart';
+import 'package:medicines_for_children_flutter/core/pdf/schedule_pdf_service.dart';
+import 'package:medicines_for_children_flutter/features/home/application/primary_carer_controller.dart';
 import 'package:medicines_for_children_flutter/features/share_centre/application/share_centre_providers.dart';
 import 'package:medicines_for_children_flutter/features/share_centre/data/share_centre_repository.dart';
 
-class ShareCentrePage extends ConsumerWidget {
+class ShareCentrePage extends ConsumerStatefulWidget {
   const ShareCentrePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ShareCentrePage> createState() => _ShareCentrePageState();
+}
+
+class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
+  bool _exportingSchedule = false;
+  bool _exportingMedicines = false;
+
+  @override
+  Widget build(BuildContext context) {
     final child = ref.watch(activeChildProvider);
     if (child == null) {
       return Scaffold(
@@ -25,6 +37,7 @@ class ShareCentrePage extends ConsumerWidget {
 
     final actionState = ref.watch(shareCentreControllerProvider);
     final schedulesAsync = ref.watch(shareCentreSchedulesProvider(child.id));
+    final carerState = ref.watch(primaryCarerControllerProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Share centre')),
@@ -36,6 +49,55 @@ class ShareCentrePage extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Export PDFs', style: Theme.of(context).textTheme.titleMedium),
+                      const SizedBox(height: 8),
+                      const Text('Generate a PDF from local data to share or print.'),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: [
+                          FilledButton.icon(
+                            onPressed: _exportingSchedule
+                                ? null
+                                : () => _exportSchedulePdf(context, carerState),
+                            icon: _exportingSchedule
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                : const Icon(Icons.picture_as_pdf_outlined),
+                            label: const Text('Export schedule'),
+                          ),
+                          OutlinedButton.icon(
+                            onPressed: _exportingMedicines
+                                ? null
+                                : () => _exportMedicinePdf(context, carerState),
+                            icon: _exportingMedicines
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                : const Icon(Icons.medication_outlined),
+                            label: const Text('Export medicines'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
             if (actionState.errorMessage != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -98,6 +160,115 @@ class ShareCentrePage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _exportSchedulePdf(BuildContext context, PrimaryCarerState carerState) async {
+    final child = ref.read(activeChildProvider);
+    if (child == null || carerState.carer == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to access child profile data.')),
+      );
+      return;
+    }
+
+    final now = DateTime.now();
+    final range = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(now.year - 1),
+      lastDate: DateTime(now.year + 1),
+      initialDateRange: DateTimeRange(
+        start: now,
+        end: now.add(const Duration(days: 7)),
+      ),
+    );
+    if (range == null) {
+      return;
+    }
+    final days = range.end.difference(range.start).inDays;
+    if (days > 14) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Schedule export is limited to 14 days.')),
+      );
+      return;
+    }
+
+    setState(() => _exportingSchedule = true);
+    try {
+      final pdfService = ref.read(schedulePdfServiceProvider);
+      final bytes = await pdfService.buildPdf(
+        carer: carerState.carer!,
+        child: child,
+        dateFrom: range.start,
+        dateTo: range.end,
+      );
+      final fileIO = ref.read(backupFileIOProvider);
+      final fileName =
+          'mfc-schedule-${DateFormat('yyyyMMdd').format(range.start)}-${DateFormat('yyyyMMdd').format(range.end)}.pdf';
+      await fileIO.saveBytes(
+        bytes: bytes,
+        filename: fileName,
+        mimeType: 'application/pdf',
+      );
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Schedule PDF saved.')),
+      );
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Unable to export schedule: $error')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _exportingSchedule = false);
+      }
+    }
+  }
+
+  Future<void> _exportMedicinePdf(BuildContext context, PrimaryCarerState carerState) async {
+    final child = ref.read(activeChildProvider);
+    if (child == null || carerState.carer == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to access child profile data.')),
+      );
+      return;
+    }
+    setState(() => _exportingMedicines = true);
+    try {
+      final pdfService = ref.read(medicineSummaryPdfServiceProvider);
+      final bytes = await pdfService.buildPdf(
+        carer: carerState.carer!,
+        child: child,
+      );
+      final fileIO = ref.read(backupFileIOProvider);
+      final fileName = 'mfc-medicines-${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf';
+      await fileIO.saveBytes(
+        bytes: bytes,
+        filename: fileName,
+        mimeType: 'application/pdf',
+      );
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Medicines PDF saved.')),
+      );
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Unable to export medicines: $error')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _exportingMedicines = false);
+      }
+    }
   }
 }
 
