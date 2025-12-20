@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 import 'package:medicines_for_children_flutter/features/shared_schedule/application/shared_schedule_providers.dart';
 
 class SharedSchedulePage extends ConsumerWidget {
@@ -11,6 +12,7 @@ class SharedSchedulePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final session = ref.watch(sharedScheduleSessionProvider);
+    final telemetry = ref.read(telemetryServiceProvider);
 
     if (session == null || session.apiId != apiId) {
       return Scaffold(
@@ -76,6 +78,9 @@ class SharedSchedulePage extends ConsumerWidget {
                                     authToken: session.authToken,
                                     approved: true,
                                   );
+                                  telemetry.trackEvent('share_schedule_approved', properties: {
+                                    'shareId': model.apiId,
+                                  });
                                   ref.invalidate(sharedScheduleViewModelProvider(session));
                                 } catch (error) {
                                   if (context.mounted) {
@@ -101,6 +106,9 @@ class SharedSchedulePage extends ConsumerWidget {
                                     approved: false,
                                     reason: reason,
                                   );
+                                  telemetry.trackEvent('share_schedule_declined', properties: {
+                                    'shareId': model.apiId,
+                                  });
                                   ref.invalidate(sharedScheduleViewModelProvider(session));
                                 } catch (error) {
                                   if (context.mounted) {
@@ -158,6 +166,11 @@ class SharedSchedulePage extends ConsumerWidget {
                                           skipped: false,
                                           scheduledItemId: item.id,
                                         );
+                                        telemetry.trackEvent('share_schedule_admin_recorded', properties: {
+                                          'shareId': model.apiId,
+                                          'scheduledItemId': item.id,
+                                          'skipped': false,
+                                        });
                                         ref.invalidate(sharedScheduleViewModelProvider(session));
                                         if (context.mounted) {
                                           ScaffoldMessenger.of(context).showSnackBar(
@@ -191,6 +204,11 @@ class SharedSchedulePage extends ConsumerWidget {
                                           skipped: true,
                                           scheduledItemId: item.id,
                                         );
+                                        telemetry.trackEvent('share_schedule_admin_recorded', properties: {
+                                          'shareId': model.apiId,
+                                          'scheduledItemId': item.id,
+                                          'skipped': true,
+                                        });
                                         ref.invalidate(sharedScheduleViewModelProvider(session));
                                         if (context.mounted) {
                                           ScaffoldMessenger.of(context).showSnackBar(

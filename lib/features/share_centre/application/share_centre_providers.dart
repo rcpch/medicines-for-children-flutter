@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/network/api_client.dart';
+import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 import 'package:medicines_for_children_flutter/features/share_centre/data/share_centre_repository.dart';
 
 class ShareCentreActionState {
@@ -24,10 +25,13 @@ class ShareCentreActionState {
 }
 
 class ShareCentreController extends StateNotifier<ShareCentreActionState> {
-  ShareCentreController(this._ref, this._repository) : super(const ShareCentreActionState());
+  ShareCentreController(this._ref, this._repository)
+      : _telemetry = _ref.read(telemetryServiceProvider),
+        super(const ShareCentreActionState());
 
   final Ref _ref;
   final ShareCentreRepository _repository;
+  final TelemetryService _telemetry;
 
   Future<ShareCentreSchedule?> createSchedule({
     required String childId,
@@ -47,6 +51,11 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
         digital: digital,
         notes: notes,
       );
+      _telemetry.trackEvent('share_centre_created', properties: {
+        'childId': childId,
+        'shareId': schedule.apiId,
+        'digital': digital,
+      });
       _ref.invalidate(shareCentreSchedulesProvider(childId));
       state = state.copyWith(isSaving: false, clearError: true);
       return schedule;
@@ -77,6 +86,10 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
         digital: digital,
         notes: notes,
       );
+      _telemetry.trackEvent('share_centre_updated', properties: {
+        'childId': childId,
+        'shareId': schedule.apiId,
+      });
       _ref.invalidate(shareCentreSchedulesProvider(childId));
       state = state.copyWith(isSaving: false, clearError: true);
       return schedule;
@@ -96,6 +109,10 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
     state = state.copyWith(isSaving: true, clearError: true);
     try {
       final schedule = await _repository.endSharedSchedule(apiId: apiId);
+      _telemetry.trackEvent('share_centre_ended', properties: {
+        'childId': childId,
+        'shareId': schedule.apiId,
+      });
       _ref.invalidate(shareCentreSchedulesProvider(childId));
       state = state.copyWith(isSaving: false, clearError: true);
       return schedule;
@@ -122,6 +139,10 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
         dateFrom: dateFrom,
         dateTo: dateTo,
       );
+      _telemetry.trackEvent('share_centre_deleted', properties: {
+        'childId': childId,
+        'shareId': schedule.apiId,
+      });
       _ref.invalidate(shareCentreSchedulesProvider(childId));
       state = state.copyWith(isSaving: false, clearError: true);
       return schedule;

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:medicines_for_children_flutter/core/domain/active_child_provider.dart';
 import 'package:medicines_for_children_flutter/features/share_centre/application/share_centre_providers.dart';
 import 'package:medicines_for_children_flutter/features/share_centre/data/share_centre_repository.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ShareCentreDetailPage extends ConsumerWidget {
   const ShareCentreDetailPage({super.key, required this.shareId});
@@ -96,6 +97,16 @@ class ShareCentreDetailPage extends ConsumerWidget {
                     icon: const Icon(Icons.link),
                     label: const Text('Copy schedule link'),
                   ),
+                if (schedule.scheduleUrl.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: actionState.isSaving
+                        ? null
+                        : () => _shareLink(schedule.scheduleUrl, subject: 'Shared schedule link'),
+                    icon: const Icon(Icons.share_outlined),
+                    label: const Text('Share schedule link'),
+                  ),
+                ],
                 if (schedule.pdfUrl.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   OutlinedButton.icon(
@@ -104,6 +115,14 @@ class ShareCentreDetailPage extends ConsumerWidget {
                         : () => _copyToClipboard(context, schedule.pdfUrl, 'PDF link copied.'),
                     icon: const Icon(Icons.picture_as_pdf_outlined),
                     label: const Text('Copy PDF link'),
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: actionState.isSaving
+                        ? null
+                        : () => _shareLink(schedule.pdfUrl, subject: 'Shared schedule PDF'),
+                    icon: const Icon(Icons.share_outlined),
+                    label: const Text('Share PDF link'),
                   ),
                 ],
                 const SizedBox(height: 24),
@@ -216,6 +235,13 @@ class ShareCentreDetailPage extends ConsumerWidget {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _shareLink(String url, {String? subject}) async {
+    if (url.isEmpty) {
+      return;
+    }
+    await Share.share(url, subject: subject);
   }
 
   Future<DateTime?> _selectDate(
