@@ -12,6 +12,8 @@ This repository hosts the Flutter implementation of the Medicines for Children m
 - ✅ Encrypted export/import supports offline backups that can be stored in personal cloud/USB/email.
 - ✅ Multi-child selection, offline CRUD, and notification scheduling are in place.
 - ✅ Share centre, secondary-carer experience, and deep-link routing are implemented.
+- ✅ QR scan import covers Medicines for Children poster codes, and medicines can store packaging photos.
+- ✅ PDF exports can be printed directly from the share centre.
 
 ## Prerequisites
 

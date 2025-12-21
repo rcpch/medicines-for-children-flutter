@@ -106,14 +106,14 @@
 
 ## Milestone 10 – Printing Enhancements
 - **Technical steps**:
-	- [ ] Add a Print button for exported PDFs.
+	- [x] Add a Print button for exported PDFs.
 
 ## Milestone 11 – Camera Capture & QR Scan
 - **Technical steps**:
-	- [ ] Add medicine packaging photo capture with camera/gallery support.
-	- [ ] Add QR code scanning flow to create a medicine entry from packaging data.
-	- [ ] Support all Medicines for Children QR poster codes with quick-add medicine data.
-	- [ ] Include Medicines for Children advice-guide QR codes and open them in the browser.
-	- [ ] Normalize QR URLs so trailing slashes and scheme differences still resolve.
-	- [ ] Add QR scan parser tests covering medicines, advice guides, and unknown codes.
-	- [ ] Detect camera capability; if unavailable, show a message advising to use a camera-enabled device.
+	- [x] Add medicine packaging photo capture with camera/gallery support.
+	- [x] Add QR code scanning flow to create a medicine entry from packaging data.
+	- [x] Support all Medicines for Children QR poster codes with quick-add medicine data.
+	- [x] Include Medicines for Children advice-guide QR codes and open them in the browser.
+	- [x] Normalize QR URLs so trailing slashes and scheme differences still resolve.
+	- [x] Add QR scan parser tests covering medicines, advice guides, and unknown codes.
+	- [x] Detect camera capability; if unavailable, show a message advising to use a camera-enabled device.

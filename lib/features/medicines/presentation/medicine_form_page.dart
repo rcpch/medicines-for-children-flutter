@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';
 import 'package:medicines_for_children_flutter/core/domain/active_child_provider.dart';
+import 'package:medicines_for_children_flutter/core/platform/image_provider.dart';
 import 'package:medicines_for_children_flutter/features/medicines/application/medicine_editor_controller.dart';
 import 'package:medicines_for_children_flutter/features/medicines/domain/medicine_draft.dart';
 
@@ -30,6 +32,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
 
   MedicineType _type = MedicineType.everyday;
   MedicineStatus _status = MedicineStatus.inUse;
+  late List<String> _photoUrls;
 
   @override
   void initState() {
@@ -45,6 +48,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
     _notesController = TextEditingController(text: medicine?.notes ?? draft?.notes ?? '');
     _type = medicine?.type ?? draft?.type ?? MedicineType.everyday;
     _status = medicine?.status ?? draft?.status ?? MedicineStatus.inUse;
+    _photoUrls = _resolvePhotos(medicine, draft);
   }
 
   @override
@@ -84,6 +88,8 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
         notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
         type: _type,
         status: _status,
+        photoUrls: _photoUrls,
+        photoUrl: _photoUrls.isEmpty ? null : _photoUrls.first,
       );
       success = await controller.updateMedicine(updated);
     } else {
@@ -97,6 +103,8 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
         notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
         type: _type,
         status: _status,
+        photoUrls: _photoUrls,
+        photoUrl: _photoUrls.isEmpty ? null : _photoUrls.first,
       );
       success = await controller.createMedicine(draft) != null;
     }
@@ -247,6 +255,8 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
                     prefixIcon: Icon(Icons.notes_outlined),
                   ),
                 ),
+                const SizedBox(height: 12),
+                _buildPhotoSection(context),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: editorState.isSaving ? null : _submit,
@@ -278,6 +288,126 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
       (medicine) => medicine.id == widget.medicineId,
       orElse: () => child.medicines.first,
     );
+  }
+
+  List<String> _resolvePhotos(Medicine? medicine, MedicineDraft? draft) {
+    final urls = <String>[];
+    if (medicine != null) {
+      urls.addAll(medicine.photoUrls);
+      if (medicine.photoUrl != null && medicine.photoUrl!.trim().isNotEmpty) {
+        urls.add(medicine.photoUrl!);
+      }
+    }
+    if (draft != null) {
+      urls.addAll(draft.photoUrls);
+      if (draft.photoUrl != null && draft.photoUrl!.trim().isNotEmpty) {
+        urls.add(draft.photoUrl!);
+      }
+    }
+    return urls.toSet().toList();
+  }
+
+  Widget _buildPhotoSection(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Packaging photos', style: theme.textTheme.titleSmall),
+        const SizedBox(height: 8),
+        if (_photoUrls.isNotEmpty)
+          SizedBox(
+            height: 96,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) {
+                final path = _photoUrls[index];
+                final image = createImageProvider(path);
+                return Stack(
+                  children: [
+                    Container(
+                      width: 96,
+                      height: 96,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceVariant,
+                        borderRadius: BorderRadius.circular(12),
+                        image: image == null
+                            ? null
+                            : DecorationImage(
+                                image: image,
+                                fit: BoxFit.cover,
+                              ),
+                      ),
+                      child: image == null ? const Icon(Icons.photo_outlined) : null,
+                    ),
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: IconButton(
+                        icon: const Icon(Icons.close, size: 18),
+                        onPressed: () {
+                          setState(() {
+                            _photoUrls.removeAt(index);
+                          });
+                        },
+                        style: IconButton.styleFrom(
+                          backgroundColor: theme.colorScheme.surface,
+                          padding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemCount: _photoUrls.length,
+            ),
+          )
+        else
+          const Text('No photos added yet.'),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 12,
+          children: [
+            OutlinedButton.icon(
+              onPressed: () => _pickPhoto(context, ImageSource.camera),
+              icon: const Icon(Icons.photo_camera_outlined),
+              label: const Text('Take photo'),
+            ),
+            OutlinedButton.icon(
+              onPressed: () => _pickPhoto(context, ImageSource.gallery),
+              icon: const Icon(Icons.photo_library_outlined),
+              label: const Text('Choose photo'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Future<void> _pickPhoto(BuildContext context, ImageSource source) async {
+    final picker = ImagePicker();
+    try {
+      final image = await picker.pickImage(source: source, imageQuality: 85);
+      if (image == null) {
+        return;
+      }
+      setState(() {
+        _photoUrls.add(image.path);
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            source == ImageSource.camera
+                ? 'Camera not available on this device. Use a device with a camera.'
+                : 'Unable to access photos on this device.',
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildTextField({
