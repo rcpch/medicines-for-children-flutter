@@ -122,4 +122,18 @@ const userGuideSections = <UserGuideSection>[
       'Tap Back to return to the main app.',
     ],
   ),
+  UserGuideSection(
+    id: 'permissions',
+    title: 'Camera & photo permissions',
+    summary: 'Allow access so you can scan QR codes or add packaging photos.',
+    steps: [
+      'Tap Medicines in the bottom navigation to open the medicines list.',
+      'Tap Add medicine to start a new medicine entry.',
+      'Tap Take photo to trigger the camera permission prompt.',
+      'Tap Allow to grant camera access.',
+      'Tap Choose photo to trigger the photo library prompt.',
+      'Tap Allow to grant photo library access.',
+      'If your device has no camera, read the message and use a camera-enabled device.',
+    ],
+  ),
 ];

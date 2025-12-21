@@ -95,6 +95,7 @@
 	- [x] Import: on importing a backup, the dialog asks for the passphrase three times, I'm not sure why. It should ask once, and if it's wrong, show an error and ask again.
 	- [x] Import: It should be made clear that import creates a new profile.
 	- [x] Import: The Profile Name (optional) should make it clear that this "Import As <Profile Name>" or the original profile name will be used.
+	- [x] Document platform permissions in the roadmap and user guide.
 
 ## Milestone 9 – iOS/Webapp Parity (Non-Firebase)
 - **Technical steps**:
