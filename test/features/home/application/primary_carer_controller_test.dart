@@ -230,6 +230,9 @@ class TestAuthRepository implements AuthRepository {
   Future<void> unlockWithPasscode(String passcode) async {}
 
   @override
+  Future<void> unlockWithBiometrics() async {}
+
+  @override
   Future<void> signOut() async {}
 
   @override

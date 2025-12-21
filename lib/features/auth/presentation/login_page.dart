@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/local_profile.dart';
+import 'package:medicines_for_children_flutter/core/security/biometric_auth_service.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -14,11 +15,13 @@ class LoginPage extends ConsumerStatefulWidget {
 
 class _LoginPageState extends ConsumerState<LoginPage> {
   late final TextEditingController _passcodeController;
+  bool _biometricsAvailable = false;
 
   @override
   void initState() {
     super.initState();
     _passcodeController = TextEditingController();
+    _checkBiometrics();
     Future<void>.microtask(() {
       ref.read(authControllerProvider.notifier).refreshProfiles();
     });
@@ -37,6 +40,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   void _showMessage(String message) {
     final messenger = ScaffoldMessenger.of(context);
     messenger.showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _checkBiometrics() async {
+    final available = await ref.read(biometricAuthServiceProvider).isSupported();
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _biometricsAvailable = available;
+    });
   }
 
   Future<void> _selectProfile(LocalProfile profile) async {
@@ -76,6 +89,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               onPressed: () => Navigator.of(context).pop(),
               child: const Text('Cancel'),
             ),
+            if (_biometricsAvailable)
+              OutlinedButton.icon(
+                onPressed: () async {
+                  final success =
+                      await ref.read(authControllerProvider.notifier).unlockWithBiometrics();
+                  if (!context.mounted) {
+                    return;
+                  }
+                  if (success) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                icon: const Icon(Icons.fingerprint),
+                label: const Text('Use biometrics'),
+              ),
             ElevatedButton(
               onPressed: () async {
                 await ref

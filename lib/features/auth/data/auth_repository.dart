@@ -18,6 +18,7 @@ abstract class AuthRepository {
   Future<LocalProfile> createProfile({required String name, String? passcode});
   Future<void> selectProfile(String profileId);
   Future<void> unlockWithPasscode(String passcode);
+  Future<void> unlockWithBiometrics();
   Future<void> signOut();
 
   Future<void> completeOnboarding({required String displayName});
@@ -176,6 +177,19 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<void> unlockWithBiometrics() async {
+    await _ensureInit();
+    final profile = _readActiveProfile();
+    if (profile == null) {
+      throw StateError('No active profile selected');
+    }
+    if (profile.hasPasscode) {
+      _unlocked = true;
+      _emitStatus();
+    }
+  }
+
+  @override
   Future<void> signOut() async {
     await _ensureInit();
     _activeProfileId = null;
@@ -274,4 +288,3 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   });
   return repo;
 });
-

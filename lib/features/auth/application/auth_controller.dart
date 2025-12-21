@@ -6,6 +6,7 @@ import 'package:medicines_for_children_flutter/features/auth/domain/auth_status.
 import 'package:medicines_for_children_flutter/features/auth/domain/auth_user.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/local_profile.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
+import 'package:medicines_for_children_flutter/core/security/biometric_auth_service.dart';
 
 class AuthState {
   const AuthState({
@@ -51,6 +52,7 @@ class AuthController extends StateNotifier<AuthState> {
   AuthController(this._ref) : super(const AuthState()) {
     _repository = _ref.read(authRepositoryProvider);
     _telemetry = _ref.read(telemetryServiceProvider);
+    _biometrics = _ref.read(biometricAuthServiceProvider);
     _statusSub = _repository.statusStream().listen((status) {
       unawaited(_syncStatus(status));
     });
@@ -60,6 +62,7 @@ class AuthController extends StateNotifier<AuthState> {
   final Ref _ref;
   late final AuthRepository _repository;
   late final TelemetryService _telemetry;
+  late final BiometricAuthService _biometrics;
   StreamSubscription<AuthStatus>? _statusSub;
 
   Future<void> _bootstrap() async {
@@ -240,6 +243,56 @@ class AuthController extends StateNotifier<AuthState> {
         isLoading: false,
         errorMessage: 'Incorrect passcode. Please try again.',
       );
+    }
+  }
+
+  Future<bool> unlockWithBiometrics() async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final canUse = await _biometrics.isSupported();
+      if (!canUse) {
+        if (!mounted) {
+          return false;
+        }
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: 'Biometrics are not available on this device.',
+        );
+        return false;
+      }
+      final ok = await _biometrics.authenticate();
+      if (!ok) {
+        if (!mounted) {
+          return false;
+        }
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: 'Biometric authentication was cancelled.',
+        );
+        return false;
+      }
+      await _repository.unlockWithBiometrics();
+      final user = await _repository.currentUser();
+      if (!mounted) {
+        return false;
+      }
+      state = state.copyWith(
+        isLoading: false,
+        user: user,
+        status: _resolveStatusFromUser(user),
+        clearError: true,
+      );
+      _telemetry.trackEvent('profile_unlocked_biometrics');
+      return true;
+    } catch (_) {
+      if (!mounted) {
+        return false;
+      }
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Unable to unlock with biometrics right now.',
+      );
+      return false;
     }
   }
 
