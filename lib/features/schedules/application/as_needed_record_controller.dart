@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medicines_for_children_flutter/features/home/application/primary_carer_controller.dart';
 import 'package:medicines_for_children_flutter/features/schedules/data/as_needed_repository.dart';
 
 class AsNeededRecordState {
@@ -23,8 +24,9 @@ class AsNeededRecordState {
 }
 
 class AsNeededRecordController extends StateNotifier<AsNeededRecordState> {
-  AsNeededRecordController(this._repository) : super(const AsNeededRecordState());
+  AsNeededRecordController(this._ref, this._repository) : super(const AsNeededRecordState());
 
+  final Ref _ref;
   final AsNeededRepository _repository;
 
   Future<bool> recordAdministration({
@@ -39,6 +41,7 @@ class AsNeededRecordController extends StateNotifier<AsNeededRecordState> {
         dateTime: dateTime,
         notes: notes,
       );
+      await _refreshCarerCache();
       state = state.copyWith(isSaving: false, clearError: true);
       return true;
     } catch (_) {
@@ -49,10 +52,14 @@ class AsNeededRecordController extends StateNotifier<AsNeededRecordState> {
       return false;
     }
   }
+
+  Future<void> _refreshCarerCache() async {
+    await _ref.read(primaryCarerControllerProvider.notifier).refreshFromLocal();
+  }
 }
 
 final asNeededRecordControllerProvider =
     StateNotifierProvider<AsNeededRecordController, AsNeededRecordState>((ref) {
   final repository = ref.watch(asNeededRepositoryProvider);
-  return AsNeededRecordController(repository);
+  return AsNeededRecordController(ref, repository);
 });

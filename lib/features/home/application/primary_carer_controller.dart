@@ -154,6 +154,23 @@ class PrimaryCarerController extends StateNotifier<PrimaryCarerState> {
     return true;
   }
 
+  Future<void> refreshFromLocal() async {
+    final profileId = _activeProfileId;
+    if (profileId == null || profileId.isEmpty) {
+      return;
+    }
+    final cached = _localDataSource.readForProfile(profileId);
+    if (cached == null || !mounted) {
+      return;
+    }
+    state = state.copyWith(
+      carer: cached,
+      isLoading: false,
+      isStale: false,
+      clearError: true,
+    );
+  }
+
   @override
   void dispose() {
     _authSub?.close();

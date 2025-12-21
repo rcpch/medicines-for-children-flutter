@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medicines_for_children_flutter/core/data/storage/active_child_local_data_source.dart';
 import 'package:medicines_for_children_flutter/core/data/storage/profile_data_local_data_source.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/administration.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
@@ -21,10 +22,12 @@ class LocalAsNeededRepository implements AsNeededRepository {
   LocalAsNeededRepository({
     required this.authRepository,
     required this.profileData,
+    required this.activeChildStorage,
   });
 
   final AuthRepository authRepository;
   final ProfileDataLocalDataSource profileData;
+  final ActiveChildLocalDataSource activeChildStorage;
 
   @override
   Future<void> recordAdministration({
@@ -79,13 +82,30 @@ class LocalAsNeededRepository implements AsNeededRepository {
     if (carer.children.isEmpty) {
       throw StateError('No child profile available');
     }
-    return _AsNeededContext(profileId: user.uid, user: user, carer: carer, child: carer.children.first);
+    final childIndex = _resolveChildIndex(carer, user.uid);
+    return _AsNeededContext(
+      profileId: user.uid,
+      user: user,
+      carer: carer,
+      child: carer.children[childIndex],
+      childIndex: childIndex,
+    );
   }
 
   Future<void> _saveChild(_AsNeededContext context, Child updatedChild) async {
-    final updatedChildren = [updatedChild, ...context.carer.children.skip(1)];
+    final updatedChildren = [...context.carer.children];
+    updatedChildren[context.childIndex] = updatedChild;
     final updatedCarer = context.carer.copyWith(children: updatedChildren);
     await profileData.writePrimaryCarer(context.profileId, updatedCarer);
+  }
+
+  int _resolveChildIndex(PrimaryCarer carer, String profileId) {
+    final activeChildId = activeChildStorage.readActiveChildId(profileId);
+    if (activeChildId == null || activeChildId.isEmpty) {
+      return 0;
+    }
+    final index = carer.children.indexWhere((child) => child.id == activeChildId);
+    return index == -1 ? 0 : index;
   }
 
   String _generateId() {
@@ -104,16 +124,23 @@ class _AsNeededContext {
     required this.user,
     required this.carer,
     required this.child,
+    required this.childIndex,
   });
 
   final String profileId;
   final AuthUser user;
   final PrimaryCarer carer;
   final Child child;
+  final int childIndex;
 }
 
 final asNeededRepositoryProvider = Provider<AsNeededRepository>((ref) {
   final authRepository = ref.watch(authRepositoryProvider);
   final profileData = ref.watch(profileDataLocalDataSourceProvider);
-  return LocalAsNeededRepository(authRepository: authRepository, profileData: profileData);
+  final activeChildStorage = ref.watch(activeChildLocalDataSourceProvider);
+  return LocalAsNeededRepository(
+    authRepository: authRepository,
+    profileData: profileData,
+    activeChildStorage: activeChildStorage,
+  );
 });
