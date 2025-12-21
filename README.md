@@ -79,6 +79,13 @@ The app routes secondary-carer links to `/auth/:token` and `/shared-schedule/:ap
 - Android: update `appLinkHost` in `android/app/build.gradle.kts` to your link host.
 - iOS: update `applinks:example.com` in `ios/Runner/Runner.entitlements`.
 
+## Platform permissions
+
+- iOS: camera and photo library usage strings are defined in `ios/Runner/Info.plist`.
+- macOS: camera and photo library usage strings are defined in `macos/Runner/Info.plist`.
+- Android: camera + photo permissions are defined in `android/app/src/main/AndroidManifest.xml`.
+- Windows: no extra permissions are required; camera access falls back to a friendly “camera not available” message when unsupported.
+
 ## Tooling
 
 - `analysis_options.yaml` uses `flutter_lints` 5.x; prefer fixing lint violations over suppressing them.
