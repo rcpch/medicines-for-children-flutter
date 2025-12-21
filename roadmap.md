@@ -112,4 +112,5 @@
 - **Technical steps**:
 	- [ ] Add medicine packaging photo capture with camera/gallery support.
 	- [ ] Add QR code scanning flow to create a medicine entry from packaging data.
+	- [ ] Support all Medicines for Children QR poster codes with quick-add medicine data.
 	- [ ] Detect camera capability; if unavailable, show a message advising to use a camera-enabled device.
