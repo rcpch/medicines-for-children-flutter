@@ -51,6 +51,25 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
         title: const Text('Medicines'),
         actions: const [ChildSwitcherAction()],
       ),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          FloatingActionButton.extended(
+            onPressed: () => context.goNamed(AppRoute.scanMedicine.name),
+            icon: const Icon(Icons.qr_code_scanner),
+            label: const Text('Add by QR code'),
+            heroTag: 'add-medicine-qr',
+          ),
+          const SizedBox(height: 12),
+          FloatingActionButton.extended(
+            onPressed: () => context.goNamed(AppRoute.addMedicine.name),
+            icon: const Icon(Icons.add),
+            label: const Text('Add medicine'),
+            heroTag: 'add-medicine',
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -89,34 +108,6 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
                     _filter = selection.first;
                   });
                 },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 48,
-                      child: FilledButton.icon(
-                        onPressed: () => context.goNamed(AppRoute.addMedicine.name),
-                        icon: const Icon(Icons.add),
-                        label: const Text('Add medicine'),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: SizedBox(
-                      height: 48,
-                      child: FilledButton.tonalIcon(
-                        onPressed: () => context.goNamed(AppRoute.scanMedicine.name),
-                        icon: const Icon(Icons.qr_code_scanner),
-                        label: const Text('Add by QR code'),
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ),
             Expanded(
