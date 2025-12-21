@@ -60,6 +60,10 @@ class NotificationStore {
     await _writeAll(all);
   }
 
+  Future<void> clearAll() async {
+    await _writeAll(<String, dynamic>{});
+  }
+
   Map<String, NotificationMetadata> readAll() {
     final raw = _readAll();
     final Map<String, NotificationMetadata> result = {};

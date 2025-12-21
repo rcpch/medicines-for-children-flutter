@@ -9,6 +9,8 @@ import 'package:medicines_for_children_flutter/core/config/app_config.dart';
 import 'package:medicines_for_children_flutter/core/config/app_theme.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 import 'package:medicines_for_children_flutter/core/offline/background_sync_service.dart';
+import 'package:medicines_for_children_flutter/core/settings/app_settings.dart';
+import 'package:medicines_for_children_flutter/core/settings/settings_controller.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/auth_status.dart';
 import 'package:medicines_for_children_flutter/core/update/update_prompt_service.dart';
@@ -128,11 +130,20 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> with WidgetsBinding
   @override
   Widget build(BuildContext context) {
     final config = ref.watch(appConfigProvider);
+    final settings = ref.watch(settingsControllerProvider);
     return MaterialApp.router(
       title: 'Medicines for Children (${config.environment.name})',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       highContrastTheme: AppTheme.highContrast,
+      themeMode: _resolveThemeMode(settings.themeMode),
+      builder: (context, child) {
+        final data = MediaQuery.of(context);
+        return MediaQuery(
+          data: data.copyWith(textScaler: TextScaler.linear(settings.textScale)),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
       routerConfig: _router,
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
@@ -142,5 +153,16 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> with WidgetsBinding
       ],
       supportedLocales: const [Locale('en')],
     );
+  }
+
+  ThemeMode _resolveThemeMode(AppThemeMode mode) {
+    switch (mode) {
+      case AppThemeMode.light:
+        return ThemeMode.light;
+      case AppThemeMode.dark:
+        return ThemeMode.dark;
+      case AppThemeMode.system:
+        return ThemeMode.system;
+    }
   }
 }

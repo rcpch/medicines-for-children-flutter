@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/schedule.dart';
 import 'package:medicines_for_children_flutter/core/notifications/notification_service.dart';
+import 'package:medicines_for_children_flutter/core/settings/settings_controller.dart';
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_controller.dart';
 import 'package:medicines_for_children_flutter/features/schedules/data/schedule_repository.dart';
 import 'package:medicines_for_children_flutter/features/schedules/domain/schedule_draft.dart';
@@ -43,7 +44,8 @@ class ScheduleEditorController extends StateNotifier<ScheduleEditorState> {
     state = state.copyWith(isSaving: true, clearError: true);
     try {
       final schedule = await _repository.createSchedule(draft);
-      if (enableNotifications) {
+      final settings = _ref.read(settingsControllerProvider);
+      if (enableNotifications && settings.notificationsEnabled) {
         await _notifications.scheduleForSchedule(schedule: schedule, medicine: medicine);
       }
       await _refreshCarerCache();
@@ -67,7 +69,8 @@ class ScheduleEditorController extends StateNotifier<ScheduleEditorState> {
     try {
       await _repository.updateSchedule(schedule);
       await _notifications.cancelForSchedule(schedule.id);
-      if (enableNotifications) {
+      final settings = _ref.read(settingsControllerProvider);
+      if (enableNotifications && settings.notificationsEnabled) {
         await _notifications.scheduleForSchedule(schedule: schedule, medicine: medicine);
       }
       await _refreshCarerCache();

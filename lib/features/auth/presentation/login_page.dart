@@ -5,6 +5,7 @@ import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/local_profile.dart';
 import 'package:medicines_for_children_flutter/core/security/biometric_auth_service.dart';
+import 'package:medicines_for_children_flutter/core/settings/profile_settings_controller.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -58,12 +59,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       return;
     }
     _passcodeController.clear();
+    final profileSettings = ref.read(profileSettingsControllerProvider(profile.id));
+    final biometricsEnabled = profileSettings.biometricsEnabled;
     if (!mounted) {
       return;
     }
     await showDialog<void>(
       context: context,
       builder: (context) {
+        final canUseBiometrics = _biometricsAvailable && biometricsEnabled;
         return AlertDialog(
           title: Text('Unlock ${profile.name}'),
           content: TextField(
@@ -89,7 +93,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               onPressed: () => Navigator.of(context).pop(),
               child: const Text('Cancel'),
             ),
-            if (_biometricsAvailable)
+            if (canUseBiometrics)
               OutlinedButton.icon(
                 onPressed: () async {
                   final success =

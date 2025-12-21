@@ -125,3 +125,10 @@
 	- [ ] Define a lightweight local search index (prefix + fuzzy matching) for fast, offline suggestions.
 	- [ ] Add ranked suggestions in the medicine name field, with clear attribution to the data source.
 	- [ ] Add tests covering matching accuracy, ranking, and empty/edge cases.
+
+## Milestone 12 – Profile Settings & Personalisation
+- **Technical steps**:
+	- [x] Add a profile settings section in-app with biometric unlock toggle.
+	- [x] Add appearance settings (theme mode and text size).
+	- [x] Add global notifications on/off control and make scheduling respect it.
+	- [x] Update user guide to explain the new settings controls.

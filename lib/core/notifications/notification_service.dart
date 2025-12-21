@@ -104,6 +104,17 @@ class NotificationService {
       }
     }
   }
+
+  Future<void> cancelAll() async {
+    await ensureInitialized();
+    final all = _store.readAll();
+    for (final entry in all.entries) {
+      for (final id in entry.value.notificationIds) {
+        await _plugin.cancel(id);
+      }
+    }
+    await _store.clearAll();
+  }
 }
 
 final notificationServiceProvider = Provider<NotificationService>((ref) {

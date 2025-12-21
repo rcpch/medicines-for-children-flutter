@@ -5,6 +5,7 @@ import 'package:medicines_for_children_flutter/core/domain/active_child_provider
 import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/schedule.dart';
 import 'package:medicines_for_children_flutter/core/notifications/notification_store.dart';
+import 'package:medicines_for_children_flutter/core/settings/settings_controller.dart';
 import 'package:medicines_for_children_flutter/features/schedules/application/schedule_editor_controller.dart';
 import 'package:medicines_for_children_flutter/features/schedules/domain/schedule_draft.dart';
 
@@ -31,6 +32,7 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
   @override
   void initState() {
     super.initState();
+    final settings = ref.read(settingsControllerProvider);
     final schedule = _loadSchedule();
     _startDate = schedule?.startDate ?? DateTime.now();
     _endDate = schedule?.endDate ?? DateTime.now().add(const Duration(days: 7));
@@ -43,9 +45,9 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
     _selectedMedicineId = schedule?.medicineId;
     if (schedule != null) {
       final metadata = ref.read(notificationStoreProvider).readForSchedule(schedule.id);
-      _enableNotifications = metadata != null;
+      _enableNotifications = metadata != null && settings.notificationsEnabled;
     } else {
-      _enableNotifications = true;
+      _enableNotifications = settings.notificationsEnabled;
     }
   }
 
@@ -53,6 +55,7 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
   Widget build(BuildContext context) {
     final child = ref.watch(activeChildProvider);
     final editorState = ref.watch(scheduleEditorControllerProvider);
+    final settings = ref.watch(settingsControllerProvider);
 
     if (child == null) {
       return Scaffold(
@@ -162,13 +165,19 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
                 const SizedBox(height: 20),
                 SwitchListTile(
                   title: const Text('Enable reminders'),
-                  subtitle: const Text('Get notified for each scheduled dose.'),
-                  value: _enableNotifications,
-                  onChanged: (value) {
-                    setState(() {
-                      _enableNotifications = value;
-                    });
-                  },
+                  subtitle: Text(
+                    settings.notificationsEnabled
+                        ? 'Get notified for each scheduled dose.'
+                        : 'Notifications are disabled in Settings.',
+                  ),
+                  value: settings.notificationsEnabled ? _enableNotifications : false,
+                  onChanged: settings.notificationsEnabled
+                      ? (value) {
+                          setState(() {
+                            _enableNotifications = value;
+                          });
+                        }
+                      : null,
                 ),
                 const SizedBox(height: 12),
                 ElevatedButton(
