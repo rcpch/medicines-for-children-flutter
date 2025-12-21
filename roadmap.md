@@ -113,4 +113,7 @@
 	- [ ] Add medicine packaging photo capture with camera/gallery support.
 	- [ ] Add QR code scanning flow to create a medicine entry from packaging data.
 	- [ ] Support all Medicines for Children QR poster codes with quick-add medicine data.
+	- [ ] Include Medicines for Children advice-guide QR codes and open them in the browser.
+	- [ ] Normalize QR URLs so trailing slashes and scheme differences still resolve.
+	- [ ] Add QR scan parser tests covering medicines, advice guides, and unknown codes.
 	- [ ] Detect camera capability; if unavailable, show a message advising to use a camera-enabled device.
