@@ -11,6 +11,8 @@ import 'package:medicines_for_children_flutter/features/home/presentation/home_p
 import 'package:medicines_for_children_flutter/features/medicines/presentation/medicine_detail_page.dart';
 import 'package:medicines_for_children_flutter/features/medicines/presentation/medicine_form_page.dart';
 import 'package:medicines_for_children_flutter/features/medicines/presentation/medicines_page.dart';
+import 'package:medicines_for_children_flutter/features/medicines/presentation/medicine_qr_scan_page.dart';
+import 'package:medicines_for_children_flutter/features/medicines/domain/medicine_draft.dart';
 import 'package:medicines_for_children_flutter/features/onboarding/presentation/onboarding_page.dart';
 import 'package:medicines_for_children_flutter/features/schedules/presentation/as_needed_record_page.dart';
 import 'package:medicines_for_children_flutter/features/schedules/presentation/schedule_form_page.dart';
@@ -40,6 +42,7 @@ enum AppRoute {
   recordAsNeeded('as-needed'),
   medicines('/medicines'),
   addMedicine('add'),
+  scanMedicine('scan'),
   medicineDetail(':medicineId'),
   editMedicine('edit'),
   childProfile('/child-profile'),
@@ -131,7 +134,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: AppRoute.addMedicine.path,
                     name: AppRoute.addMedicine.name,
-                    builder: (context, state) => const MedicineFormPage(),
+                    builder: (context, state) => MedicineFormPage(
+                      draft: state.extra is MedicineDraft ? state.extra as MedicineDraft : null,
+                    ),
+                  ),
+                  GoRoute(
+                    path: AppRoute.scanMedicine.path,
+                    name: AppRoute.scanMedicine.name,
+                    builder: (context, state) => const MedicineQrScanPage(),
                   ),
                   GoRoute(
                     path: AppRoute.medicineDetail.path,

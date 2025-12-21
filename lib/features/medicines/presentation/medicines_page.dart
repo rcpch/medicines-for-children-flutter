@@ -49,7 +49,14 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Medicines'),
-        actions: const [ChildSwitcherAction()],
+        actions: [
+          const ChildSwitcherAction(),
+          IconButton(
+            onPressed: () => context.goNamed(AppRoute.scanMedicine.name),
+            icon: const Icon(Icons.qr_code_scanner),
+            tooltip: 'Scan QR',
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.goNamed(AppRoute.addMedicine.name),

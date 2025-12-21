@@ -6,9 +6,10 @@ import 'package:medicines_for_children_flutter/features/medicines/application/me
 import 'package:medicines_for_children_flutter/features/medicines/domain/medicine_draft.dart';
 
 class MedicineFormPage extends ConsumerStatefulWidget {
-  const MedicineFormPage({super.key, this.medicineId});
+  const MedicineFormPage({super.key, this.medicineId, this.draft});
 
   final String? medicineId;
+  final MedicineDraft? draft;
 
   bool get isEditing => medicineId != null;
 
@@ -34,15 +35,16 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
   void initState() {
     super.initState();
     final medicine = _loadMedicine();
-    _nameController = TextEditingController(text: medicine?.name ?? '');
-    _aliasController = TextEditingController(text: medicine?.alias ?? '');
-    _doseController = TextEditingController(text: medicine?.dose ?? '');
-    _doseUnitController = TextEditingController(text: medicine?.doseUnit ?? '');
-    _routeController = TextEditingController(text: medicine?.route ?? '');
-    _frequencyController = TextEditingController(text: medicine?.frequency ?? '');
-    _notesController = TextEditingController(text: medicine?.notes ?? '');
-    _type = medicine?.type ?? MedicineType.everyday;
-    _status = medicine?.status ?? MedicineStatus.inUse;
+    final draft = medicine == null ? widget.draft : null;
+    _nameController = TextEditingController(text: medicine?.name ?? draft?.name ?? '');
+    _aliasController = TextEditingController(text: medicine?.alias ?? draft?.alias ?? '');
+    _doseController = TextEditingController(text: medicine?.dose ?? draft?.dose ?? '');
+    _doseUnitController = TextEditingController(text: medicine?.doseUnit ?? draft?.doseUnit ?? '');
+    _routeController = TextEditingController(text: medicine?.route ?? draft?.route ?? '');
+    _frequencyController = TextEditingController(text: medicine?.frequency ?? draft?.frequency ?? '');
+    _notesController = TextEditingController(text: medicine?.notes ?? draft?.notes ?? '');
+    _type = medicine?.type ?? draft?.type ?? MedicineType.everyday;
+    _status = medicine?.status ?? draft?.status ?? MedicineStatus.inUse;
   }
 
   @override

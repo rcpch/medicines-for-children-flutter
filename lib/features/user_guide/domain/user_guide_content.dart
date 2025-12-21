@@ -34,6 +34,8 @@ const userGuideSections = <UserGuideSection>[
       'Tap Add medicine to start a new medicine entry.',
       'Tap each field to enter name, dose, route, and frequency details.',
       'Tap Add medicine at the bottom to save the medicine.',
+      'Tap Scan QR to import a medicine from a Medicines for Children QR code.',
+      'Tap Save on the prefilled medicine form after reviewing the details.',
       'Tap a medicine card to review details or tap Edit to update it.',
     ],
   ),
