@@ -118,3 +118,10 @@
 	- [x] Normalize QR URLs so trailing slashes and scheme differences still resolve.
 	- [x] Add QR scan parser tests covering medicines, advice guides, and unknown codes.
 	- [x] Detect camera capability; if unavailable, show a message advising to use a camera-enabled device.
+
+## Stretch Goals – Significant Additions Beyond Baseline Spec
+- **Medicine name suggestions (UK datasets)**:
+	- [ ] Identify a suitable open UK medicine list (e.g., NHS dm+d or OpenPrescribing datasets) with an appropriate licence (likely OGL).
+	- [ ] Define a lightweight local search index (prefix + fuzzy matching) for fast, offline suggestions.
+	- [ ] Add ranked suggestions in the medicine name field, with clear attribution to the data source.
+	- [ ] Add tests covering matching accuracy, ranking, and empty/edge cases.
