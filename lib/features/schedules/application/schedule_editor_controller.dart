@@ -46,7 +46,11 @@ class ScheduleEditorController extends StateNotifier<ScheduleEditorState> {
       final schedule = await _repository.createSchedule(draft);
       final settings = _ref.read(settingsControllerProvider);
       if (enableNotifications && settings.notificationsEnabled) {
-        await _notifications.scheduleForSchedule(schedule: schedule, medicine: medicine);
+        try {
+          await _notifications.scheduleForSchedule(schedule: schedule, medicine: medicine);
+        } catch (_) {
+          // Scheduling failures should not block saving the schedule.
+        }
       }
       await _refreshCarerCache();
       state = state.copyWith(isSaving: false, clearError: true);
@@ -68,10 +72,18 @@ class ScheduleEditorController extends StateNotifier<ScheduleEditorState> {
     state = state.copyWith(isSaving: true, clearError: true);
     try {
       await _repository.updateSchedule(schedule);
-      await _notifications.cancelForSchedule(schedule.id);
+      try {
+        await _notifications.cancelForSchedule(schedule.id);
+      } catch (_) {
+        // Ignore notification failures so edits still succeed.
+      }
       final settings = _ref.read(settingsControllerProvider);
       if (enableNotifications && settings.notificationsEnabled) {
-        await _notifications.scheduleForSchedule(schedule: schedule, medicine: medicine);
+        try {
+          await _notifications.scheduleForSchedule(schedule: schedule, medicine: medicine);
+        } catch (_) {
+          // Scheduling failures should not block saving the schedule.
+        }
       }
       await _refreshCarerCache();
       state = state.copyWith(isSaving: false, clearError: true);
@@ -89,7 +101,11 @@ class ScheduleEditorController extends StateNotifier<ScheduleEditorState> {
     state = state.copyWith(isSaving: true, clearError: true);
     try {
       await _repository.deleteSchedule(scheduleId);
-      await _notifications.cancelForSchedule(scheduleId);
+      try {
+        await _notifications.cancelForSchedule(scheduleId);
+      } catch (_) {
+        // Ignore notification failures so deletes still succeed.
+      }
       await _refreshCarerCache();
       state = state.copyWith(isSaving: false, clearError: true);
       return true;
