@@ -120,6 +120,7 @@ const userGuideSections = <UserGuideSection>[
       'Drag the Text size slider to adjust the text scale.',
       'Tap Enable reminders to turn notifications on or off.',
       'Tap Biometric unlock to allow Face ID/Touch ID where available.',
+      'Tap Change passcode to update the profile passcode.',
       'Tap Privacy policy to read the privacy information.',
       'Tap Data deletion to read data removal guidance.',
       'Tap Back to return to the main app.',

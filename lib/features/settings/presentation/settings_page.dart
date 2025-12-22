@@ -29,6 +29,7 @@ class SettingsPage extends ConsumerWidget {
     final profileSettings = currentProfile == null
         ? null
         : ref.watch(profileSettingsControllerProvider(currentProfile.id));
+    final authController = ref.read(authControllerProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
@@ -45,11 +46,54 @@ class SettingsPage extends ConsumerWidget {
                 biometricsEnabled: profileSettings?.biometricsEnabled ?? false,
                 onChanged: profileSettings == null
                     ? null
-                    : (value) => ref
-                        .read(profileSettingsControllerProvider(currentProfile!.id).notifier)
-                        .setBiometricsEnabled(value),
+                    : (value) async {
+                        final controller = ref.read(
+                          profileSettingsControllerProvider(currentProfile!.id).notifier,
+                        );
+                        if (!value) {
+                          await controller.setBiometricsEnabled(false);
+                          return;
+                        }
+                        final ok = await _confirmPasscode(
+                          context,
+                          authController,
+                          title: 'Enable biometric unlock',
+                          actionLabel: 'Enable',
+                        );
+                        if (!ok) {
+                          return;
+                        }
+                        await controller.setBiometricsEnabled(true);
+                      },
               ),
             ),
+            if (currentProfile != null)
+              Builder(
+                builder: (context) {
+                  final profile = currentProfile!;
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Card(
+                      child: ListTile(
+                        title: Text(
+                          profile.hasPasscode ? 'Change passcode' : 'Set passcode',
+                        ),
+                        subtitle: Text(
+                          profile.hasPasscode
+                              ? 'Update the passcode for this profile.'
+                              : 'Add a passcode to protect this profile.',
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => _showPasscodeDialog(
+                          context,
+                          authController,
+                          hasPasscode: profile.hasPasscode,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
             const SizedBox(height: 16),
             Text('Appearance', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
@@ -175,6 +219,148 @@ class SettingsPage extends ConsumerWidget {
       return 'Large';
     }
     return 'Extra large';
+  }
+
+  Future<bool> _confirmPasscode(
+    BuildContext context,
+    AuthController controller, {
+    required String title,
+    required String actionLabel,
+  }) async {
+    final passcodeController = TextEditingController();
+    bool confirmed = false;
+    await showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: TextField(
+            controller: passcodeController,
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'Passcode',
+              hintText: 'Enter passcode to confirm',
+            ),
+            textInputAction: TextInputAction.done,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final ok = await controller.verifyPasscode(
+                  passcodeController.text.trim(),
+                );
+                if (!context.mounted) {
+                  return;
+                }
+                if (!ok) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Incorrect passcode.')),
+                  );
+                  return;
+                }
+                confirmed = true;
+                Navigator.of(context).pop();
+              },
+              child: Text(actionLabel),
+            ),
+          ],
+        );
+      },
+    );
+    passcodeController.dispose();
+    return confirmed;
+  }
+
+  Future<void> _showPasscodeDialog(
+    BuildContext context,
+    AuthController controller, {
+    required bool hasPasscode,
+  }) async {
+    final currentController = TextEditingController();
+    final newController = TextEditingController();
+    final confirmController = TextEditingController();
+    await showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(hasPasscode ? 'Change passcode' : 'Set passcode'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (hasPasscode)
+                TextField(
+                  controller: currentController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Current passcode',
+                  ),
+                ),
+              TextField(
+                controller: newController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'New passcode',
+                ),
+              ),
+              TextField(
+                controller: confirmController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Confirm new passcode',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final current = currentController.text.trim();
+                final next = newController.text.trim();
+                final confirm = confirmController.text.trim();
+                if (next.isEmpty || confirm.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Enter and confirm the new passcode.')),
+                  );
+                  return;
+                }
+                if (next != confirm) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Passcodes do not match.')),
+                  );
+                  return;
+                }
+                final ok = await controller.changePasscode(
+                  currentPasscode: hasPasscode ? current : null,
+                  newPasscode: next,
+                );
+                if (!context.mounted) {
+                  return;
+                }
+                if (!ok) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Unable to update passcode.')),
+                  );
+                  return;
+                }
+                Navigator.of(context).pop();
+              },
+              child: Text(hasPasscode ? 'Update' : 'Set'),
+            ),
+          ],
+        );
+      },
+    );
+    currentController.dispose();
+    newController.dispose();
+    confirmController.dispose();
   }
 }
 

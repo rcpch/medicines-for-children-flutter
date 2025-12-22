@@ -296,6 +296,60 @@ class AuthController extends StateNotifier<AuthState> {
     }
   }
 
+  Future<bool> verifyPasscode(String passcode) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final ok = await _repository.verifyPasscode(passcode);
+      if (!mounted) {
+        return false;
+      }
+      state = state.copyWith(isLoading: false, clearError: true);
+      return ok;
+    } catch (_) {
+      if (!mounted) {
+        return false;
+      }
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Incorrect passcode. Please try again.',
+      );
+      return false;
+    }
+  }
+
+  Future<bool> changePasscode({
+    String? currentPasscode,
+    required String newPasscode,
+  }) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      await _repository.changePasscode(
+        currentPasscode: currentPasscode,
+        newPasscode: newPasscode,
+      );
+      final profiles = await _repository.listProfiles();
+      if (!mounted) {
+        return false;
+      }
+      state = state.copyWith(
+        isLoading: false,
+        profiles: profiles,
+        clearError: true,
+      );
+      _telemetry.trackEvent('passcode_changed');
+      return true;
+    } catch (_) {
+      if (!mounted) {
+        return false;
+      }
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Unable to update the passcode. Please try again.',
+      );
+      return false;
+    }
+  }
+
   Future<void> completeOnboarding({required String displayName}) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {

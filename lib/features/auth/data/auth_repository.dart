@@ -19,6 +19,8 @@ abstract class AuthRepository {
   Future<void> selectProfile(String profileId);
   Future<void> unlockWithPasscode(String passcode);
   Future<void> unlockWithBiometrics();
+  Future<bool> verifyPasscode(String passcode);
+  Future<void> changePasscode({String? currentPasscode, required String newPasscode});
   Future<void> signOut();
 
   Future<void> completeOnboarding({required String displayName});
@@ -190,6 +192,53 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<bool> verifyPasscode(String passcode) async {
+    await _ensureInit();
+    final profile = _readActiveProfile();
+    if (profile == null) {
+      throw StateError('No active profile selected');
+    }
+    if (!profile.hasPasscode) {
+      return false;
+    }
+    final record = _profiles.readPasscodeRecord(profile.id);
+    if (record == null) {
+      return false;
+    }
+    return _verifyPasscode(passcode, record);
+  }
+
+  @override
+  Future<void> changePasscode({String? currentPasscode, required String newPasscode}) async {
+    await _ensureInit();
+    final profile = _readActiveProfile();
+    if (profile == null) {
+      throw StateError('No active profile selected');
+    }
+    if (profile.hasPasscode) {
+      if (currentPasscode == null || currentPasscode.isEmpty) {
+        throw StateError('Current passcode is required');
+      }
+      final record = _profiles.readPasscodeRecord(profile.id);
+      if (record == null) {
+        throw StateError('Passcode missing for selected profile');
+      }
+      final ok = await _verifyPasscode(currentPasscode, record);
+      if (!ok) {
+        throw StateError('Invalid passcode');
+      }
+    }
+
+    final next = await _derivePasscodeRecord(newPasscode);
+    await _profiles.writePasscodeRecord(profile.id, next);
+    if (!profile.hasPasscode) {
+      await _updateProfilePasscodeStatus(profile.id, true);
+    }
+    _unlocked = true;
+    _emitStatus();
+  }
+
+  @override
   Future<void> signOut() async {
     await _ensureInit();
     _activeProfileId = null;
@@ -216,6 +265,17 @@ class LocalAuthRepository implements AuthRepository {
     updated[index] = profiles[index].copyWith(displayName: displayName.trim());
     await _profiles.writeProfiles(updated);
     _emitStatus();
+  }
+
+  Future<void> _updateProfilePasscodeStatus(String profileId, bool hasPasscode) async {
+    final profiles = _profiles.listProfiles();
+    final index = profiles.indexWhere((item) => item.id == profileId);
+    if (index == -1) {
+      return;
+    }
+    final updated = [...profiles];
+    updated[index] = profiles[index].copyWith(hasPasscode: hasPasscode);
+    await _profiles.writeProfiles(updated);
   }
 
   String _generateId() {
