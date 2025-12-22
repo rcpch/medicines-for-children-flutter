@@ -163,6 +163,9 @@ class _DateTimeField extends StatelessWidget {
             firstDate: DateTime(value.year - 2),
             lastDate: DateTime(value.year + 2),
           );
+          if (!context.mounted) {
+            return;
+          }
           if (date == null) {
             return;
           }
@@ -170,6 +173,9 @@ class _DateTimeField extends StatelessWidget {
             context: context,
             initialTime: TimeOfDay.fromDateTime(value),
           );
+          if (!context.mounted) {
+            return;
+          }
           if (time == null) {
             return;
           }

@@ -147,7 +147,7 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                 if (_guidanceLoaded && _showGuidance) const SizedBox(height: 12),
                 if (model.status.toLowerCase() == 'pending')
                   Card(
-                    color: Theme.of(context).colorScheme.surfaceVariant,
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -489,7 +489,7 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
   ) async {
     final pdfUrl = _generatedPdfUrl ?? model.pdfUrl;
     if (pdfUrl.isNotEmpty) {
-      Share.share(pdfUrl, subject: 'Shared schedule PDF');
+      SharePlus.instance.share(ShareParams(text: pdfUrl, subject: 'Shared schedule PDF'));
       return;
     }
     setState(() => _exportingPdf = true);
@@ -501,16 +501,16 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
         dateTo: model.dateTo,
         primaryCarerEmail: model.parentId,
       );
-      if (!mounted) {
+      if (!context.mounted) {
         return;
       }
       setState(() {
         _generatedPdfUrl = url;
         _exportingPdf = false;
       });
-      Share.share(url, subject: 'Shared schedule PDF');
+      SharePlus.instance.share(ShareParams(text: url, subject: 'Shared schedule PDF'));
     } catch (error) {
-      if (!mounted) {
+      if (!context.mounted) {
         return;
       }
       setState(() => _exportingPdf = false);
@@ -534,7 +534,7 @@ class _GuidanceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Card(
-      color: theme.colorScheme.surfaceVariant,
+      color: theme.colorScheme.surfaceContainerHighest,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

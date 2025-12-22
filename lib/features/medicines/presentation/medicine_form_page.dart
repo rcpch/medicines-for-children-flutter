@@ -328,7 +328,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
                       width: 96,
                       height: 96,
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceVariant,
+                        color: theme.colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(12),
                         image: image == null
                             ? null
@@ -358,7 +358,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
                   ],
                 );
               },
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              separatorBuilder: (context, index) => const SizedBox(width: 8),
               itemCount: _photoUrls.length,
             ),
           )
@@ -395,7 +395,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
         _photoUrls.add(image.path);
       });
     } catch (_) {
-      if (!mounted) {
+      if (!context.mounted) {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(

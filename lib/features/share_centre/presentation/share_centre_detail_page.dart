@@ -241,7 +241,7 @@ class ShareCentreDetailPage extends ConsumerWidget {
             );
           },
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (_, __) => const Padding(
+          error: (error, stackTrace) => const Padding(
             padding: EdgeInsets.all(16),
             child: Text('Unable to load share details right now.'),
           ),
@@ -269,7 +269,7 @@ class ShareCentreDetailPage extends ConsumerWidget {
     if (url.isEmpty) {
       return;
     }
-    await Share.share(url, subject: subject);
+    await SharePlus.instance.share(ShareParams(text: url, subject: subject));
   }
 
   Future<DateTime?> _selectDate(

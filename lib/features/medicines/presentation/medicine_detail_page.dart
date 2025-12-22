@@ -70,7 +70,7 @@ class MedicineDetailPage extends ConsumerWidget {
           children: [
             if (medicine.status == MedicineStatus.noLongerUsed)
               Card(
-                color: Theme.of(context).colorScheme.surfaceVariant,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 child: const Padding(
                   padding: EdgeInsets.all(12),
                   child: Text('This medicine is archived and no longer in active use.'),
@@ -300,7 +300,7 @@ class _InfoChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Chip(
       label: Text(label),
-      backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
     );
   }
 }

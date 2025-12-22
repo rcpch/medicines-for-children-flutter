@@ -8,7 +8,7 @@ import 'package:medicines_for_children_flutter/features/home/data/primary_carer_
 class MockPrimaryCarerRepository implements PrimaryCarerRepository {
   MockPrimaryCarerRepository({PrimaryCarer? seed}) : _seed = seed ?? _samplePrimaryCarer();
 
-  PrimaryCarer _seed;
+  final PrimaryCarer _seed;
 
   @override
   Future<PrimaryCarer> fetchPrimaryCarer() async {

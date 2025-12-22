@@ -125,7 +125,7 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
                           ),
                         );
                       },
-                      separatorBuilder: (_, __) => const SizedBox(height: 8),
+                      separatorBuilder: (context, index) => const SizedBox(height: 8),
                       itemCount: filtered.length,
                     ),
             ),
@@ -171,7 +171,7 @@ class _MedicineTile extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         leading: CircleAvatar(
-          backgroundColor: theme.colorScheme.surfaceVariant,
+          backgroundColor: theme.colorScheme.surfaceContainerHighest,
           backgroundImage: imageProvider,
           child: imageProvider == null ? const Icon(Icons.medication_outlined) : null,
         ),

@@ -174,12 +174,12 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
                           ),
                         );
                       },
-                      separatorBuilder: (_, __) => const SizedBox(height: 8),
+                      separatorBuilder: (context, index) => const SizedBox(height: 8),
                       itemCount: schedules.length,
                     );
                   },
                   loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (_, __) => ListView(
+                  error: (error, stackTrace) => ListView(
                     padding: const EdgeInsets.all(16),
                     children: const [
                       Text('Unable to load shared schedules right now.'),
@@ -210,21 +210,21 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
         filename: fileName,
         mimeType: 'application/pdf',
       );
-      if (!mounted) {
+      if (!context.mounted) {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Schedule PDF saved.')),
       );
     } catch (error) {
-      if (!mounted) {
+      if (!context.mounted) {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Unable to export schedule: $error')),
       );
     } finally {
-      if (mounted) {
+      if (context.mounted) {
         setState(() => _exportingSchedule = false);
       }
     }
@@ -244,21 +244,21 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
         filename: fileName,
         mimeType: 'application/pdf',
       );
-      if (!mounted) {
+      if (!context.mounted) {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Medicines PDF saved.')),
       );
     } catch (error) {
-      if (!mounted) {
+      if (!context.mounted) {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Unable to export medicines: $error')),
       );
     } finally {
-      if (mounted) {
+      if (context.mounted) {
         setState(() => _exportingMedicines = false);
       }
     }
@@ -277,14 +277,14 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
             'mfc-schedule-${DateFormat('yyyyMMdd').format(schedule.range.start)}-${DateFormat('yyyyMMdd').format(schedule.range.end)}.pdf',
       );
     } catch (error) {
-      if (!mounted) {
+      if (!context.mounted) {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Unable to print schedule: $error')),
       );
     } finally {
-      if (mounted) {
+      if (context.mounted) {
         setState(() => _printingSchedule = false);
       }
     }
@@ -302,14 +302,14 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
         name: 'mfc-medicines-${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf',
       );
     } catch (error) {
-      if (!mounted) {
+      if (!context.mounted) {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Unable to print medicines: $error')),
       );
     } finally {
-      if (mounted) {
+      if (context.mounted) {
         setState(() => _printingMedicines = false);
       }
     }
@@ -337,6 +337,9 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
         end: now.add(const Duration(days: 7)),
       ),
     );
+    if (!context.mounted) {
+      return null;
+    }
     if (range == null) {
       return null;
     }
@@ -405,7 +408,7 @@ class _ShareScheduleTile extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         leading: CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
           child: Icon(schedule.isDigital ? Icons.link : Icons.picture_as_pdf_outlined),
         ),
         title: Text(schedule.displayCarer),

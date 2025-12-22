@@ -212,11 +212,17 @@ class _HomePageState extends ConsumerState<HomePage> {
       );
       return;
     }
+    if (!context.mounted) {
+      return;
+    }
     if (bytes == null) {
       return;
     }
 
     final details = await _promptImportDetails(context);
+    if (!context.mounted) {
+      return;
+    }
     if (details == null) {
       return;
     }
@@ -224,6 +230,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     final backupService = ref.read(backupServiceProvider);
     while (true) {
       final passphrase = await _promptImportPassphrase(context);
+      if (!context.mounted) {
+        return;
+      }
       if (passphrase == null) {
         return;
       }
@@ -526,7 +535,7 @@ class _HomeBody extends StatelessWidget {
         children: [
           if (state.isStale)
             Card(
-              color: theme.colorScheme.surfaceVariant,
+              color: theme.colorScheme.surfaceContainerHighest,
               child: const Padding(
                 padding: EdgeInsets.all(16),
                 child: Text('Showing saved data while we refresh your latest schedule...'),
@@ -816,7 +825,7 @@ class _ScheduleTile extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: _statusColor(context).withOpacity(0.12),
+                    color: _statusColor(context).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(32),
                   ),
                   child: Text(
@@ -1036,7 +1045,7 @@ class _CalendarStrip extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: days.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (context, index) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final date = days[index];
           final isSelected = _isSameDay(date, selectedDate);
@@ -1047,7 +1056,7 @@ class _CalendarStrip extends StatelessWidget {
               width: 56,
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
-                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceVariant,
+                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -1106,7 +1115,7 @@ class _LoadingSection extends StatelessWidget {
                 child: Container(
                   height: 16,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceVariant,
+                    color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),

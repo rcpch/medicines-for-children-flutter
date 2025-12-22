@@ -36,7 +36,7 @@ class UserGuidePage extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Card(
-            color: colorScheme.surfaceVariant,
+            color: colorScheme.surfaceContainerHighest,
             child: const Padding(
               padding: EdgeInsets.all(16),
               child: Text(
@@ -67,7 +67,7 @@ class _GuideHeader extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
-          colors: [accent.withOpacity(0.15), accent.withOpacity(0.03)],
+          colors: [accent.withValues(alpha: 0.15), accent.withValues(alpha: 0.03)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

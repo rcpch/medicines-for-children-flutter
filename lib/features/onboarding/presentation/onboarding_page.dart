@@ -449,7 +449,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     final visibleLines = lines.where((line) => line.trim().isNotEmpty).toList();
     return Card(
       elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceVariant,
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

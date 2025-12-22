@@ -71,7 +71,7 @@ class ChildProfilePage extends ConsumerWidget {
                   children: [
                     CircleAvatar(
                       radius: 36,
-                      backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                       backgroundImage: imageProvider,
                       child: imageProvider == null ? const Icon(Icons.child_care_outlined) : null,
                     ),

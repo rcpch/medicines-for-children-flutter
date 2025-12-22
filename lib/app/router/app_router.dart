@@ -260,7 +260,7 @@ class RouterNotifier extends ChangeNotifier {
   RouterNotifier(this._ref) {
     _subscription = _ref.listen<AuthState>(
       authControllerProvider,
-      (_, __) => notifyListeners(),
+      (previous, next) => notifyListeners(),
       fireImmediately: true,
     );
   }
