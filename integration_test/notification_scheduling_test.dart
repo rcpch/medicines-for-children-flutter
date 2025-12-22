@@ -60,6 +60,11 @@ class RecordingNotificationService implements NotificationService {
 
   @override
   Future<void> pruneExpired() async {}
+
+  @override
+  Future<void> cancelAll() async {
+    await _store.clearAll();
+  }
 }
 
 void main() {

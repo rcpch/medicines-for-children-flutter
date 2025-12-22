@@ -266,7 +266,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   }) async {
     final formKey = GlobalKey<FormState>();
     var passphrase = '';
-    var confirmPassphrase = '';
 
     final result = await showDialog<String>(
       context: context,
@@ -294,7 +293,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                   TextFormField(
                     obscureText: true,
                     decoration: InputDecoration(labelText: confirmLabel),
-                    onChanged: (value) => confirmPassphrase = value,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Confirm your passphrase';

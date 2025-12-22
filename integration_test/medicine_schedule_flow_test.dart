@@ -32,6 +32,9 @@ class FakeNotificationService implements NotificationService {
 
   @override
   Future<void> pruneExpired() async {}
+
+  @override
+  Future<void> cancelAll() async {}
 }
 
 void main() {

@@ -16,7 +16,6 @@ import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.
 import 'package:medicines_for_children_flutter/features/auth/data/local_profiles_local_data_source.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/local_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/semantics.dart';
 
 class FakeNotificationService implements NotificationService {
   @override
@@ -33,6 +32,9 @@ class FakeNotificationService implements NotificationService {
 
   @override
   Future<void> pruneExpired() async {}
+
+  @override
+  Future<void> cancelAll() async {}
 }
 
 class NoopTelemetryService implements TelemetryService {

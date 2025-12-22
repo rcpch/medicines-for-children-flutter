@@ -43,11 +43,18 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
             .toList() ??
         [const TimeOfDay(hour: 8, minute: 0)];
     _selectedMedicineId = schedule?.medicineId;
+    _enableNotifications = settings.notificationsEnabled;
     if (schedule != null) {
-      final metadata = ref.read(notificationStoreProvider).readForSchedule(schedule.id);
-      _enableNotifications = metadata != null && settings.notificationsEnabled;
-    } else {
-      _enableNotifications = settings.notificationsEnabled;
+      Future<void>.microtask(() async {
+        final metadata =
+            await ref.read(notificationStoreProvider).readForSchedule(schedule.id);
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _enableNotifications = settings.notificationsEnabled && metadata != null;
+        });
+      });
     }
   }
 

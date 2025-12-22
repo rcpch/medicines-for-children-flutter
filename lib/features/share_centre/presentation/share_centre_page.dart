@@ -149,7 +149,7 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () async {
-                  await ref.refresh(shareCentreSchedulesProvider(child.id).future);
+                  final _ = await ref.refresh(shareCentreSchedulesProvider(child.id).future);
                 },
                 child: schedulesAsync.when(
                   data: (schedules) {
