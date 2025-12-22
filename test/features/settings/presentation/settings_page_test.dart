@@ -88,7 +88,7 @@ void main() {
 }
 
 class FakeNotificationService extends NotificationService {
-  FakeNotificationService(NotificationStore store) : super(store);
+  FakeNotificationService(super.store);
 
   @override
   Future<void> cancelAll() async {}

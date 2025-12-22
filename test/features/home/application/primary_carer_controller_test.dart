@@ -250,7 +250,7 @@ class TestAuthRepository implements AuthRepository {
 class TestPrimaryCarerRepository implements PrimaryCarerRepository {
   TestPrimaryCarerRepository(this._carer);
 
-  PrimaryCarer _carer;
+  final PrimaryCarer _carer;
   bool shouldThrow = false;
 
   @override

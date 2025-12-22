@@ -102,7 +102,7 @@ void main() {
 }
 
 class FakeNotificationService extends NotificationService {
-  FakeNotificationService(NotificationStore store) : super(store);
+  FakeNotificationService(super.store);
 
   int cancelAllCalls = 0;
 

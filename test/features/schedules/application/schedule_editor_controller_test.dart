@@ -81,7 +81,7 @@ class _FakeScheduleRepository implements ScheduleRepository {
 }
 
 class _FailingNotificationService extends NotificationService {
-  _FailingNotificationService(NotificationStore store) : super(store);
+  _FailingNotificationService(super.store);
 
   @override
   Future<void> scheduleForSchedule({
