@@ -62,16 +62,6 @@ Shared-schedule API configuration is optional. The app boots without env files (
 - Register those files under the `assets` section in `pubspec.yaml`.
 - The flavor entrypoints in `lib/main_<flavor>.dart` load the matching file via `dotenv`.
 
-### API keys
-
-- `SHARED_SCHEDULE_API_BASE_URL` and `SHARED_SCHEDULE_API_KEY` map to the shared schedule backend described in `spec.md`.
-- The Dio client attaches the `ApiKey` header automatically via `securedApiClientProvider`.
-- Optional update prompt config:
-  - `LATEST_APP_VERSION` and `MINIMUM_APP_VERSION` control update prompts.
-  - `APP_UPDATE_URL` is copied to clipboard for update instructions.
-- Optional telemetry prompt config:
-  - `TELEMETRY_CONSENT_ENABLED` set to `true` to show the analytics consent dialog.
-
 ## Deep links (App Links / Universal Links)
 
 The app routes secondary-carer links to `/auth/:token` and `/shared-schedule/:apiId`. Configure platform link domains:
@@ -85,11 +75,8 @@ The app routes secondary-carer links to `/auth/:token` and `/shared-schedule/:ap
 - macOS: camera and photo library usage strings are defined in `macos/Runner/Info.plist`.
 - Android: camera + photo permissions are defined in `android/app/src/main/AndroidManifest.xml`.
 - Windows: no extra permissions are required; camera access falls back to a friendly “camera not available” message when unsupported.
-
-## Tooling
-
-- `analysis_options.yaml` uses `flutter_lints` 5.x; prefer fixing lint violations over suppressing them.
-- `roadmap.md` tracks milestone definitions; `spec.md` contains the functional spec used to shape upcoming work.
+- Linux: no extra permissions are required; camera access falls back to a friendly “camera not available” message when unsupported.
+- Web: camera access is requested via browser prompt when needed.
 
 ## Release automation
 
