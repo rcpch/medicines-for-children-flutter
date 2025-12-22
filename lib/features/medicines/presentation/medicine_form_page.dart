@@ -205,45 +205,69 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
                       : null,
                 ),
                 const SizedBox(height: 12),
-                DropdownButtonFormField<MedicineType>(
-                  value: _type,
-                  decoration: const InputDecoration(
-                    labelText: 'Type',
-                    prefixIcon: Icon(Icons.category_outlined),
-                  ),
-                  items: MedicineType.values
-                      .map((type) => DropdownMenuItem(
-                            value: type,
-                            child: Text(_typeLabel(type)),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _type = value;
-                      });
-                    }
+                FormField<MedicineType>(
+                  initialValue: _type,
+                  builder: (state) {
+                    return InputDecorator(
+                      decoration: InputDecoration(
+                        labelText: 'Type',
+                        prefixIcon: const Icon(Icons.category_outlined),
+                        errorText: state.errorText,
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<MedicineType>(
+                          isExpanded: true,
+                          value: state.value,
+                          items: MedicineType.values
+                              .map((type) => DropdownMenuItem(
+                                    value: type,
+                                    child: Text(_typeLabel(type)),
+                                  ))
+                              .toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _type = value;
+                              });
+                              state.didChange(value);
+                            }
+                          },
+                        ),
+                      ),
+                    );
                   },
                 ),
                 const SizedBox(height: 12),
-                DropdownButtonFormField<MedicineStatus>(
-                  value: _status,
-                  decoration: const InputDecoration(
-                    labelText: 'Status',
-                    prefixIcon: Icon(Icons.verified_outlined),
-                  ),
-                  items: MedicineStatus.values
-                      .map((status) => DropdownMenuItem(
-                            value: status,
-                            child: Text(_statusLabel(status)),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _status = value;
-                      });
-                    }
+                FormField<MedicineStatus>(
+                  initialValue: _status,
+                  builder: (state) {
+                    return InputDecorator(
+                      decoration: InputDecoration(
+                        labelText: 'Status',
+                        prefixIcon: const Icon(Icons.verified_outlined),
+                        errorText: state.errorText,
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<MedicineStatus>(
+                          isExpanded: true,
+                          value: state.value,
+                          items: MedicineStatus.values
+                              .map((status) => DropdownMenuItem(
+                                    value: status,
+                                    child: Text(_statusLabel(status)),
+                                  ))
+                              .toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _status = value;
+                              });
+                              state.didChange(value);
+                            }
+                          },
+                        ),
+                      ),
+                    );
                   },
                 ),
                 const SizedBox(height: 12),

@@ -63,19 +63,33 @@ class _AsNeededRecordPageState extends ConsumerState<AsNeededRecordPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              DropdownButtonFormField<String>(
-                value: _selectedMedicineId,
-                decoration: const InputDecoration(
-                  labelText: 'Medicine',
-                  prefixIcon: Icon(Icons.medication_outlined),
-                ),
-                items: candidates
-                    .map((medicine) => DropdownMenuItem(
-                          value: medicine.id,
-                          child: Text(medicine.name),
-                        ))
-                    .toList(),
-                onChanged: (value) => setState(() => _selectedMedicineId = value),
+              FormField<String>(
+                initialValue: _selectedMedicineId,
+                builder: (state) {
+                  return InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'Medicine',
+                      prefixIcon: const Icon(Icons.medication_outlined),
+                      errorText: state.errorText,
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        value: state.value,
+                        items: candidates
+                            .map((medicine) => DropdownMenuItem(
+                                  value: medicine.id,
+                                  child: Text(medicine.name),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() => _selectedMedicineId = value);
+                          state.didChange(value);
+                        },
+                      ),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 16),
               _DateTimeField(
