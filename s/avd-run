@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Launch an Android emulator (optional) and run the app.
+# Usage: s/avd-run [emulator_id]
+# If no id is provided, uses $ANDROID_EMULATOR_ID or the first available emulator.
+
+EMULATOR_ID="${1:-${ANDROID_EMULATOR_ID:-}}"
+
+if [[ -z "${EMULATOR_ID}" ]]; then
+  EMULATOR_ID=$(flutter emulators --machine | python - <<'PY'
+import json,sys
+try:
+    data=json.load(sys.stdin)
+except json.JSONDecodeError:
+    sys.exit(1)
+if not data:
+    sys.exit(1)
+print(data[0].get("id",""))
+PY
+  )
+fi
+
+if [[ -n "${EMULATOR_ID}" ]]; then
+  flutter emulators --launch "${EMULATOR_ID}"
+fi
+
+# Use the first available Android device/emulator.
+flutter run -d android

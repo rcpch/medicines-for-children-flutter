@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Enforce formatting as the lint baseline.
+dart format --set-exit-if-changed .

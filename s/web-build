@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Build the Flutter web app.
+# Usage: ./s/build_web.sh
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+flutter build web --release
+printf "Web build output: %s\n" "$repo_root/build/web"

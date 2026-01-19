@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Build the Flutter Windows app.
+# Usage: ./s/build_windows.sh
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+flutter build windows --release
+printf "Windows build output: %s\n" "$repo_root/build/windows/x64/runner/Release"

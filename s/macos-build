@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Build the Flutter macOS app.
+# Usage: ./s/build_macos.sh
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+flutter build macos --release
+printf "macOS build output: %s\n" "$repo_root/build/macos/Build/Products/Release"
