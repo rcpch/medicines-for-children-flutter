@@ -84,19 +84,19 @@ flutter:
   fonts:
     - family: Montserrat
       fonts:
-        - asset: assets/fonts/Montserrat-Regular.ttf
+        - asset: assets/fonts/Montserrat/static/Montserrat-Regular.ttf
           weight: 400
-        - asset: assets/fonts/Montserrat-SemiBold.ttf
+        - asset: assets/fonts/Montserrat/static/Montserrat-SemiBold.ttf
           weight: 600
-        - asset: assets/fonts/Montserrat-Bold.ttf
+        - asset: assets/fonts/Montserrat/static/Montserrat-Bold.ttf
           weight: 700
     - family: Quicksand
       fonts:
-        - asset: assets/fonts/Quicksand-Regular.ttf
+        - asset: assets/fonts/Quicksand/static/Quicksand-Regular.ttf
           weight: 400
-        - asset: assets/fonts/Quicksand-SemiBold.ttf
+        - asset: assets/fonts/Quicksand/static/Quicksand-SemiBold.ttf
           weight: 600
-        - asset: assets/fonts/Quicksand-Bold.ttf
+        - asset: assets/fonts/Quicksand/static/Quicksand-Bold.ttf
           weight: 700
 
   # Assets removed for env configs; supply runtime configuration externally if needed.

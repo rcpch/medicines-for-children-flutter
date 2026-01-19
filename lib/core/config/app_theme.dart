@@ -16,19 +16,23 @@ class AppTheme {
       fontWeight: _headingWeight,
     );
 
-    return base
-        .apply(bodyColor: color, displayColor: color)
-        .copyWith(
-          displayLarge: heading(base.displayLarge),
-          displayMedium: heading(base.displayMedium),
-          displaySmall: heading(base.displaySmall),
-          headlineLarge: heading(base.headlineLarge),
-          headlineMedium: heading(base.headlineMedium),
-          headlineSmall: heading(base.headlineSmall),
-          titleLarge: heading(base.titleLarge),
-          titleMedium: heading(base.titleMedium),
-          titleSmall: heading(base.titleSmall),
-        );
+    final themed = base.apply(
+      fontFamily: _bodyFontFamily,
+      bodyColor: color,
+      displayColor: color,
+    );
+
+    return themed.copyWith(
+      displayLarge: heading(themed.displayLarge),
+      displayMedium: heading(themed.displayMedium),
+      displaySmall: heading(themed.displaySmall),
+      headlineLarge: heading(themed.headlineLarge),
+      headlineMedium: heading(themed.headlineMedium),
+      headlineSmall: heading(themed.headlineSmall),
+      titleLarge: heading(themed.titleLarge),
+      titleMedium: heading(themed.titleMedium),
+      titleSmall: heading(themed.titleSmall),
+    );
   }
 
   static ThemeData get light {
@@ -94,6 +98,10 @@ class AppTheme {
         base.textTheme,
         color: rcpchCharcoalDark,
       ),
+      primaryTextTheme: _applyRcpchTypography(
+        base.primaryTextTheme,
+        color: rcpchCharcoalDark,
+      ),
     );
   }
 
@@ -107,6 +115,10 @@ class AppTheme {
     return base.copyWith(
       scaffoldBackgroundColor: Colors.white,
       textTheme: _applyRcpchTypography(base.textTheme, color: Colors.black),
+      primaryTextTheme: _applyRcpchTypography(
+        base.primaryTextTheme,
+        color: Colors.black,
+      ),
     );
   }
 
@@ -137,6 +149,10 @@ class AppTheme {
         foregroundColor: rcpchWhite,
       ),
       textTheme: _applyRcpchTypography(base.textTheme, color: Colors.white),
+      primaryTextTheme: _applyRcpchTypography(
+        base.primaryTextTheme,
+        color: Colors.white,
+      ),
     );
   }
 }
