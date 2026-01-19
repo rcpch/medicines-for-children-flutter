@@ -55,7 +55,6 @@ dependencies:
   json_annotation: ^4.9.0
   share_plus: ^12.0.1
   package_info_plus: ^9.0.0
-  google_fonts: ^6.3.0
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +80,24 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Montserrat-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Montserrat-Bold.ttf
+          weight: 700
+    - family: Quicksand
+      fonts:
+        - asset: assets/fonts/Quicksand-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Quicksand-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Quicksand-Bold.ttf
+          weight: 700
 
   # Assets removed for env configs; supply runtime configuration externally if needed.
   # To add assets to your application, add an assets section, like this:

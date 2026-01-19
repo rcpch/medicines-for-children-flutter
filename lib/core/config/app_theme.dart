@@ -1,34 +1,34 @@
 // App theme definitions and styling tokens.
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:medicines_for_children_flutter/core/theme/rcpch_colours.dart';
 
 class AppTheme {
+  static const String _bodyFontFamily = 'Montserrat';
+  static const String _headingFontFamily = 'Quicksand';
   static const FontWeight _headingWeight = FontWeight.w600;
 
   static TextTheme _applyRcpchTypography(
     TextTheme base, {
     required Color color,
   }) {
-    final body = GoogleFonts.montserratTextTheme(base);
-    final headings = GoogleFonts.quicksandTextTheme(base);
+    TextStyle? heading(TextStyle? style) => style?.copyWith(
+      fontFamily: _headingFontFamily,
+      fontWeight: _headingWeight,
+    );
 
-    TextStyle? heading(TextStyle? style) =>
-        style?.copyWith(fontWeight: _headingWeight);
-
-    return body
+    return base
+        .apply(bodyColor: color, displayColor: color)
         .copyWith(
-          displayLarge: heading(headings.displayLarge),
-          displayMedium: heading(headings.displayMedium),
-          displaySmall: heading(headings.displaySmall),
-          headlineLarge: heading(headings.headlineLarge),
-          headlineMedium: heading(headings.headlineMedium),
-          headlineSmall: heading(headings.headlineSmall),
-          titleLarge: heading(headings.titleLarge),
-          titleMedium: heading(headings.titleMedium),
-          titleSmall: heading(headings.titleSmall),
-        )
-        .apply(bodyColor: color, displayColor: color);
+          displayLarge: heading(base.displayLarge),
+          displayMedium: heading(base.displayMedium),
+          displaySmall: heading(base.displaySmall),
+          headlineLarge: heading(base.headlineLarge),
+          headlineMedium: heading(base.headlineMedium),
+          headlineSmall: heading(base.headlineSmall),
+          titleLarge: heading(base.titleLarge),
+          titleMedium: heading(base.titleMedium),
+          titleSmall: heading(base.titleSmall),
+        );
   }
 
   static ThemeData get light {
@@ -52,7 +52,11 @@ class AppTheme {
           outline: rcpchMidGrey,
         );
 
-    final base = ThemeData(colorScheme: scheme, useMaterial3: true);
+    final base = ThemeData(
+      colorScheme: scheme,
+      useMaterial3: true,
+      fontFamily: _bodyFontFamily,
+    );
 
     return base.copyWith(
       scaffoldBackgroundColor: rcpchWhite,
@@ -97,6 +101,7 @@ class AppTheme {
     final base = ThemeData(
       colorScheme: const ColorScheme.highContrastLight(),
       useMaterial3: true,
+      fontFamily: _bodyFontFamily,
     );
 
     return base.copyWith(
@@ -119,7 +124,11 @@ class AppTheme {
           onSurface: rcpchWhite,
         );
 
-    final base = ThemeData(colorScheme: scheme, useMaterial3: true);
+    final base = ThemeData(
+      colorScheme: scheme,
+      useMaterial3: true,
+      fontFamily: _bodyFontFamily,
+    );
 
     return base.copyWith(
       scaffoldBackgroundColor: const Color(0xFF0C1416),
