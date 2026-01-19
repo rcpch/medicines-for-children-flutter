@@ -28,7 +28,9 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final controller = container.read(scheduleEditorControllerProvider.notifier);
+    final controller = container.read(
+      scheduleEditorControllerProvider.notifier,
+    );
     const medicine = Medicine(
       id: 'med-1',
       name: 'Ibuprofen',

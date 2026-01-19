@@ -45,7 +45,8 @@ class ChildProfilePage extends ConsumerWidget {
       );
     }
 
-    final imageProvider = child.photoUrl == null || child.photoUrl!.trim().isEmpty
+    final imageProvider =
+        child.photoUrl == null || child.photoUrl!.trim().isEmpty
         ? null
         : createImageProvider(child.photoUrl!);
 
@@ -72,9 +73,13 @@ class ChildProfilePage extends ConsumerWidget {
                   children: [
                     CircleAvatar(
                       radius: 36,
-                      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
                       backgroundImage: imageProvider,
-                      child: imageProvider == null ? const Icon(Icons.child_care_outlined) : null,
+                      child: imageProvider == null
+                          ? const Icon(Icons.child_care_outlined)
+                          : null,
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -105,7 +110,9 @@ class ChildProfilePage extends ConsumerWidget {
             _InfoCard(
               title: 'Condition',
               child: Text(
-                child.condition.isNotEmpty ? child.condition : 'No condition recorded.',
+                child.condition.isNotEmpty
+                    ? child.condition
+                    : 'No condition recorded.',
               ),
             ),
             const SizedBox(height: 16),
@@ -123,10 +130,7 @@ class ChildProfilePage extends ConsumerWidget {
             ),
             if (child.notes != null && child.notes!.trim().isNotEmpty) ...[
               const SizedBox(height: 16),
-              _InfoCard(
-                title: 'Notes for carers',
-                child: Text(child.notes!),
-              ),
+              _InfoCard(title: 'Notes for carers', child: Text(child.notes!)),
             ],
             const SizedBox(height: 16),
             _InfoCard(
@@ -160,13 +164,15 @@ class ChildProfilePage extends ConsumerWidget {
   String _formatAge(DateTime dateOfBirth) {
     final now = DateTime.now();
     int years = now.year - dateOfBirth.year;
-    final hasHadBirthday = now.month > dateOfBirth.month ||
+    final hasHadBirthday =
+        now.month > dateOfBirth.month ||
         (now.month == dateOfBirth.month && now.day >= dateOfBirth.day);
     if (!hasHadBirthday) {
       years -= 1;
     }
     if (years <= 0) {
-      final months = (now.year - dateOfBirth.year) * 12 + (now.month - dateOfBirth.month);
+      final months =
+          (now.year - dateOfBirth.year) * 12 + (now.month - dateOfBirth.month);
       return '${months < 1 ? 1 : months} months old';
     }
     return '$years years old';

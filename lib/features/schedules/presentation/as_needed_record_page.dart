@@ -41,7 +41,8 @@ class _AsNeededRecordPageState extends ConsumerState<AsNeededRecordPage> {
 
     final candidates = child.medicines.where((medicine) {
       return medicine.status == MedicineStatus.inUse &&
-          (medicine.type == MedicineType.asNeeded || medicine.type == MedicineType.both);
+          (medicine.type == MedicineType.asNeeded ||
+              medicine.type == MedicineType.both);
     }).toList();
 
     if (candidates.isEmpty) {
@@ -78,10 +79,12 @@ class _AsNeededRecordPageState extends ConsumerState<AsNeededRecordPage> {
                         isExpanded: true,
                         value: state.value,
                         items: candidates
-                            .map((medicine) => DropdownMenuItem(
-                                  value: medicine.id,
-                                  child: Text(medicine.name),
-                                ))
+                            .map(
+                              (medicine) => DropdownMenuItem(
+                                value: medicine.id,
+                                child: Text(medicine.name),
+                              ),
+                            )
                             .toList(),
                         onChanged: (value) {
                           setState(() => _selectedMedicineId = value);
@@ -129,25 +132,29 @@ class _AsNeededRecordPageState extends ConsumerState<AsNeededRecordPage> {
     if (_selectedMedicineId == null) {
       return;
     }
-    final success = await ref.read(asNeededRecordControllerProvider.notifier).recordAdministration(
+    final success = await ref
+        .read(asNeededRecordControllerProvider.notifier)
+        .recordAdministration(
           medicineId: _selectedMedicineId!,
           dateTime: _dateTime,
-          notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+          notes: _notesController.text.trim().isEmpty
+              ? null
+              : _notesController.text.trim(),
         );
     if (!mounted) {
       return;
     }
     final state = ref.read(asNeededRecordControllerProvider);
     if (state.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(state.errorMessage!)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
       return;
     }
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('As-needed dose recorded.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('As-needed dose recorded.')));
       Navigator.of(context).pop();
     }
   }
@@ -194,7 +201,9 @@ class _DateTimeField extends StatelessWidget {
           if (time == null) {
             return;
           }
-          onPick(DateTime(date.year, date.month, date.day, time.hour, time.minute));
+          onPick(
+            DateTime(date.year, date.month, date.day, time.hour, time.minute),
+          );
         },
         child: InputDecorator(
           decoration: InputDecoration(

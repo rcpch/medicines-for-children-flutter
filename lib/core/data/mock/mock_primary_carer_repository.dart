@@ -7,7 +7,8 @@ import 'package:medicines_for_children_flutter/core/domain/models/schedule.dart'
 import 'package:medicines_for_children_flutter/features/home/data/primary_carer_repository.dart';
 
 class MockPrimaryCarerRepository implements PrimaryCarerRepository {
-  MockPrimaryCarerRepository({PrimaryCarer? seed}) : _seed = seed ?? _samplePrimaryCarer();
+  MockPrimaryCarerRepository({PrimaryCarer? seed})
+    : _seed = seed ?? _samplePrimaryCarer();
 
   final PrimaryCarer _seed;
 

@@ -45,7 +45,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   Future<void> _checkBiometrics() async {
-    final available = await ref.read(biometricAuthServiceProvider).isSupported();
+    final available = await ref
+        .read(biometricAuthServiceProvider)
+        .isSupported();
     if (!mounted) {
       return;
     }
@@ -60,7 +62,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       return;
     }
     _passcodeController.clear();
-    final profileSettings = ref.read(profileSettingsControllerProvider(profile.id));
+    final profileSettings = ref.read(
+      profileSettingsControllerProvider(profile.id),
+    );
     final biometricsEnabled = profileSettings.biometricsEnabled;
     if (!mounted) {
       return;
@@ -97,8 +101,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             if (canUseBiometrics)
               OutlinedButton.icon(
                 onPressed: () async {
-                  final success =
-                      await ref.read(authControllerProvider.notifier).unlockWithBiometrics();
+                  final success = await ref
+                      .read(authControllerProvider.notifier)
+                      .unlockWithBiometrics();
                   if (!context.mounted) {
                     return;
                   }
@@ -148,7 +153,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             tooltip: 'Refresh profiles',
             onPressed: authState.isLoading
                 ? null
-                : () => ref.read(authControllerProvider.notifier).refreshProfiles(),
+                : () => ref
+                      .read(authControllerProvider.notifier)
+                      .refreshProfiles(),
             icon: const Icon(Icons.refresh),
           ),
         ],
@@ -185,7 +192,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             const Text('No profiles yet.'),
                             const SizedBox(height: 12),
                             ElevatedButton(
-                              onPressed: authState.isLoading ? null : _goToSignup,
+                              onPressed: authState.isLoading
+                                  ? null
+                                  : _goToSignup,
                               child: const Text('Create a profile'),
                             ),
                           ],
@@ -203,7 +212,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           trailing: profile.hasPasscode
                               ? const Icon(Icons.lock_outline)
                               : const Icon(Icons.chevron_right),
-                          onTap: authState.isLoading ? null : () => _selectProfile(profile),
+                          onTap: authState.isLoading
+                              ? null
+                              : () => _selectProfile(profile),
                         ),
                       ),
                     ),

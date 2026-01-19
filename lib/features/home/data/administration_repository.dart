@@ -54,7 +54,9 @@ class LocalAdministrationRepository implements AdministrationRepository {
     );
 
     final updatedAdmin = Administration(
-      id: existingIndex == -1 ? _generateId() : schedule.administrations[existingIndex].id,
+      id: existingIndex == -1
+          ? _generateId()
+          : schedule.administrations[existingIndex].id,
       dateTime: dateTime,
       status: status,
       isAsNeeded: false,
@@ -69,7 +71,9 @@ class LocalAdministrationRepository implements AdministrationRepository {
       updatedAdministrations[existingIndex] = updatedAdmin;
     }
 
-    final updatedSchedule = schedule.copyWith(administrations: updatedAdministrations);
+    final updatedSchedule = schedule.copyWith(
+      administrations: updatedAdministrations,
+    );
     await _saveSchedule(context, updatedSchedule);
   }
 
@@ -87,7 +91,9 @@ class LocalAdministrationRepository implements AdministrationRepository {
     final updatedAdministrations = schedule.administrations
         .where((admin) => !_isSameMinute(admin.dateTime, dateTime))
         .toList();
-    final updatedSchedule = schedule.copyWith(administrations: updatedAdministrations);
+    final updatedSchedule = schedule.copyWith(
+      administrations: updatedAdministrations,
+    );
     await _saveSchedule(context, updatedSchedule);
   }
 
@@ -103,20 +109,31 @@ class LocalAdministrationRepository implements AdministrationRepository {
     if (carer.children.isEmpty) {
       throw StateError('No child profile available');
     }
-    return _AdministrationContext(profileId: user.uid, user: user, carer: carer, child: carer.children.first);
+    return _AdministrationContext(
+      profileId: user.uid,
+      user: user,
+      carer: carer,
+      child: carer.children.first,
+    );
   }
 
-  Future<void> _saveSchedule(_AdministrationContext context, MedicineSchedule schedule) async {
-    final prunedAdministrations = _pruneAdministrations(schedule.administrations);
-    final prunedSchedule = schedule.copyWith(administrations: prunedAdministrations);
+  Future<void> _saveSchedule(
+    _AdministrationContext context,
+    MedicineSchedule schedule,
+  ) async {
+    final prunedAdministrations = _pruneAdministrations(
+      schedule.administrations,
+    );
+    final prunedSchedule = schedule.copyWith(
+      administrations: prunedAdministrations,
+    );
     final updatedSchedules = context.child.schedules
         .map((item) => item.id == schedule.id ? prunedSchedule : item)
         .toList();
     final updatedChild = context.child.copyWith(schedules: updatedSchedules);
-    final updatedCarer = context.carer.copyWith(children: [
-      updatedChild,
-      ...context.carer.children.skip(1),
-    ]);
+    final updatedCarer = context.carer.copyWith(
+      children: [updatedChild, ...context.carer.children.skip(1)],
+    );
     await profileData.writePrimaryCarer(context.profileId, updatedCarer);
   }
 
@@ -128,9 +145,15 @@ class LocalAdministrationRepository implements AdministrationRepository {
         a.minute == b.minute;
   }
 
-  List<Administration> _pruneAdministrations(List<Administration> administrations) {
-    final cutoff = DateTime.now().subtract(const Duration(days: _administrationRetentionDays));
-    return administrations.where((admin) => !admin.dateTime.isBefore(cutoff)).toList();
+  List<Administration> _pruneAdministrations(
+    List<Administration> administrations,
+  ) {
+    final cutoff = DateTime.now().subtract(
+      const Duration(days: _administrationRetentionDays),
+    );
+    return administrations
+        .where((admin) => !admin.dateTime.isBefore(cutoff))
+        .toList();
   }
 
   String _generateId() {
@@ -152,8 +175,13 @@ class _AdministrationContext {
   final Child child;
 }
 
-final administrationRepositoryProvider = Provider<AdministrationRepository>((ref) {
+final administrationRepositoryProvider = Provider<AdministrationRepository>((
+  ref,
+) {
   final authRepository = ref.watch(authRepositoryProvider);
   final profileData = ref.watch(profileDataLocalDataSourceProvider);
-  return LocalAdministrationRepository(authRepository: authRepository, profileData: profileData);
+  return LocalAdministrationRepository(
+    authRepository: authRepository,
+    profileData: profileData,
+  );
 });

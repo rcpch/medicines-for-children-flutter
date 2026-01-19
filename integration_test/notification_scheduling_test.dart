@@ -20,7 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class RecordingNotificationService implements NotificationService {
   RecordingNotificationService(this._store)
-      : _calculator = const NotificationScheduleCalculator();
+    : _calculator = const NotificationScheduleCalculator();
 
   final NotificationStore _store;
   final NotificationScheduleCalculator _calculator;
@@ -131,20 +131,26 @@ void main() {
         overrides: [
           appConfigProvider.overrideWithValue(config),
           sharedPreferencesProvider.overrideWithValue(prefs),
-          notificationServiceProvider.overrideWithValue(RecordingNotificationService(store)),
+          notificationServiceProvider.overrideWithValue(
+            RecordingNotificationService(store),
+          ),
         ],
         child: const MedicinesApp(),
       ),
     );
     await tester.pumpAndSettle();
 
-    final container = ProviderScope.containerOf(tester.element(find.byType(MedicinesApp)));
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(MedicinesApp)),
+    );
     final router = container.read(appRouterProvider);
 
     router.goNamed(AppRoute.addSchedule.name);
     await tester.pumpAndSettle();
 
-    final addScheduleButton = find.widgetWithText(ElevatedButton, 'Add schedule').first;
+    final addScheduleButton = find
+        .widgetWithText(ElevatedButton, 'Add schedule')
+        .first;
     await tester.scrollUntilVisible(
       addScheduleButton,
       200,

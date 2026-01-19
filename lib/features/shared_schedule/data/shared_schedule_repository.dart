@@ -26,7 +26,8 @@ class SharedScheduleAuthResult {
   final String message;
   final String status;
 
-  bool get hasUsableAuthToken => authToken != null && authToken != '0' && authToken!.isNotEmpty;
+  bool get hasUsableAuthToken =>
+      authToken != null && authToken != '0' && authToken!.isNotEmpty;
 }
 
 class SharedScheduleMedicineSummary {
@@ -87,9 +88,9 @@ class SharedScheduleDay {
     final rawItems = json['scheduledItemsForDay'];
     final items = rawItems is List
         ? rawItems
-            .whereType<Map<String, dynamic>>()
-            .map(SharedScheduledItem.fromJson)
-            .toList(growable: false)
+              .whereType<Map<String, dynamic>>()
+              .map(SharedScheduledItem.fromJson)
+              .toList(growable: false)
         : const <SharedScheduledItem>[];
 
     final rawDate = json['date'];
@@ -119,7 +120,10 @@ class SharedScheduleChildSummary {
   factory SharedScheduleChildSummary.fromJson(Map<String, dynamic> json) {
     final allergiesValue = json['allergies'];
     final allergies = allergiesValue is List
-        ? allergiesValue.map((item) => item.toString().trim()).where((item) => item.isNotEmpty).toList()
+        ? allergiesValue
+              .map((item) => item.toString().trim())
+              .where((item) => item.isNotEmpty)
+              .toList()
         : _parseAllergies(allergiesValue?.toString() ?? '');
 
     return SharedScheduleChildSummary(
@@ -162,17 +166,17 @@ class SharedScheduleViewModel {
     final rawMedicines = json['medicines'];
     final medicines = rawMedicines is List
         ? rawMedicines
-            .whereType<Map<String, dynamic>>()
-            .map(SharedScheduleMedicineSummary.fromJson)
-            .toList(growable: false)
+              .whereType<Map<String, dynamic>>()
+              .map(SharedScheduleMedicineSummary.fromJson)
+              .toList(growable: false)
         : const <SharedScheduleMedicineSummary>[];
 
     final rawDays = json['days'];
     final days = rawDays is List
         ? rawDays
-            .whereType<Map<String, dynamic>>()
-            .map(SharedScheduleDay.fromJson)
-            .toList(growable: false)
+              .whereType<Map<String, dynamic>>()
+              .map(SharedScheduleDay.fromJson)
+              .toList(growable: false)
         : const <SharedScheduleDay>[];
 
     final rawFrom = json['dateFrom'];
@@ -219,9 +223,9 @@ class SharedScheduleViewModel {
   final String scheduleUrl;
 
   SharedScheduleDay? get today => days.cast<SharedScheduleDay?>().firstWhere(
-        (day) => day?.isToday == true,
-        orElse: () => null,
-      );
+    (day) => day?.isToday == true,
+    orElse: () => null,
+  );
 }
 
 String _readString(Map<String, dynamic> json, List<String> keys) {
@@ -302,9 +306,7 @@ class HttpSharedScheduleRepository implements SharedScheduleRepository {
     final response = await _dio.get<List<dynamic>>(
       '/sharedSchedule/$apiId',
       options: Options(
-        headers: <String, dynamic>{
-          'Authorization': 'token $authToken',
-        },
+        headers: <String, dynamic>{'Authorization': 'token $authToken'},
       ),
     );
 
@@ -361,10 +363,7 @@ class HttpSharedScheduleRepository implements SharedScheduleRepository {
   }) async {
     await _dio.post<Map<String, dynamic>>(
       '/confirm/$apiId',
-      data: <String, dynamic>{
-        'approved': approved,
-        'reason': reason ?? '',
-      },
+      data: <String, dynamic>{'approved': approved, 'reason': reason ?? ''},
       options: Options(
         headers: <String, dynamic>{'Authorization': 'token $authToken'},
       ),

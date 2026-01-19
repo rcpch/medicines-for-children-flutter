@@ -51,12 +51,16 @@ class SelectedChildController extends StateNotifier<String?> {
   void _syncWithCarer() {
     final profileId = _profileId;
     final carer = _carerState?.carer;
-    if (profileId == null || profileId.isEmpty || carer == null || carer.children.isEmpty) {
+    if (profileId == null ||
+        profileId.isEmpty ||
+        carer == null ||
+        carer.children.isEmpty) {
       state = null;
       return;
     }
     final currentId = state;
-    final selected = carer.children.cast<Child?>().firstWhere(
+    final selected =
+        carer.children.cast<Child?>().firstWhere(
           (child) => child?.id == currentId,
           orElse: () => null,
         ) ??
@@ -84,10 +88,11 @@ class SelectedChildController extends StateNotifier<String?> {
   }
 }
 
-final selectedChildIdProvider = StateNotifierProvider<SelectedChildController, String?>((ref) {
-  final storage = ref.watch(activeChildLocalDataSourceProvider);
-  return SelectedChildController(ref, storage);
-});
+final selectedChildIdProvider =
+    StateNotifierProvider<SelectedChildController, String?>((ref) {
+      final storage = ref.watch(activeChildLocalDataSourceProvider);
+      return SelectedChildController(ref, storage);
+    });
 
 final activeChildProvider = Provider<Child?>((ref) {
   final state = ref.watch(primaryCarerStateProvider);
@@ -100,7 +105,7 @@ final activeChildProvider = Provider<Child?>((ref) {
     return carer.children.first;
   }
   return carer.children.cast<Child?>().firstWhere(
-        (child) => child?.id == selectedChildId,
-        orElse: () => carer.children.first,
-      );
+    (child) => child?.id == selectedChildId,
+    orElse: () => carer.children.first,
+  );
 });

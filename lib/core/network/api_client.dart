@@ -15,13 +15,7 @@ final dioProvider = Provider<Dio>((ref) {
         'Content-Type': 'application/json',
       },
     ),
-  )
-    ..interceptors.add(
-      LogInterceptor(
-        requestBody: true,
-        responseBody: true,
-      ),
-    );
+  )..interceptors.add(LogInterceptor(requestBody: true, responseBody: true));
 
   return dio;
 });

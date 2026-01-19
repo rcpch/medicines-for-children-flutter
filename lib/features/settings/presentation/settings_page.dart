@@ -49,7 +49,9 @@ class SettingsPage extends ConsumerWidget {
                     ? null
                     : (value) async {
                         final controller = ref.read(
-                          profileSettingsControllerProvider(currentProfile!.id).notifier,
+                          profileSettingsControllerProvider(
+                            currentProfile!.id,
+                          ).notifier,
                         );
                         if (!value) {
                           await controller.setBiometricsEnabled(false);
@@ -77,7 +79,9 @@ class SettingsPage extends ConsumerWidget {
                     child: Card(
                       child: ListTile(
                         title: Text(
-                          profile.hasPasscode ? 'Change passcode' : 'Set passcode',
+                          profile.hasPasscode
+                              ? 'Change passcode'
+                              : 'Set passcode',
                         ),
                         subtitle: Text(
                           profile.hasPasscode
@@ -152,7 +156,10 @@ class SettingsPage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Text('Notifications', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Notifications',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
             Card(
               child: SwitchListTile.adaptive(
@@ -173,7 +180,9 @@ class SettingsPage extends ConsumerWidget {
               child: SwitchListTile.adaptive(
                 value: settings.telemetryEnabled,
                 title: const Text('Share anonymous analytics'),
-                subtitle: const Text('Help improve the app by sharing usage data.'),
+                subtitle: const Text(
+                  'Help improve the app by sharing usage data.',
+                ),
                 onChanged: (value) => controller.setTelemetryEnabled(value),
               ),
             ),
@@ -303,9 +312,7 @@ class SettingsPage extends ConsumerWidget {
               TextField(
                 controller: newController,
                 obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'New passcode',
-                ),
+                decoration: const InputDecoration(labelText: 'New passcode'),
               ),
               TextField(
                 controller: confirmController,
@@ -328,7 +335,9 @@ class SettingsPage extends ConsumerWidget {
                 final confirm = confirmController.text.trim();
                 if (next.isEmpty || confirm.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Enter and confirm the new passcode.')),
+                    const SnackBar(
+                      content: Text('Enter and confirm the new passcode.'),
+                    ),
                   );
                   return;
                 }
@@ -388,10 +397,10 @@ class _BiometricsTile extends ConsumerWidget {
         final subtitle = !supported
             ? 'Biometrics are not available on this device.'
             : !hasPasscode
-                ? 'Add a passcode to enable biometric unlock.'
-                : profileName == null
-                    ? 'Select a profile to configure biometrics.'
-                    : 'Use biometrics to unlock ${profileName!}.';
+            ? 'Add a passcode to enable biometric unlock.'
+            : profileName == null
+            ? 'Select a profile to configure biometrics.'
+            : 'Use biometrics to unlock ${profileName!}.';
         return SwitchListTile.adaptive(
           value: enabled && biometricsEnabled,
           title: const Text('Biometric unlock'),

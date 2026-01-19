@@ -16,7 +16,8 @@ class LocalProfile {
       name: (json['name'] ?? '').toString(),
       displayName: (json['displayName'] ?? '').toString(),
       createdAt:
-          DateTime.tryParse((json['createdAt'] ?? '').toString()) ?? DateTime.fromMillisecondsSinceEpoch(0),
+          DateTime.tryParse((json['createdAt'] ?? '').toString()) ??
+          DateTime.fromMillisecondsSinceEpoch(0),
       hasPasscode: json['hasPasscode'] == true,
     );
   }
@@ -37,7 +38,9 @@ class LocalProfile {
   }
 
   static String listToRawJson(List<LocalProfile> profiles) {
-    return jsonEncode(profiles.map((profile) => profile.toJson()).toList(growable: false));
+    return jsonEncode(
+      profiles.map((profile) => profile.toJson()).toList(growable: false),
+    );
   }
 
   Map<String, dynamic> toJson() {
@@ -70,4 +73,3 @@ class LocalProfile {
   final DateTime createdAt;
   final bool hasPasscode;
 }
-

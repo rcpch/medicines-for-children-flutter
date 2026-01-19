@@ -89,7 +89,9 @@ void main() {
         overrides: [
           appConfigProvider.overrideWithValue(config),
           sharedPreferencesProvider.overrideWithValue(prefs),
-          notificationServiceProvider.overrideWithValue(FakeNotificationService()),
+          notificationServiceProvider.overrideWithValue(
+            FakeNotificationService(),
+          ),
         ],
         child: const MedicinesApp(),
       ),
@@ -110,7 +112,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.descendant(of: find.byType(AppBar), matching: find.text(section.title)),
+        find.descendant(
+          of: find.byType(AppBar),
+          matching: find.text(section.title),
+        ),
         findsOneWidget,
       );
       expect(find.text('Step-by-step guidance'), findsOneWidget);

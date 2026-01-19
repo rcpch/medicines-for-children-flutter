@@ -53,7 +53,9 @@ class OnboardingDraft {
       childLastName: childLastName ?? this.childLastName,
       childCondition: childCondition ?? this.childCondition,
       childAllergies: childAllergies ?? this.childAllergies,
-      childDateOfBirth: clearChildDateOfBirth ? null : (childDateOfBirth ?? this.childDateOfBirth),
+      childDateOfBirth: clearChildDateOfBirth
+          ? null
+          : (childDateOfBirth ?? this.childDateOfBirth),
       childNotes: childNotes ?? this.childNotes,
     );
   }

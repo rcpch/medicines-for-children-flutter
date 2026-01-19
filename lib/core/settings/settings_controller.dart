@@ -15,15 +15,17 @@ const _maxTextScale = 1.3;
 
 class SettingsController extends StateNotifier<AppSettings> {
   SettingsController(this._ref, this._prefs)
-      : super(
-          AppSettings(
-            telemetryEnabled: _prefs.getBool(_telemetryEnabledKey) ?? true,
-            telemetryConsentShown: _prefs.getBool(_telemetryConsentShownKey) ?? false,
-            notificationsEnabled: _prefs.getBool(_notificationsEnabledKey) ?? true,
-            themeMode: _parseThemeMode(_prefs.getString(_themeModeKey)),
-            textScale: _clampTextScale(_prefs.getDouble(_textScaleKey) ?? 1.0),
-          ),
-        );
+    : super(
+        AppSettings(
+          telemetryEnabled: _prefs.getBool(_telemetryEnabledKey) ?? true,
+          telemetryConsentShown:
+              _prefs.getBool(_telemetryConsentShownKey) ?? false,
+          notificationsEnabled:
+              _prefs.getBool(_notificationsEnabledKey) ?? true,
+          themeMode: _parseThemeMode(_prefs.getString(_themeModeKey)),
+          textScale: _clampTextScale(_prefs.getDouble(_textScaleKey) ?? 1.0),
+        ),
+      );
 
   final Ref _ref;
   final SharedPreferences _prefs;
@@ -73,7 +75,8 @@ class SettingsController extends StateNotifier<AppSettings> {
   }
 }
 
-final settingsControllerProvider = StateNotifierProvider<SettingsController, AppSettings>((ref) {
-  final prefs = ref.watch(sharedPreferencesProvider);
-  return SettingsController(ref, prefs);
-});
+final settingsControllerProvider =
+    StateNotifierProvider<SettingsController, AppSettings>((ref) {
+      final prefs = ref.watch(sharedPreferencesProvider);
+      return SettingsController(ref, prefs);
+    });

@@ -53,8 +53,9 @@ class _AddChildPageState extends ConsumerState<AddChildPage> {
                       prefixIcon: Icon(Icons.badge_outlined),
                     ),
                     textInputAction: TextInputAction.next,
-                    validator: (value) =>
-                        value == null || value.trim().isEmpty ? 'Enter a first name' : null,
+                    validator: (value) => value == null || value.trim().isEmpty
+                        ? 'Enter a first name'
+                        : null,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
@@ -64,13 +65,15 @@ class _AddChildPageState extends ConsumerState<AddChildPage> {
                       prefixIcon: Icon(Icons.badge_outlined),
                     ),
                     textInputAction: TextInputAction.next,
-                    validator: (value) =>
-                        value == null || value.trim().isEmpty ? 'Enter a last name' : null,
+                    validator: (value) => value == null || value.trim().isEmpty
+                        ? 'Enter a last name'
+                        : null,
                   ),
                   const SizedBox(height: 16),
                   Semantics(
                     button: true,
-                    label: 'Date of birth. ${_dateOfBirth == null ? 'No date selected.' : _dobController.text}.',
+                    label:
+                        'Date of birth. ${_dateOfBirth == null ? 'No date selected.' : _dobController.text}.',
                     child: TextFormField(
                       controller: _dobController,
                       readOnly: true,
@@ -79,8 +82,9 @@ class _AddChildPageState extends ConsumerState<AddChildPage> {
                         prefixIcon: Icon(Icons.cake_outlined),
                       ),
                       onTap: _pickDateOfBirth,
-                      validator: (_) =>
-                          _dateOfBirth == null ? 'Choose a date of birth' : null,
+                      validator: (_) => _dateOfBirth == null
+                          ? 'Choose a date of birth'
+                          : null,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -181,7 +185,9 @@ class _AddChildPageState extends ConsumerState<AddChildPage> {
       dateOfBirth: _dateOfBirth ?? DateTime(1970, 1, 1),
       condition: _conditionController.text.trim(),
       allergies: _parseAllergies(_allergiesController.text),
-      notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+      notes: _notesController.text.trim().isEmpty
+          ? null
+          : _notesController.text.trim(),
       medicines: const [],
       schedules: const [],
       asNeededSchedules: const [],
@@ -194,14 +200,17 @@ class _AddChildPageState extends ConsumerState<AddChildPage> {
     }
     setState(() => _isSaving = false);
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Child added.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Child added.')));
       Navigator.of(context).pop();
     } else {
-      final error = ref.read(primaryCarerControllerProvider).errorMessage ??
+      final error =
+          ref.read(primaryCarerControllerProvider).errorMessage ??
           'Unable to add child right now.';
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error)));
     }
   }
 }

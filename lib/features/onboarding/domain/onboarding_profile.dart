@@ -80,15 +80,16 @@ class ChildProfile {
 }
 
 class OnboardingProfile {
-  const OnboardingProfile({
-    required this.carer,
-    required this.child,
-  });
+  const OnboardingProfile({required this.carer, required this.child});
 
   factory OnboardingProfile.fromMap(Map<String, dynamic> json) {
     return OnboardingProfile(
-      carer: CarerProfile.fromJson(json['carer'] as Map<String, dynamic>? ?? const {}),
-      child: ChildProfile.fromJson(json['child'] as Map<String, dynamic>? ?? const {}),
+      carer: CarerProfile.fromJson(
+        json['carer'] as Map<String, dynamic>? ?? const {},
+      ),
+      child: ChildProfile.fromJson(
+        json['child'] as Map<String, dynamic>? ?? const {},
+      ),
     );
   }
 
@@ -104,10 +105,7 @@ class OnboardingProfile {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'carer': carer.toJson(),
-      'child': child.toJson(),
-    };
+    return {'carer': carer.toJson(), 'child': child.toJson()};
   }
 
   String toJson() => jsonEncode(toMap());

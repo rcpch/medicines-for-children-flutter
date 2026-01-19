@@ -34,9 +34,7 @@ class _IoBackupFileIO implements BackupFileIO {
     required List<String> extensions,
   }) async {
     final file = await openFile(
-      acceptedTypeGroups: [
-        XTypeGroup(label: label, extensions: extensions),
-      ],
+      acceptedTypeGroups: [XTypeGroup(label: label, extensions: extensions)],
     );
     if (file == null) {
       return null;

@@ -6,21 +6,20 @@ import 'package:medicines_for_children_flutter/core/data/storage/shared_preferen
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationMetadata {
-  NotificationMetadata({
-    required this.notificationIds,
-    required this.endDate,
-  });
+  NotificationMetadata({required this.notificationIds, required this.endDate});
 
   final List<int> notificationIds;
   final DateTime endDate;
 
   Map<String, dynamic> toJson() => {
-        'notificationIds': notificationIds,
-        'endDate': endDate.toIso8601String(),
-      };
+    'notificationIds': notificationIds,
+    'endDate': endDate.toIso8601String(),
+  };
 
   static NotificationMetadata? fromJson(Map<String, dynamic> json) {
-    final ids = (json['notificationIds'] as List?)?.map((item) => item as int).toList();
+    final ids = (json['notificationIds'] as List?)
+        ?.map((item) => item as int)
+        .toList();
     final endDateRaw = json['endDate'] as String?;
     if (ids == null || endDateRaw == null) {
       return null;
@@ -49,7 +48,10 @@ class NotificationStore {
     return NotificationMetadata.fromJson(value);
   }
 
-  Future<void> writeForSchedule(String scheduleId, NotificationMetadata metadata) async {
+  Future<void> writeForSchedule(
+    String scheduleId,
+    NotificationMetadata metadata,
+  ) async {
     final all = _readAll();
     all[scheduleId] = metadata.toJson();
     await _writeAll(all);

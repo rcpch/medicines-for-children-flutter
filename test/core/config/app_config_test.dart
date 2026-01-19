@@ -5,10 +5,12 @@ import 'package:medicines_for_children_flutter/core/config/app_config.dart';
 void main() {
   group('AppConfig', () {
     setUp(() {
-      dotenv.loadFromString(envString: '''
+      dotenv.loadFromString(
+        envString: '''
 SHARED_SCHEDULE_API_BASE_URL=https://api.test
 SHARED_SCHEDULE_API_KEY=test-key
-''');
+''',
+      );
     });
 
     test('creates config from env', () {

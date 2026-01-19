@@ -42,9 +42,13 @@ class _SignupPageState extends ConsumerState<SignupPage> {
       return;
     }
 
-    await ref.read(authControllerProvider.notifier).createProfile(
+    await ref
+        .read(authControllerProvider.notifier)
+        .createProfile(
           name: _profileNameController.text.trim(),
-          passcode: _passcodeController.text.trim().isEmpty ? null : _passcodeController.text.trim(),
+          passcode: _passcodeController.text.trim().isEmpty
+              ? null
+              : _passcodeController.text.trim(),
         );
 
     if (!mounted) {
@@ -54,7 +58,9 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     final authState = ref.read(authControllerProvider);
     if (authState.errorMessage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile created. Let\'s set up your family.')),
+        const SnackBar(
+          content: Text('Profile created. Let\'s set up your family.'),
+        ),
       );
       context.goNamed(AppRoute.onboarding.name);
     }
@@ -66,8 +72,12 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
     ref.listen<AuthState>(authControllerProvider, (previous, next) {
       final message = next.errorMessage;
-      if (message != null && message.isNotEmpty && message != previous?.errorMessage) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      if (message != null &&
+          message.isNotEmpty &&
+          message != previous?.errorMessage) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
       }
     });
 
@@ -108,7 +118,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                         labelText: 'Profile name',
                         prefixIcon: Icon(Icons.person_outline),
                       ),
-                      validator: (value) => value == null || value.trim().isEmpty
+                      validator: (value) =>
+                          value == null || value.trim().isEmpty
                           ? 'Enter a name for this profile'
                           : null,
                     ),
@@ -120,7 +131,9 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                         labelText: 'Passcode (optional)',
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
-                          tooltip: _obscurePasscode ? 'Show passcode' : 'Hide passcode',
+                          tooltip: _obscurePasscode
+                              ? 'Show passcode'
+                              : 'Hide passcode',
                           onPressed: () {
                             setState(() {
                               _obscurePasscode = !_obscurePasscode;
@@ -142,10 +155,13 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                         labelText: 'Confirm passcode',
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
-                          tooltip: _obscureConfirmPasscode ? 'Show passcode' : 'Hide passcode',
+                          tooltip: _obscureConfirmPasscode
+                              ? 'Show passcode'
+                              : 'Hide passcode',
                           onPressed: () {
                             setState(() {
-                              _obscureConfirmPasscode = !_obscureConfirmPasscode;
+                              _obscureConfirmPasscode =
+                                  !_obscureConfirmPasscode;
                             });
                           },
                           icon: Icon(

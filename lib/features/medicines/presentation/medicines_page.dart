@@ -27,9 +27,7 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
     final child = ref.watch(activeChildProvider);
 
     if (state.isLoading && child == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (child == null) {
@@ -84,8 +82,8 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
                     child: Text(
                       state.errorMessage!,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onErrorContainer,
-                          ),
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                      ),
                     ),
                   ),
                 ),
@@ -126,7 +124,8 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
                           ),
                         );
                       },
-                      separatorBuilder: (context, index) => const SizedBox(height: 8),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 8),
                       itemCount: filtered.length,
                     ),
             ),
@@ -143,20 +142,18 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
       }
       switch (_filter) {
         case MedicineFilter.everyday:
-          return medicine.type == MedicineType.everyday || medicine.type == MedicineType.both;
+          return medicine.type == MedicineType.everyday ||
+              medicine.type == MedicineType.both;
         case MedicineFilter.asNeeded:
-          return medicine.type == MedicineType.asNeeded || medicine.type == MedicineType.both;
+          return medicine.type == MedicineType.asNeeded ||
+              medicine.type == MedicineType.both;
       }
-    }).toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
+    }).toList()..sort((a, b) => a.name.compareTo(b.name));
   }
 }
 
 class _MedicineTile extends StatelessWidget {
-  const _MedicineTile({
-    required this.medicine,
-    required this.onTap,
-  });
+  const _MedicineTile({required this.medicine, required this.onTap});
 
   final Medicine medicine;
   final VoidCallback onTap;
@@ -174,13 +171,19 @@ class _MedicineTile extends StatelessWidget {
         leading: CircleAvatar(
           backgroundColor: theme.colorScheme.surfaceContainerHighest,
           backgroundImage: imageProvider,
-          child: imageProvider == null ? const Icon(Icons.medication_outlined) : null,
+          child: imageProvider == null
+              ? const Icon(Icons.medication_outlined)
+              : null,
         ),
         title: Text(medicine.name),
-        subtitle: Text('${medicine.dose} ${medicine.doseUnit} · ${medicine.route}'),
+        subtitle: Text(
+          '${medicine.dose} ${medicine.doseUnit} · ${medicine.route}',
+        ),
         trailing: Text(
           _typeLabel(medicine.type),
-          style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.primary),
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.primary,
+          ),
         ),
       ),
     );

@@ -5,21 +5,36 @@ import 'package:medicines_for_children_flutter/features/shared_schedule/data/sha
 
 typedef SharedScheduleSession = ({String apiId, String authToken});
 
-final sharedScheduleSessionProvider = StateProvider<SharedScheduleSession?>((ref) {
+final sharedScheduleSessionProvider = StateProvider<SharedScheduleSession?>((
+  ref,
+) {
   return null;
 });
 
-final sharedScheduleRepositoryProvider = Provider<SharedScheduleRepository>((ref) {
+final sharedScheduleRepositoryProvider = Provider<SharedScheduleRepository>((
+  ref,
+) {
   final dio = ref.watch(securedApiClientProvider);
   return HttpSharedScheduleRepository(dio);
 });
 
-final sharedScheduleAuthResultProvider = FutureProvider.family<SharedScheduleAuthResult, String>((ref, linkToken) async {
-  final repository = ref.watch(sharedScheduleRepositoryProvider);
-  return repository.exchangeLinkToken(linkToken);
-});
+final sharedScheduleAuthResultProvider =
+    FutureProvider.family<SharedScheduleAuthResult, String>((
+      ref,
+      linkToken,
+    ) async {
+      final repository = ref.watch(sharedScheduleRepositoryProvider);
+      return repository.exchangeLinkToken(linkToken);
+    });
 
-final sharedScheduleViewModelProvider = FutureProvider.family<SharedScheduleViewModel, SharedScheduleSession>((ref, session) async {
-  final repository = ref.watch(sharedScheduleRepositoryProvider);
-  return repository.fetchSharedSchedule(apiId: session.apiId, authToken: session.authToken);
-});
+final sharedScheduleViewModelProvider =
+    FutureProvider.family<SharedScheduleViewModel, SharedScheduleSession>((
+      ref,
+      session,
+    ) async {
+      final repository = ref.watch(sharedScheduleRepositoryProvider);
+      return repository.fetchSharedSchedule(
+        apiId: session.apiId,
+        authToken: session.authToken,
+      );
+    });

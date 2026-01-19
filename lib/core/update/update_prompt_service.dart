@@ -24,8 +24,10 @@ class UpdatePromptService {
     final packageInfo = await PackageInfo.fromPlatform();
     final currentVersion = packageInfo.version.trim();
 
-    final requiresUpdate = minimum.isNotEmpty && _compareVersions(currentVersion, minimum) < 0;
-    final hasUpdate = latest.isNotEmpty && _compareVersions(currentVersion, latest) < 0;
+    final requiresUpdate =
+        minimum.isNotEmpty && _compareVersions(currentVersion, minimum) < 0;
+    final hasUpdate =
+        latest.isNotEmpty && _compareVersions(currentVersion, latest) < 0;
 
     if (!requiresUpdate && !hasUpdate) {
       return;
@@ -95,9 +97,9 @@ class UpdatePromptService {
     if (!context.mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Update link copied.')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Update link copied.')));
   }
 }
 

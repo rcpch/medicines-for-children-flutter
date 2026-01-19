@@ -48,7 +48,9 @@ class NoopTelemetryService implements TelemetryService {
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('accessibility labels present for schedule dates', (tester) async {
+  testWidgets('accessibility labels present for schedule dates', (
+    tester,
+  ) async {
     final originalOnError = FlutterError.onError;
     addTearDown(() {
       FlutterError.onError = originalOnError;
@@ -124,7 +126,9 @@ void main() {
         overrides: [
           appConfigProvider.overrideWithValue(config),
           sharedPreferencesProvider.overrideWithValue(prefs),
-          notificationServiceProvider.overrideWithValue(FakeNotificationService()),
+          notificationServiceProvider.overrideWithValue(
+            FakeNotificationService(),
+          ),
           telemetryServiceProvider.overrideWithValue(NoopTelemetryService()),
         ],
         child: const MedicinesApp(),
@@ -133,14 +137,17 @@ void main() {
     await tester.pumpAndSettle();
     FlutterError.onError = originalOnError;
 
-    final container = ProviderScope.containerOf(tester.element(find.byType(MedicinesApp)));
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(MedicinesApp)),
+    );
     final router = container.read(appRouterProvider);
     final semantics = tester.ensureSemantics();
     addTearDown(semantics.dispose);
 
     expect(
       find.byWidgetPredicate(
-        (widget) => widget is Semantics &&
+        (widget) =>
+            widget is Semantics &&
             widget.properties.label?.contains('Scheduled Amoxicillin') == true,
       ),
       findsWidgets,
@@ -151,14 +158,16 @@ void main() {
 
     expect(
       find.byWidgetPredicate(
-        (widget) => widget is Semantics &&
+        (widget) =>
+            widget is Semantics &&
             widget.properties.label?.contains('Start date.') == true,
       ),
       findsWidgets,
     );
     expect(
       find.byWidgetPredicate(
-        (widget) => widget is Semantics &&
+        (widget) =>
+            widget is Semantics &&
             widget.properties.label?.contains('End date.') == true,
       ),
       findsWidgets,

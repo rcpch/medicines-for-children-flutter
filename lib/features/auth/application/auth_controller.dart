@@ -45,9 +45,11 @@ class AuthState {
   }
 }
 
-final authControllerProvider = StateNotifierProvider<AuthController, AuthState>((ref) {
-  return AuthController(ref);
-});
+final authControllerProvider = StateNotifierProvider<AuthController, AuthState>(
+  (ref) {
+    return AuthController(ref);
+  },
+);
 
 class AuthController extends StateNotifier<AuthState> {
   AuthController(this._ref) : super(const AuthState()) {
@@ -107,7 +109,8 @@ class AuthController extends StateNotifier<AuthState> {
 
   Future<void> _syncStatus(AuthStatus status) async {
     try {
-      if (status == AuthStatus.authenticated || status == AuthStatus.onboarding) {
+      if (status == AuthStatus.authenticated ||
+          status == AuthStatus.onboarding) {
         final user = await _repository.currentUser();
         final profiles = await _repository.listProfiles();
         if (!mounted) {
@@ -153,7 +156,11 @@ class AuthController extends StateNotifier<AuthState> {
       if (!mounted) {
         return;
       }
-      state = state.copyWith(isLoading: false, profiles: profiles, clearError: true);
+      state = state.copyWith(
+        isLoading: false,
+        profiles: profiles,
+        clearError: true,
+      );
     } catch (_) {
       if (!mounted) {
         return;
@@ -181,9 +188,10 @@ class AuthController extends StateNotifier<AuthState> {
         status: _resolveStatusFromUser(user),
         clearError: true,
       );
-      _telemetry.trackEvent('profile_created', properties: {
-        'hasPasscode': passcode != null && passcode.isNotEmpty,
-      });
+      _telemetry.trackEvent(
+        'profile_created',
+        properties: {'hasPasscode': passcode != null && passcode.isNotEmpty},
+      );
     } catch (_) {
       if (!mounted) {
         return;

@@ -11,7 +11,8 @@ class ShareCentreCreatePage extends ConsumerStatefulWidget {
   const ShareCentreCreatePage({super.key});
 
   @override
-  ConsumerState<ShareCentreCreatePage> createState() => _ShareCentreCreatePageState();
+  ConsumerState<ShareCentreCreatePage> createState() =>
+      _ShareCentreCreatePageState();
 }
 
 class _ShareCentreCreatePageState extends ConsumerState<ShareCentreCreatePage> {
@@ -104,7 +105,9 @@ class _ShareCentreCreatePageState extends ConsumerState<ShareCentreCreatePage> {
                               setState(() {
                                 _dateFrom = selected;
                                 if (_dateTo.isBefore(_dateFrom)) {
-                                  _dateTo = _dateFrom.add(const Duration(days: 1));
+                                  _dateTo = _dateFrom.add(
+                                    const Duration(days: 1),
+                                  );
                                 }
                               });
                             },
@@ -231,7 +234,9 @@ class _DateCard extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outlineVariant,
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

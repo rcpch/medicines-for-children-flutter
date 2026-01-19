@@ -24,11 +24,11 @@ void main() {
           notificationServiceProvider.overrideWithValue(
             FakeNotificationService(NotificationStore(prefs)),
           ),
-          biometricAuthServiceProvider.overrideWithValue(FakeBiometricAuthService()),
+          biometricAuthServiceProvider.overrideWithValue(
+            FakeBiometricAuthService(),
+          ),
         ],
-        child: const MaterialApp(
-          home: SettingsPage(),
-        ),
+        child: const MaterialApp(home: SettingsPage()),
       ),
     );
     await tester.pumpAndSettle();
@@ -46,7 +46,9 @@ void main() {
     expect(prefs.getBool('telemetry_enabled'), isFalse);
   });
 
-  testWidgets('settings page navigates to privacy policy and data deletion', (tester) async {
+  testWidgets('settings page navigates to privacy policy and data deletion', (
+    tester,
+  ) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
 
@@ -57,19 +59,16 @@ void main() {
           notificationServiceProvider.overrideWithValue(
             FakeNotificationService(NotificationStore(prefs)),
           ),
-          biometricAuthServiceProvider.overrideWithValue(FakeBiometricAuthService()),
+          biometricAuthServiceProvider.overrideWithValue(
+            FakeBiometricAuthService(),
+          ),
         ],
-        child: const MaterialApp(
-          home: SettingsPage(),
-        ),
+        child: const MaterialApp(home: SettingsPage()),
       ),
     );
     await tester.pumpAndSettle();
 
-    await tester.scrollUntilVisible(
-      find.text('Privacy policy'),
-      200,
-    );
+    await tester.scrollUntilVisible(find.text('Privacy policy'), 200);
     await tester.tap(find.text('Privacy policy'));
     await tester.pumpAndSettle();
     expect(find.byType(PrivacyPolicyPage), findsOneWidget);
@@ -77,10 +76,7 @@ void main() {
     Navigator.of(tester.element(find.byType(PrivacyPolicyPage))).pop();
     await tester.pumpAndSettle();
 
-    await tester.scrollUntilVisible(
-      find.text('Request data deletion'),
-      200,
-    );
+    await tester.scrollUntilVisible(find.text('Request data deletion'), 200);
     await tester.tap(find.text('Request data deletion'));
     await tester.pumpAndSettle();
     expect(find.byType(DataDeletionPage), findsOneWidget);
@@ -118,7 +114,8 @@ class _FakeLocalAuth implements LocalAuthentication {
   Future<bool> get canCheckBiometrics async => false;
 
   @override
-  Future<List<BiometricType>> getAvailableBiometrics() async => <BiometricType>[];
+  Future<List<BiometricType>> getAvailableBiometrics() async =>
+      <BiometricType>[];
 
   @override
   Future<bool> isDeviceSupported() async => false;

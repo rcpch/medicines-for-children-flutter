@@ -86,7 +86,10 @@ void main() {
     final updated = profileData.readPrimaryCarer(profileId);
     final updatedSchedule = updated!.children.first.schedules.first;
     expect(updatedSchedule.administrations, hasLength(1));
-    expect(updatedSchedule.administrations.first.status, AdministrationStatus.given);
+    expect(
+      updatedSchedule.administrations.first.status,
+      AdministrationStatus.given,
+    );
 
     await repository.clearScheduledAdministration(
       scheduleId: schedule.id,
@@ -230,7 +233,10 @@ class _TestAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> changePasscode({String? currentPasscode, required String newPasscode}) async {}
+  Future<void> changePasscode({
+    String? currentPasscode,
+    required String newPasscode,
+  }) async {}
 
   @override
   Future<void> signOut() async {}

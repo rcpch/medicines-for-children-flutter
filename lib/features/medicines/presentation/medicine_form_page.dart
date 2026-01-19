@@ -40,13 +40,27 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
     super.initState();
     final medicine = _loadMedicine();
     final draft = medicine == null ? widget.draft : null;
-    _nameController = TextEditingController(text: medicine?.name ?? draft?.name ?? '');
-    _aliasController = TextEditingController(text: medicine?.alias ?? draft?.alias ?? '');
-    _doseController = TextEditingController(text: medicine?.dose ?? draft?.dose ?? '');
-    _doseUnitController = TextEditingController(text: medicine?.doseUnit ?? draft?.doseUnit ?? '');
-    _routeController = TextEditingController(text: medicine?.route ?? draft?.route ?? '');
-    _frequencyController = TextEditingController(text: medicine?.frequency ?? draft?.frequency ?? '');
-    _notesController = TextEditingController(text: medicine?.notes ?? draft?.notes ?? '');
+    _nameController = TextEditingController(
+      text: medicine?.name ?? draft?.name ?? '',
+    );
+    _aliasController = TextEditingController(
+      text: medicine?.alias ?? draft?.alias ?? '',
+    );
+    _doseController = TextEditingController(
+      text: medicine?.dose ?? draft?.dose ?? '',
+    );
+    _doseUnitController = TextEditingController(
+      text: medicine?.doseUnit ?? draft?.doseUnit ?? '',
+    );
+    _routeController = TextEditingController(
+      text: medicine?.route ?? draft?.route ?? '',
+    );
+    _frequencyController = TextEditingController(
+      text: medicine?.frequency ?? draft?.frequency ?? '',
+    );
+    _notesController = TextEditingController(
+      text: medicine?.notes ?? draft?.notes ?? '',
+    );
     _type = medicine?.type ?? draft?.type ?? MedicineType.everyday;
     _status = medicine?.status ?? draft?.status ?? MedicineStatus.inUse;
     _photoUrls = _resolvePhotos(medicine, draft);
@@ -86,7 +100,9 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
         doseUnit: _doseUnitController.text.trim(),
         route: _routeController.text.trim(),
         frequency: _frequencyController.text.trim(),
-        notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+        notes: _notesController.text.trim().isEmpty
+            ? null
+            : _notesController.text.trim(),
         type: _type,
         status: _status,
         photoUrls: _photoUrls,
@@ -101,7 +117,9 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
         doseUnit: _doseUnitController.text.trim(),
         route: _routeController.text.trim(),
         frequency: _frequencyController.text.trim(),
-        notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+        notes: _notesController.text.trim().isEmpty
+            ? null
+            : _notesController.text.trim(),
         type: _type,
         status: _status,
         photoUrls: _photoUrls,
@@ -116,16 +134,18 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
 
     final nextState = ref.read(medicineEditorControllerProvider);
     if (nextState.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(nextState.errorMessage!)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(nextState.errorMessage!)));
       return;
     }
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(widget.isEditing ? 'Medicine updated.' : 'Medicine added.'),
+          content: Text(
+            widget.isEditing ? 'Medicine updated.' : 'Medicine added.',
+          ),
         ),
       );
       Navigator.of(context).pop();
@@ -169,7 +189,8 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
                         controller: _doseController,
                         label: 'Dose',
                         icon: Icons.medication_liquid_outlined,
-                        validator: (value) => value == null || value.trim().isEmpty
+                        validator: (value) =>
+                            value == null || value.trim().isEmpty
                             ? 'Enter the dose amount'
                             : null,
                       ),
@@ -180,7 +201,8 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
                         controller: _doseUnitController,
                         label: 'Unit',
                         icon: Icons.straighten_outlined,
-                        validator: (value) => value == null || value.trim().isEmpty
+                        validator: (value) =>
+                            value == null || value.trim().isEmpty
                             ? 'Enter the unit'
                             : null,
                       ),
@@ -220,10 +242,12 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
                           isExpanded: true,
                           value: state.value,
                           items: MedicineType.values
-                              .map((type) => DropdownMenuItem(
-                                    value: type,
-                                    child: Text(_typeLabel(type)),
-                                  ))
+                              .map(
+                                (type) => DropdownMenuItem(
+                                  value: type,
+                                  child: Text(_typeLabel(type)),
+                                ),
+                              )
                               .toList(),
                           onChanged: (value) {
                             if (value != null) {
@@ -253,10 +277,12 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
                           isExpanded: true,
                           value: state.value,
                           items: MedicineStatus.values
-                              .map((status) => DropdownMenuItem(
-                                    value: status,
-                                    child: Text(_statusLabel(status)),
-                                  ))
+                              .map(
+                                (status) => DropdownMenuItem(
+                                  value: status,
+                                  child: Text(_statusLabel(status)),
+                                ),
+                              )
                               .toList(),
                           onChanged: (value) {
                             if (value != null) {
@@ -291,7 +317,9 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
                           width: 18,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : Text(widget.isEditing ? 'Save changes' : 'Add medicine'),
+                      : Text(
+                          widget.isEditing ? 'Save changes' : 'Add medicine',
+                        ),
                 ),
               ],
             ),
@@ -357,12 +385,11 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
                         borderRadius: BorderRadius.circular(12),
                         image: image == null
                             ? null
-                            : DecorationImage(
-                                image: image,
-                                fit: BoxFit.cover,
-                              ),
+                            : DecorationImage(image: image, fit: BoxFit.cover),
                       ),
-                      child: image == null ? const Icon(Icons.photo_outlined) : null,
+                      child: image == null
+                          ? const Icon(Icons.photo_outlined)
+                          : null,
                     ),
                     Positioned(
                       top: 4,
@@ -443,10 +470,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
   }) {
     return TextFormField(
       controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon),
-      ),
+      decoration: InputDecoration(labelText: label, prefixIcon: Icon(icon)),
       validator: validator,
     );
   }

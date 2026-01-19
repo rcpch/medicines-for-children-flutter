@@ -41,14 +41,14 @@ class PrimaryCarerState {
 
 final primaryCarerControllerProvider =
     StateNotifierProvider<PrimaryCarerController, PrimaryCarerState>((ref) {
-  return PrimaryCarerController(ref);
-});
+      return PrimaryCarerController(ref);
+    });
 
 class PrimaryCarerController extends StateNotifier<PrimaryCarerState> {
   PrimaryCarerController(this._ref)
-      : _repository = _ref.read(primaryCarerRepositoryProvider),
-        _localDataSource = _ref.read(primaryCarerLocalDataSourceProvider),
-        super(const PrimaryCarerState()) {
+    : _repository = _ref.read(primaryCarerRepositoryProvider),
+      _localDataSource = _ref.read(primaryCarerLocalDataSourceProvider),
+      super(const PrimaryCarerState()) {
     _authSub = _ref.listen<AuthState>(
       authControllerProvider,
       (previous, next) => unawaited(_handleAuthChange(previous, next)),
@@ -133,12 +133,16 @@ class PrimaryCarerController extends StateNotifier<PrimaryCarerState> {
   Future<bool> addChild(Child child) async {
     final profileId = _activeProfileId;
     if (profileId == null || profileId.isEmpty) {
-      state = state.copyWith(errorMessage: 'Select a profile before adding a child.');
+      state = state.copyWith(
+        errorMessage: 'Select a profile before adding a child.',
+      );
       return false;
     }
     final current = state.carer ?? _localDataSource.readForProfile(profileId);
     if (current == null) {
-      state = state.copyWith(errorMessage: 'Unable to access your profile data.');
+      state = state.copyWith(
+        errorMessage: 'Unable to access your profile data.',
+      );
       return false;
     }
     final updated = current.copyWith(children: [...current.children, child]);
@@ -146,11 +150,7 @@ class PrimaryCarerController extends StateNotifier<PrimaryCarerState> {
     if (!mounted) {
       return false;
     }
-    state = state.copyWith(
-      carer: updated,
-      isStale: false,
-      clearError: true,
-    );
+    state = state.copyWith(carer: updated, isStale: false, clearError: true);
     await _ref.read(selectedChildIdProvider.notifier).selectChild(child.id);
     return true;
   }

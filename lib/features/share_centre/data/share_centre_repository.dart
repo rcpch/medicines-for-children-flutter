@@ -19,13 +19,32 @@ class ShareCentreSchedule {
   factory ShareCentreSchedule.fromJson(Map<String, dynamic> json) {
     final apiId = _readString(json, ['apiId', 'api_id', 'id', 'scheduleId']);
     final status = _readString(json, ['status', 'state']);
-    final dateFrom = _parseDate(json['dateFrom'] ?? json['date_from'] ?? json['dateFromObj']);
-    final dateTo = _parseDate(json['dateTo'] ?? json['date_to'] ?? json['dateToObj']);
-    final isDigital = _parseBool(json['digital'] ?? json['isDigital'] ?? json['is_digital']);
-    final isDeleted = _parseBool(json['deleted'] ?? json['isDeleted'] ?? json['is_deleted']);
-    final carerEmail = _readString(json, ['email', 'carerEmail', 'emailAddress', 'carer_email']);
-    final carerName = _parseCarerName(json['carer'] ?? json['secondaryCarer'] ?? json);
-    final scheduleUrl = _readString(json, ['scheduleUrl', 'scheduleURL', 'url']);
+    final dateFrom = _parseDate(
+      json['dateFrom'] ?? json['date_from'] ?? json['dateFromObj'],
+    );
+    final dateTo = _parseDate(
+      json['dateTo'] ?? json['date_to'] ?? json['dateToObj'],
+    );
+    final isDigital = _parseBool(
+      json['digital'] ?? json['isDigital'] ?? json['is_digital'],
+    );
+    final isDeleted = _parseBool(
+      json['deleted'] ?? json['isDeleted'] ?? json['is_deleted'],
+    );
+    final carerEmail = _readString(json, [
+      'email',
+      'carerEmail',
+      'emailAddress',
+      'carer_email',
+    ]);
+    final carerName = _parseCarerName(
+      json['carer'] ?? json['secondaryCarer'] ?? json,
+    );
+    final scheduleUrl = _readString(json, [
+      'scheduleUrl',
+      'scheduleURL',
+      'url',
+    ]);
     final pdfUrl = _readString(json, ['pdfUrl', 'pdfURL']);
     final notes = _readString(json, ['notes', 'note']);
 
@@ -68,7 +87,9 @@ class ShareCentreSchedule {
 }
 
 abstract class ShareCentreRepository {
-  Future<List<ShareCentreSchedule>> fetchSharedSchedules({required String childId});
+  Future<List<ShareCentreSchedule>> fetchSharedSchedules({
+    required String childId,
+  });
   Future<ShareCentreSchedule> createSharedSchedule({
     required String childId,
     required String email,
@@ -107,12 +128,12 @@ class HttpShareCentreRepository implements ShareCentreRepository {
   final Dio _dio;
 
   @override
-  Future<List<ShareCentreSchedule>> fetchSharedSchedules({required String childId}) async {
+  Future<List<ShareCentreSchedule>> fetchSharedSchedules({
+    required String childId,
+  }) async {
     final response = await _dio.post<dynamic>(
       '/mySharedSchedules',
-      data: <String, dynamic>{
-        'childId': childId,
-      },
+      data: <String, dynamic>{'childId': childId},
     );
 
     final data = response.data;
@@ -209,7 +230,9 @@ class HttpShareCentreRepository implements ShareCentreRepository {
 
   @override
   Future<ShareCentreSchedule> endSharedSchedule({required String apiId}) async {
-    final response = await _dio.get<Map<String, dynamic>>('/sharedSchedule/end/$apiId');
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/sharedSchedule/end/$apiId',
+    );
     final json = response.data;
     if (json == null) {
       throw StateError('Empty shared schedule end response');
@@ -239,7 +262,8 @@ List<Map<String, dynamic>> _extractScheduleList(dynamic data) {
     return data.whereType<Map<String, dynamic>>().toList(growable: false);
   }
   if (data is Map<String, dynamic>) {
-    final nested = data['sharedSchedules'] ?? data['schedules'] ?? data['items'];
+    final nested =
+        data['sharedSchedules'] ?? data['schedules'] ?? data['items'];
     if (nested is List) {
       return nested.whereType<Map<String, dynamic>>().toList(growable: false);
     }
@@ -248,11 +272,7 @@ List<Map<String, dynamic>> _extractScheduleList(dynamic data) {
 }
 
 Map<String, int> _toDateMap(DateTime date) {
-  return <String, int>{
-    'day': date.day,
-    'month': date.month,
-    'year': date.year,
-  };
+  return <String, int>{'day': date.day, 'month': date.month, 'year': date.year};
 }
 
 String _readString(Map<String, dynamic> json, List<String> keys) {
@@ -271,9 +291,20 @@ String _readString(Map<String, dynamic> json, List<String> keys) {
 
 String _parseCarerName(dynamic source) {
   if (source is Map<String, dynamic>) {
-    final firstName = _readString(source, ['firstName', 'first_name', 'givenName']);
-    final lastName = _readString(source, ['lastName', 'last_name', 'familyName']);
-    final combined = [firstName, lastName].where((value) => value.trim().isNotEmpty).join(' ');
+    final firstName = _readString(source, [
+      'firstName',
+      'first_name',
+      'givenName',
+    ]);
+    final lastName = _readString(source, [
+      'lastName',
+      'last_name',
+      'familyName',
+    ]);
+    final combined = [
+      firstName,
+      lastName,
+    ].where((value) => value.trim().isNotEmpty).join(' ');
     return combined.trim();
   }
   if (source is String) {

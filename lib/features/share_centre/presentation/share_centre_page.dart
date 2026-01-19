@@ -64,9 +64,14 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Export PDFs', style: Theme.of(context).textTheme.titleMedium),
+                      Text(
+                        'Export PDFs',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                       const SizedBox(height: 8),
-                      const Text('Generate a PDF from local data to share or print.'),
+                      const Text(
+                        'Generate a PDF from local data to share or print.',
+                      ),
                       const SizedBox(height: 12),
                       Wrap(
                         spacing: 12,
@@ -80,7 +85,9 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
                                 ? const SizedBox(
                                     width: 18,
                                     height: 18,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   )
                                 : const Icon(Icons.picture_as_pdf_outlined),
                             label: const Text('Export schedule'),
@@ -93,7 +100,9 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
                                 ? const SizedBox(
                                     width: 18,
                                     height: 18,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   )
                                 : const Icon(Icons.medication_outlined),
                             label: const Text('Export medicines'),
@@ -106,7 +115,9 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
                                 ? const SizedBox(
                                     width: 18,
                                     height: 18,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   )
                                 : const Icon(Icons.print_outlined),
                             label: const Text('Print schedule'),
@@ -119,7 +130,9 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
                                 ? const SizedBox(
                                     width: 18,
                                     height: 18,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   )
                                 : const Icon(Icons.print_outlined),
                             label: const Text('Print medicines'),
@@ -141,8 +154,8 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
                     child: Text(
                       actionState.errorMessage!,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onErrorContainer,
-                          ),
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                      ),
                     ),
                   ),
                 ),
@@ -150,7 +163,9 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () async {
-                  final _ = await ref.refresh(shareCentreSchedulesProvider(child.id).future);
+                  final _ = await ref.refresh(
+                    shareCentreSchedulesProvider(child.id).future,
+                  );
                 },
                 child: schedulesAsync.when(
                   data: (schedules) {
@@ -175,11 +190,13 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
                           ),
                         );
                       },
-                      separatorBuilder: (context, index) => const SizedBox(height: 8),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 8),
                       itemCount: schedules.length,
                     );
                   },
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                   error: (error, stackTrace) => ListView(
                     padding: const EdgeInsets.all(16),
                     children: const [
@@ -195,7 +212,10 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
     );
   }
 
-  Future<void> _exportSchedulePdf(BuildContext context, PrimaryCarerState carerState) async {
+  Future<void> _exportSchedulePdf(
+    BuildContext context,
+    PrimaryCarerState carerState,
+  ) async {
     setState(() => _exportingSchedule = true);
     try {
       final schedule = await _buildSchedulePdf(context, carerState);
@@ -214,9 +234,9 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
       if (!context.mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Schedule PDF saved.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Schedule PDF saved.')));
     } catch (error) {
       if (!context.mounted) {
         return;
@@ -231,7 +251,10 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
     }
   }
 
-  Future<void> _exportMedicinePdf(BuildContext context, PrimaryCarerState carerState) async {
+  Future<void> _exportMedicinePdf(
+    BuildContext context,
+    PrimaryCarerState carerState,
+  ) async {
     setState(() => _exportingMedicines = true);
     try {
       final bytes = await _buildMedicinesPdf(context, carerState);
@@ -239,7 +262,8 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
         return;
       }
       final fileIO = ref.read(backupFileIOProvider);
-      final fileName = 'mfc-medicines-${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf';
+      final fileName =
+          'mfc-medicines-${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf';
       await fileIO.saveBytes(
         bytes: bytes,
         filename: fileName,
@@ -248,9 +272,9 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
       if (!context.mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Medicines PDF saved.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Medicines PDF saved.')));
     } catch (error) {
       if (!context.mounted) {
         return;
@@ -265,7 +289,10 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
     }
   }
 
-  Future<void> _printSchedulePdf(BuildContext context, PrimaryCarerState carerState) async {
+  Future<void> _printSchedulePdf(
+    BuildContext context,
+    PrimaryCarerState carerState,
+  ) async {
     setState(() => _printingSchedule = true);
     try {
       final schedule = await _buildSchedulePdf(context, carerState);
@@ -291,7 +318,10 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
     }
   }
 
-  Future<void> _printMedicinesPdf(BuildContext context, PrimaryCarerState carerState) async {
+  Future<void> _printMedicinesPdf(
+    BuildContext context,
+    PrimaryCarerState carerState,
+  ) async {
     setState(() => _printingMedicines = true);
     try {
       final bytes = await _buildMedicinesPdf(context, carerState);
@@ -300,7 +330,8 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
       }
       await Printing.layoutPdf(
         onLayout: (_) async => bytes,
-        name: 'mfc-medicines-${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf',
+        name:
+            'mfc-medicines-${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf',
       );
     } catch (error) {
       if (!context.mounted) {
@@ -374,28 +405,19 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
       return null;
     }
     final pdfService = ref.read(medicineSummaryPdfServiceProvider);
-    return pdfService.buildPdf(
-      carer: carerState.carer!,
-      child: child,
-    );
+    return pdfService.buildPdf(carer: carerState.carer!, child: child);
   }
 }
 
 class _SchedulePdfPayload {
-  const _SchedulePdfPayload({
-    required this.bytes,
-    required this.range,
-  });
+  const _SchedulePdfPayload({required this.bytes, required this.range});
 
   final Uint8List bytes;
   final DateTimeRange range;
 }
 
 class _ShareScheduleTile extends StatelessWidget {
-  const _ShareScheduleTile({
-    required this.schedule,
-    required this.onTap,
-  });
+  const _ShareScheduleTile({required this.schedule, required this.onTap});
 
   final ShareCentreSchedule schedule;
   final VoidCallback onTap;
@@ -409,8 +431,12 @@ class _ShareScheduleTile extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         leading: CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-          child: Icon(schedule.isDigital ? Icons.link : Icons.picture_as_pdf_outlined),
+          backgroundColor: Theme.of(
+            context,
+          ).colorScheme.surfaceContainerHighest,
+          child: Icon(
+            schedule.isDigital ? Icons.link : Icons.picture_as_pdf_outlined,
+          ),
         ),
         title: Text(schedule.displayCarer),
         subtitle: Text('$dateLabel · $statusLabel'),

@@ -36,6 +36,8 @@ class LocalPrimaryCarerRepository implements PrimaryCarerRepository {
 final primaryCarerRepositoryProvider = Provider<PrimaryCarerRepository>((ref) {
   final authRepository = ref.watch(authRepositoryProvider);
   final profileData = ref.watch(profileDataLocalDataSourceProvider);
-  return LocalPrimaryCarerRepository(authRepository: authRepository, profileData: profileData);
+  return LocalPrimaryCarerRepository(
+    authRepository: authRepository,
+    profileData: profileData,
+  );
 });
-

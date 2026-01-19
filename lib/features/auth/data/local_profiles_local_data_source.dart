@@ -20,7 +20,10 @@ class LocalProfilesLocalDataSource {
   }
 
   Future<void> writeProfiles(List<LocalProfile> profiles) async {
-    await _preferences.setString(_profilesKey, LocalProfile.listToRawJson(profiles));
+    await _preferences.setString(
+      _profilesKey,
+      LocalProfile.listToRawJson(profiles),
+    );
   }
 
   String? readActiveProfileId() {
@@ -37,10 +40,15 @@ class LocalProfilesLocalDataSource {
   }
 
   PasscodeRecord? readPasscodeRecord(String profileId) {
-    return PasscodeRecord.fromRawJson(_preferences.getString('$_passcodePrefix$profileId'));
+    return PasscodeRecord.fromRawJson(
+      _preferences.getString('$_passcodePrefix$profileId'),
+    );
   }
 
-  Future<void> writePasscodeRecord(String profileId, PasscodeRecord? record) async {
+  Future<void> writePasscodeRecord(
+    String profileId,
+    PasscodeRecord? record,
+  ) async {
     final key = '$_passcodePrefix$profileId';
     if (record == null) {
       await _preferences.remove(key);
@@ -50,8 +58,8 @@ class LocalProfilesLocalDataSource {
   }
 }
 
-final localProfilesLocalDataSourceProvider = Provider<LocalProfilesLocalDataSource>((ref) {
-  final preferences = ref.watch(sharedPreferencesProvider);
-  return LocalProfilesLocalDataSource(preferences);
-});
-
+final localProfilesLocalDataSourceProvider =
+    Provider<LocalProfilesLocalDataSource>((ref) {
+      final preferences = ref.watch(sharedPreferencesProvider);
+      return LocalProfilesLocalDataSource(preferences);
+    });

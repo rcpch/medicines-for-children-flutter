@@ -26,7 +26,13 @@ class NotificationScheduleCalculator {
     if (parsed == null) {
       return null;
     }
-    final start = DateTime(startDate.year, startDate.month, startDate.day, parsed.hour, parsed.minute);
+    final start = DateTime(
+      startDate.year,
+      startDate.month,
+      startDate.day,
+      parsed.hour,
+      parsed.minute,
+    );
     if (start.isAfter(now)) {
       return start;
     }

@@ -25,7 +25,8 @@ class AppSettings {
   }) {
     return AppSettings(
       telemetryEnabled: telemetryEnabled ?? this.telemetryEnabled,
-      telemetryConsentShown: telemetryConsentShown ?? this.telemetryConsentShown,
+      telemetryConsentShown:
+          telemetryConsentShown ?? this.telemetryConsentShown,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       themeMode: themeMode ?? this.themeMode,
       textScale: textScale ?? this.textScale,

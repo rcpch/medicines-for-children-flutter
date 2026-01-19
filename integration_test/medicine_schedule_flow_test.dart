@@ -90,7 +90,9 @@ void main() {
         overrides: [
           appConfigProvider.overrideWithValue(config),
           sharedPreferencesProvider.overrideWithValue(prefs),
-          notificationServiceProvider.overrideWithValue(FakeNotificationService()),
+          notificationServiceProvider.overrideWithValue(
+            FakeNotificationService(),
+          ),
         ],
         child: const MedicinesApp(),
       ),
@@ -115,7 +117,9 @@ void main() {
     await tester.enterText(fields.at(4), 'oral');
     await tester.enterText(fields.at(5), 'Twice daily');
 
-    final addMedicineButton = find.widgetWithText(ElevatedButton, 'Add medicine').first;
+    final addMedicineButton = find
+        .widgetWithText(ElevatedButton, 'Add medicine')
+        .first;
     await tester.scrollUntilVisible(
       addMedicineButton,
       200,
@@ -145,7 +149,9 @@ void main() {
     await tester.tap(reminderLabel);
     await tester.pumpAndSettle();
 
-    final addScheduleButton = find.widgetWithText(ElevatedButton, 'Add schedule').first;
+    final addScheduleButton = find
+        .widgetWithText(ElevatedButton, 'Add schedule')
+        .first;
     await tester.scrollUntilVisible(
       addScheduleButton,
       200,

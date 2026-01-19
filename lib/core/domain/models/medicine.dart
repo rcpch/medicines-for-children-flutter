@@ -27,5 +27,6 @@ abstract class Medicine with _$Medicine {
     @Default(<String>[]) List<String> photoUrls,
   }) = _Medicine;
 
-  factory Medicine.fromJson(Map<String, dynamic> json) => _$MedicineFromJson(json);
+  factory Medicine.fromJson(Map<String, dynamic> json) =>
+      _$MedicineFromJson(json);
 }

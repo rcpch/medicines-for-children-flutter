@@ -83,14 +83,11 @@ class _HomePageState extends ConsumerState<HomePage> {
     final controller = ref.read(primaryCarerControllerProvider.notifier);
     final selectedDate = ref.watch(selectedDateProvider);
     final telemetry = ref.read(telemetryServiceProvider);
-    ref.listen<PrimaryCarerState>(
-      primaryCarerControllerProvider,
-      (_, next) {
-        if (next.carer != null) {
-          ref.read(notificationServiceProvider).pruneExpired();
-        }
-      },
-    );
+    ref.listen<PrimaryCarerState>(primaryCarerControllerProvider, (_, next) {
+      if (next.carer != null) {
+        ref.read(notificationServiceProvider).pruneExpired();
+      }
+    });
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -132,9 +129,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           selectedDate: selectedDate,
           onSelectDate: (date) {
             ref.read(selectedDateProvider.notifier).state = date;
-            telemetry.trackEvent('home_date_selected', properties: {
-              'date': DateFormat('yyyy-MM-dd').format(date),
-            });
+            telemetry.trackEvent(
+              'home_date_selected',
+              properties: {'date': DateFormat('yyyy-MM-dd').format(date)},
+            );
           },
           onAddSchedule: () {
             context.goNamed(AppRoute.addSchedule.name);
@@ -150,7 +148,11 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Future<void> _handleAction(BuildContext context, WidgetRef ref, _HomeAction action) async {
+  Future<void> _handleAction(
+    BuildContext context,
+    WidgetRef ref,
+    _HomeAction action,
+  ) async {
     switch (action) {
       case _HomeAction.exportBackup:
         await _exportBackup(context, ref);
@@ -187,7 +189,9 @@ class _HomePageState extends ConsumerState<HomePage> {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Backup exported. Store it somewhere safe.')),
+        const SnackBar(
+          content: Text('Backup exported. Store it somewhere safe.'),
+        ),
       );
     } catch (error) {
       if (!context.mounted) {
@@ -203,14 +207,17 @@ class _HomePageState extends ConsumerState<HomePage> {
     final backupFileIO = ref.read(backupFileIOProvider);
     Uint8List? bytes;
     try {
-      bytes = await backupFileIO.pickFileBytes(label: 'Backup', extensions: const ['mfc']);
+      bytes = await backupFileIO.pickFileBytes(
+        label: 'Backup',
+        extensions: const ['mfc'],
+      );
     } catch (error) {
       if (!context.mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Unable to open backup: $error')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Unable to open backup: $error')));
       return;
     }
     if (!context.mounted) {
@@ -408,20 +415,25 @@ class _HomePageState extends ConsumerState<HomePage> {
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'Import as (optional)',
-                      helperText: 'Leave blank to use the original profile name.',
+                      helperText:
+                          'Leave blank to use the original profile name.',
                     ),
                     onChanged: (value) => profileName = value,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     obscureText: true,
-                    decoration: const InputDecoration(labelText: 'New passcode (optional)'),
+                    decoration: const InputDecoration(
+                      labelText: 'New passcode (optional)',
+                    ),
                     onChanged: (value) => passcode = value,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Confirm new passcode'),
+                    decoration: const InputDecoration(
+                      labelText: 'Confirm new passcode',
+                    ),
                     validator: (value) {
                       if (passcode.trim().isEmpty) {
                         return null;
@@ -449,8 +461,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                 if (formKey.currentState?.validate() ?? false) {
                   Navigator.of(context).pop(
                     _ImportDetails(
-                      profileName: profileName.trim().isEmpty ? null : profileName.trim(),
-                      passcode: passcode.trim().isEmpty ? null : passcode.trim(),
+                      profileName: profileName.trim().isEmpty
+                          ? null
+                          : profileName.trim(),
+                      passcode: passcode.trim().isEmpty
+                          ? null
+                          : passcode.trim(),
                     ),
                   );
                 }
@@ -469,10 +485,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 enum _HomeAction { exportBackup, importBackup, signOut }
 
 class _ImportDetails {
-  const _ImportDetails({
-    this.profileName,
-    this.passcode,
-  });
+  const _ImportDetails({this.profileName, this.passcode});
 
   final String? profileName;
   final String? passcode;
@@ -513,7 +526,9 @@ class _HomeBody extends StatelessWidget {
 
     if (state.carer == null) {
       return _EmptyState(
-        message: state.errorMessage ?? 'Sign in to view your child\'s medicines and schedule.',
+        message:
+            state.errorMessage ??
+            'Sign in to view your child\'s medicines and schedule.',
         onRefresh: onRefresh,
       );
     }
@@ -522,11 +537,16 @@ class _HomeBody extends StatelessWidget {
     final Child? primaryChild = children.isEmpty ? null : children.first;
     final scheduleEntries = primaryChild == null
         ? <DailyScheduleEntry>[]
-        : dailyScheduleBuilder.buildScheduledEntries(primaryChild, selectedDate);
+        : dailyScheduleBuilder.buildScheduledEntries(
+            primaryChild,
+            selectedDate,
+          );
     final asNeededEntries = primaryChild == null
         ? <AsNeededAdministrationEntry>[]
         : dailyScheduleBuilder.buildAsNeededEntries(primaryChild, selectedDate);
-    final timeOfDaySections = dailyScheduleBuilder.buildTimeOfDaySections(scheduleEntries);
+    final timeOfDaySections = dailyScheduleBuilder.buildTimeOfDaySections(
+      scheduleEntries,
+    );
 
     return RefreshIndicator(
       onRefresh: () => onRefresh(),
@@ -539,7 +559,9 @@ class _HomeBody extends StatelessWidget {
               color: theme.colorScheme.surfaceContainerHighest,
               child: const Padding(
                 padding: EdgeInsets.all(16),
-                child: Text('Showing saved data while we refresh your latest schedule...'),
+                child: Text(
+                  'Showing saved data while we refresh your latest schedule...',
+                ),
               ),
             ),
           if (state.errorMessage != null)
@@ -586,7 +608,9 @@ class _HomeBody extends StatelessWidget {
                   children: const [
                     Text('No children found'),
                     SizedBox(height: 8),
-                    Text('Add your first child to start tracking medicines and schedules.'),
+                    Text(
+                      'Add your first child to start tracking medicines and schedules.',
+                    ),
                   ],
                 ),
               ),
@@ -691,7 +715,9 @@ class _ChildCard extends StatelessWidget {
               Text('Allergies: ${child.allergies.join(', ')}'),
             ],
             const SizedBox(height: 12),
-            Text('Medicines: ${child.medicines.length} · Schedules: ${child.schedules.length}'),
+            Text(
+              'Medicines: ${child.medicines.length} · Schedules: ${child.schedules.length}',
+            ),
           ],
         ),
       ),
@@ -753,7 +779,8 @@ class _ScheduleSection extends StatelessWidget {
                   style: Theme.of(context).textTheme.labelLarge,
                 ),
                 const SizedBox(height: 8),
-                for (final entry in section.entries) _ScheduleTile(entry: entry),
+                for (final entry in section.entries)
+                  _ScheduleTile(entry: entry),
                 const SizedBox(height: 12),
               ],
             ],
@@ -809,10 +836,7 @@ class _ScheduleTile extends ConsumerWidget {
               children: [
                 Text(entry.timeLabel, style: theme.textTheme.titleMedium),
                 const SizedBox(height: 4),
-                Text(
-                  entry.medicine.name,
-                  style: theme.textTheme.bodyLarge,
-                ),
+                Text(entry.medicine.name, style: theme.textTheme.bodyLarge),
                 Text(
                   '${entry.medicine.dose} ${entry.medicine.doseUnit} · ${entry.medicine.route}',
                   style: theme.textTheme.bodySmall,
@@ -824,7 +848,10 @@ class _ScheduleTile extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: _statusColor(context).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(32),
@@ -848,10 +875,10 @@ class _ScheduleTile extends ConsumerWidget {
                           onPressed: adminState.isSaving
                               ? null
                               : () => _markStatus(
-                                    context,
-                                    ref,
-                                    AdministrationStatus.given,
-                                  ),
+                                  context,
+                                  ref,
+                                  AdministrationStatus.given,
+                                ),
                           child: const Text('Given'),
                         ),
                       ),
@@ -862,10 +889,10 @@ class _ScheduleTile extends ConsumerWidget {
                           onPressed: adminState.isSaving
                               ? null
                               : () => _markStatus(
-                                    context,
-                                    ref,
-                                    AdministrationStatus.skipped,
-                                  ),
+                                  context,
+                                  ref,
+                                  AdministrationStatus.skipped,
+                                ),
                           child: const Text('Skip'),
                         ),
                       ),
@@ -876,7 +903,9 @@ class _ScheduleTile extends ConsumerWidget {
                     button: true,
                     label: 'Undo status for ${entry.medicine.name}',
                     child: TextButton(
-                      onPressed: adminState.isSaving ? null : () => _undo(context, ref),
+                      onPressed: adminState.isSaving
+                          ? null
+                          : () => _undo(context, ref),
                       child: const Text('Undo'),
                     ),
                   ),
@@ -902,7 +931,9 @@ class _ScheduleTile extends ConsumerWidget {
     if (!context.mounted) {
       return;
     }
-    final message = status == AdministrationStatus.given ? 'Marked as given.' : 'Marked as skipped.';
+    final message = status == AdministrationStatus.given
+        ? 'Marked as given.'
+        : 'Marked as skipped.';
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -919,7 +950,9 @@ class _ScheduleTile extends ConsumerWidget {
     } else {
       final error = ref.read(administrationControllerProvider).errorMessage;
       if (error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error)));
       }
     }
   }
@@ -934,13 +967,15 @@ class _ScheduleTile extends ConsumerWidget {
       return;
     }
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Update undone.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Update undone.')));
     } else {
       final error = ref.read(administrationControllerProvider).errorMessage;
       if (error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error)));
       }
     }
   }
@@ -1037,7 +1072,11 @@ class _CalendarStrip extends StatelessWidget {
     final theme = Theme.of(context);
     final days = List.generate(14, (index) {
       final base = DateTime.now();
-      final date = DateTime(base.year, base.month, base.day).add(Duration(days: index - 3));
+      final date = DateTime(
+        base.year,
+        base.month,
+        base.day,
+      ).add(Duration(days: index - 3));
       return date;
     });
 
@@ -1057,7 +1096,9 @@ class _CalendarStrip extends StatelessWidget {
               width: 56,
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
-                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest,
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(

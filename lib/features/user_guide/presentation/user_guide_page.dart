@@ -12,15 +12,14 @@ class UserGuidePage extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('User guide'),
-      ),
+      appBar: AppBar(title: const Text('User guide')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           _GuideHeader(
             title: 'Medicines for Children',
-            subtitle: 'A quick guide to managing medicines, schedules, and shared care.',
+            subtitle:
+                'A quick guide to managing medicines, schedules, and shared care.',
             accent: colorScheme.primary,
           ),
           const SizedBox(height: 16),
@@ -68,7 +67,10 @@ class _GuideHeader extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
-          colors: [accent.withValues(alpha: 0.15), accent.withValues(alpha: 0.03)],
+          colors: [
+            accent.withValues(alpha: 0.15),
+            accent.withValues(alpha: 0.03),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -79,13 +81,12 @@ class _GuideHeader extends StatelessWidget {
         children: [
           Text(
             title,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
-          Text(
-            subtitle,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          Text(subtitle, style: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
     );
@@ -122,7 +123,12 @@ class _GuideSection extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                    Text(
+                      title,
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     Text(summary, style: textTheme.bodyMedium),
                   ],

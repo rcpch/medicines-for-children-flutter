@@ -23,9 +23,7 @@ class _MedicineQrScanPageState extends ConsumerState<MedicineQrScanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Scan QR code'),
-      ),
+      appBar: AppBar(title: const Text('Scan QR code')),
       body: Column(
         children: [
           const Padding(
@@ -52,9 +50,10 @@ class _MedicineQrScanPageState extends ConsumerState<MedicineQrScanPage> {
       return;
     }
     final barcode = capture.barcodes.cast<Barcode?>().firstWhere(
-          (barcode) => barcode?.rawValue != null && barcode!.rawValue!.trim().isNotEmpty,
-          orElse: () => null,
-        );
+      (barcode) =>
+          barcode?.rawValue != null && barcode!.rawValue!.trim().isNotEmpty,
+      orElse: () => null,
+    );
     final rawValue = barcode?.rawValue?.trim();
     if (rawValue == null || rawValue.isEmpty) {
       return;
@@ -73,7 +72,8 @@ class _MedicineQrScanPageState extends ConsumerState<MedicineQrScanPage> {
           doseUnit: '',
           route: '',
           frequency: '',
-          notes: 'Quick add from Medicines for Children QR.\n${entry.title}\n${entry.url}',
+          notes:
+              'Quick add from Medicines for Children QR.\n${entry.title}\n${entry.url}',
         );
         if (!mounted) {
           return;
@@ -161,10 +161,7 @@ class _ScannerError extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Text(
-          message,
-          textAlign: TextAlign.center,
-        ),
+        child: Text(message, textAlign: TextAlign.center),
       ),
     );
   }

@@ -7,10 +7,7 @@ import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.
 import 'package:medicines_for_children_flutter/features/share_centre/data/share_centre_repository.dart';
 
 class ShareCentreActionState {
-  const ShareCentreActionState({
-    this.isSaving = false,
-    this.errorMessage,
-  });
+  const ShareCentreActionState({this.isSaving = false, this.errorMessage});
 
   final bool isSaving;
   final String? errorMessage;
@@ -29,9 +26,9 @@ class ShareCentreActionState {
 
 class ShareCentreController extends StateNotifier<ShareCentreActionState> {
   ShareCentreController(this._ref, this._repository)
-      : _telemetry = _ref.read(telemetryServiceProvider),
-        _queue = _ref.read(shareActionQueueServiceProvider),
-        super(const ShareCentreActionState());
+    : _telemetry = _ref.read(telemetryServiceProvider),
+      _queue = _ref.read(shareActionQueueServiceProvider),
+      super(const ShareCentreActionState());
 
   final Ref _ref;
   final ShareCentreRepository _repository;
@@ -56,11 +53,14 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
         digital: digital,
         notes: notes,
       );
-      _telemetry.trackEvent('share_centre_created', properties: {
-        'childId': childId,
-        'shareId': schedule.apiId,
-        'digital': digital,
-      });
+      _telemetry.trackEvent(
+        'share_centre_created',
+        properties: {
+          'childId': childId,
+          'shareId': schedule.apiId,
+          'digital': digital,
+        },
+      );
       _ref.invalidate(shareCentreSchedulesProvider(childId));
       state = state.copyWith(isSaving: false, clearError: true);
       return schedule;
@@ -110,10 +110,10 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
         digital: digital,
         notes: notes,
       );
-      _telemetry.trackEvent('share_centre_updated', properties: {
-        'childId': childId,
-        'shareId': schedule.apiId,
-      });
+      _telemetry.trackEvent(
+        'share_centre_updated',
+        properties: {'childId': childId, 'shareId': schedule.apiId},
+      );
       _ref.invalidate(shareCentreSchedulesProvider(childId));
       state = state.copyWith(isSaving: false, clearError: true);
       return schedule;
@@ -159,9 +159,10 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
         dateTo: dateTo,
         primaryCarerEmail: primaryCarerEmail,
       );
-      _telemetry.trackEvent('share_centre_pdf_exported', properties: {
-        'childId': childId,
-      });
+      _telemetry.trackEvent(
+        'share_centre_pdf_exported',
+        properties: {'childId': childId},
+      );
       state = state.copyWith(isSaving: false, clearError: true);
       return pdfUrl;
     } catch (_) {
@@ -180,10 +181,10 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
     state = state.copyWith(isSaving: true, clearError: true);
     try {
       final schedule = await _repository.endSharedSchedule(apiId: apiId);
-      _telemetry.trackEvent('share_centre_ended', properties: {
-        'childId': childId,
-        'shareId': schedule.apiId,
-      });
+      _telemetry.trackEvent(
+        'share_centre_ended',
+        properties: {'childId': childId, 'shareId': schedule.apiId},
+      );
       _ref.invalidate(shareCentreSchedulesProvider(childId));
       state = state.copyWith(isSaving: false, clearError: true);
       return schedule;
@@ -193,9 +194,7 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
           PendingShareAction(
             id: 'share-end-${DateTime.now().millisecondsSinceEpoch}',
             type: ShareActionType.end,
-            payload: {
-              'apiId': apiId,
-            },
+            payload: {'apiId': apiId},
             queuedAt: DateTime.now(),
           ),
         );
@@ -224,10 +223,10 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
         dateFrom: dateFrom,
         dateTo: dateTo,
       );
-      _telemetry.trackEvent('share_centre_deleted', properties: {
-        'childId': childId,
-        'shareId': schedule.apiId,
-      });
+      _telemetry.trackEvent(
+        'share_centre_deleted',
+        properties: {'childId': childId, 'shareId': schedule.apiId},
+      );
       _ref.invalidate(shareCentreSchedulesProvider(childId));
       state = state.copyWith(isSaving: false, clearError: true);
       return schedule;
@@ -272,12 +271,17 @@ final shareCentreRepositoryProvider = Provider<ShareCentreRepository>((ref) {
   return HttpShareCentreRepository(dio);
 });
 
-final shareCentreSchedulesProvider = FutureProvider.family<List<ShareCentreSchedule>, String>((ref, childId) async {
-  final repository = ref.watch(shareCentreRepositoryProvider);
-  return repository.fetchSharedSchedules(childId: childId);
-});
+final shareCentreSchedulesProvider =
+    FutureProvider.family<List<ShareCentreSchedule>, String>((
+      ref,
+      childId,
+    ) async {
+      final repository = ref.watch(shareCentreRepositoryProvider);
+      return repository.fetchSharedSchedules(childId: childId);
+    });
 
-final shareCentreControllerProvider = StateNotifierProvider<ShareCentreController, ShareCentreActionState>((ref) {
-  final repository = ref.watch(shareCentreRepositoryProvider);
-  return ShareCentreController(ref, repository);
-});
+final shareCentreControllerProvider =
+    StateNotifierProvider<ShareCentreController, ShareCentreActionState>((ref) {
+      final repository = ref.watch(shareCentreRepositoryProvider);
+      return ShareCentreController(ref, repository);
+    });

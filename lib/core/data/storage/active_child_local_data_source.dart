@@ -25,7 +25,9 @@ class ActiveChildLocalDataSource {
   }
 }
 
-final activeChildLocalDataSourceProvider = Provider<ActiveChildLocalDataSource>((ref) {
-  final preferences = ref.watch(sharedPreferencesProvider);
-  return ActiveChildLocalDataSource(preferences);
-});
+final activeChildLocalDataSourceProvider = Provider<ActiveChildLocalDataSource>(
+  (ref) {
+    final preferences = ref.watch(sharedPreferencesProvider);
+    return ActiveChildLocalDataSource(preferences);
+  },
+);

@@ -41,4 +41,3 @@ class PasscodeRecord {
   final int iterations;
   final String hashBase64;
 }
-

@@ -13,7 +13,9 @@ class FakeShareCentreRepository implements ShareCentreRepository {
   final ShareCentreSchedule schedule;
 
   @override
-  Future<List<ShareCentreSchedule>> fetchSharedSchedules({required String childId}) async {
+  Future<List<ShareCentreSchedule>> fetchSharedSchedules({
+    required String childId,
+  }) async {
     return [schedule];
   }
 
@@ -137,7 +139,9 @@ void main() {
 
     expect(result, isNotNull);
     final tracked = telemetry.events.any(
-      (event) => event.name == 'share_centre_created' && event.properties?['shareId'] == 'share-1',
+      (event) =>
+          event.name == 'share_centre_created' &&
+          event.properties?['shareId'] == 'share-1',
     );
     expect(tracked, isTrue);
   });
@@ -173,7 +177,9 @@ void main() {
 
     expect(result, isNotNull);
     final tracked = telemetry.events.any(
-      (event) => event.name == 'share_centre_deleted' && event.properties?['shareId'] == 'share-2',
+      (event) =>
+          event.name == 'share_centre_deleted' &&
+          event.properties?['shareId'] == 'share-2',
     );
     expect(tracked, isTrue);
   });
@@ -209,7 +215,9 @@ void main() {
 
     expect(result, isNotNull);
     final tracked = telemetry.events.any(
-      (event) => event.name == 'share_centre_pdf_exported' && event.properties?['childId'] == 'child-1',
+      (event) =>
+          event.name == 'share_centre_pdf_exported' &&
+          event.properties?['childId'] == 'child-1',
     );
     expect(tracked, isTrue);
   });

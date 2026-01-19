@@ -21,7 +21,10 @@ abstract class AuthRepository {
   Future<void> unlockWithPasscode(String passcode);
   Future<void> unlockWithBiometrics();
   Future<bool> verifyPasscode(String passcode);
-  Future<void> changePasscode({String? currentPasscode, required String newPasscode});
+  Future<void> changePasscode({
+    String? currentPasscode,
+    required String newPasscode,
+  });
   Future<void> signOut();
 
   Future<void> completeOnboarding({required String displayName});
@@ -35,7 +38,8 @@ class LocalAuthRepository implements AuthRepository {
   static const _passcodeDerivedKeyBytes = 32;
 
   final LocalProfilesLocalDataSource _profiles;
-  final StreamController<AuthStatus> _statusController = StreamController<AuthStatus>.broadcast(sync: true);
+  final StreamController<AuthStatus> _statusController =
+      StreamController<AuthStatus>.broadcast(sync: true);
 
   String? _activeProfileId;
   bool _unlocked = false;
@@ -57,9 +61,9 @@ class LocalAuthRepository implements AuthRepository {
       return null;
     }
     return _profiles.listProfiles().cast<LocalProfile?>().firstWhere(
-          (profile) => profile?.id == id,
-          orElse: () => null,
-        );
+      (profile) => profile?.id == id,
+      orElse: () => null,
+    );
   }
 
   AuthStatus _resolveStatus(LocalProfile? activeProfile) {
@@ -113,7 +117,10 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<LocalProfile> createProfile({required String name, String? passcode}) async {
+  Future<LocalProfile> createProfile({
+    required String name,
+    String? passcode,
+  }) async {
     await _ensureInit();
     final newProfile = LocalProfile(
       id: _generateId(),
@@ -143,9 +150,9 @@ class LocalAuthRepository implements AuthRepository {
     await _ensureInit();
     final profiles = _profiles.listProfiles();
     final selected = profiles.cast<LocalProfile?>().firstWhere(
-          (profile) => profile?.id == profileId,
-          orElse: () => null,
-        );
+      (profile) => profile?.id == profileId,
+      orElse: () => null,
+    );
     if (selected == null) {
       throw StateError('Profile not found');
     }
@@ -210,7 +217,10 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> changePasscode({String? currentPasscode, required String newPasscode}) async {
+  Future<void> changePasscode({
+    String? currentPasscode,
+    required String newPasscode,
+  }) async {
     await _ensureInit();
     final profile = _readActiveProfile();
     if (profile == null) {
@@ -268,7 +278,10 @@ class LocalAuthRepository implements AuthRepository {
     _emitStatus();
   }
 
-  Future<void> _updateProfilePasscodeStatus(String profileId, bool hasPasscode) async {
+  Future<void> _updateProfilePasscodeStatus(
+    String profileId,
+    bool hasPasscode,
+  ) async {
     final profiles = _profiles.listProfiles();
     final index = profiles.indexWhere((item) => item.id == profileId);
     if (index == -1) {
@@ -295,7 +308,10 @@ class LocalAuthRepository implements AuthRepository {
 
   Future<PasscodeRecord> _derivePasscodeRecord(String passcode) async {
     final random = _secureRandom();
-    final salt = List<int>.generate(_passcodeSaltBytes, (_) => random.nextInt(256));
+    final salt = List<int>.generate(
+      _passcodeSaltBytes,
+      (_) => random.nextInt(256),
+    );
     final pbkdf2 = Pbkdf2(
       macAlgorithm: Hmac.sha256(),
       iterations: _passcodeIterations,

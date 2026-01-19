@@ -157,14 +157,20 @@ PrimaryCarer _sampleCarer() {
   );
 }
 
-Future<void> _writeCarer(SharedPreferences prefs, String profileId, PrimaryCarer carer) async {
+Future<void> _writeCarer(
+  SharedPreferences prefs,
+  String profileId,
+  PrimaryCarer carer,
+) async {
   final data = ProfileDataLocalDataSource(prefs);
   await data.writePrimaryCarer(profileId, carer);
 }
 
 Future<void> _awaitAuthenticated(ProviderContainer container) async {
   final controller = container.read(authControllerProvider.notifier);
-  await controller.stream.firstWhere((state) => state.status == AuthStatus.authenticated);
+  await controller.stream.firstWhere(
+    (state) => state.status == AuthStatus.authenticated,
+  );
 }
 
 class _TestAuthRepository implements AuthRepository {
@@ -215,7 +221,10 @@ class _TestAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> changePasscode({String? currentPasscode, required String newPasscode}) async {}
+  Future<void> changePasscode({
+    String? currentPasscode,
+    required String newPasscode,
+  }) async {}
 
   @override
   Future<void> signOut() async {}

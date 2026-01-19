@@ -17,11 +17,11 @@ class ProfileSettings {
 
 class ProfileSettingsController extends StateNotifier<ProfileSettings> {
   ProfileSettingsController(this._prefs, this._profileId)
-      : super(
-          ProfileSettings(
-            biometricsEnabled: _prefs.getBool(_keyFor(_profileId)) ?? false,
-          ),
-        );
+    : super(
+        ProfileSettings(
+          biometricsEnabled: _prefs.getBool(_keyFor(_profileId)) ?? false,
+        ),
+      );
 
   final SharedPreferences _prefs;
   final String _profileId;
@@ -37,7 +37,11 @@ class ProfileSettingsController extends StateNotifier<ProfileSettings> {
 }
 
 final profileSettingsControllerProvider =
-    StateNotifierProvider.family<ProfileSettingsController, ProfileSettings, String>((ref, profileId) {
-  final prefs = ref.watch(sharedPreferencesProvider);
-  return ProfileSettingsController(prefs, profileId);
-});
+    StateNotifierProvider.family<
+      ProfileSettingsController,
+      ProfileSettings,
+      String
+    >((ref, profileId) {
+      final prefs = ref.watch(sharedPreferencesProvider);
+      return ProfileSettingsController(prefs, profileId);
+    });

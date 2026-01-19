@@ -10,7 +10,9 @@ class FakeShareCentreRepository implements ShareCentreRepository {
   int updateCalls = 0;
 
   @override
-  Future<List<ShareCentreSchedule>> fetchSharedSchedules({required String childId}) async {
+  Future<List<ShareCentreSchedule>> fetchSharedSchedules({
+    required String childId,
+  }) async {
     return [];
   }
 

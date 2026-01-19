@@ -44,5 +44,7 @@ class AppConfig {
 }
 
 final appConfigProvider = Provider<AppConfig>((ref) {
-  throw UnimplementedError('appConfig provider must be overridden at bootstrap');
+  throw UnimplementedError(
+    'appConfig provider must be overridden at bootstrap',
+  );
 });

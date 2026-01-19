@@ -25,12 +25,18 @@ class MedicineSummaryPdfService {
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(32),
         build: (_) => [
-          pw.Text('Medicines summary', style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold)),
+          pw.Text(
+            'Medicines summary',
+            style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold),
+          ),
           pw.SizedBox(height: 8),
           pw.Text('Child: ${_childName(child)}'),
           pw.Text('Carer: ${carer.firstName} ${carer.lastName}'.trim()),
           pw.SizedBox(height: 12),
-          pw.Text('Medicines', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+          pw.Text(
+            'Medicines',
+            style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+          ),
           pw.SizedBox(height: 8),
           if (child.medicines.isEmpty)
             pw.Text('No medicines recorded.')
@@ -48,7 +54,8 @@ class MedicineSummaryPdfService {
       'Dose: ${medicine.dose} ${medicine.doseUnit}',
       'Route: ${medicine.route}',
       'Frequency: ${medicine.frequency}',
-      if (medicine.notes != null && medicine.notes!.trim().isNotEmpty) 'Notes: ${medicine.notes}',
+      if (medicine.notes != null && medicine.notes!.trim().isNotEmpty)
+        'Notes: ${medicine.notes}',
     ];
 
     return pw.Container(
@@ -66,7 +73,9 @@ class MedicineSummaryPdfService {
             style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
           ),
           pw.SizedBox(height: 6),
-          ...details.map((line) => pw.Text(line, style: const pw.TextStyle(fontSize: 11))),
+          ...details.map(
+            (line) => pw.Text(line, style: const pw.TextStyle(fontSize: 11)),
+          ),
         ],
       ),
     );
@@ -85,6 +94,8 @@ class MedicineSummaryPdfService {
   }
 }
 
-final medicineSummaryPdfServiceProvider = Provider<MedicineSummaryPdfService>((ref) {
+final medicineSummaryPdfServiceProvider = Provider<MedicineSummaryPdfService>((
+  ref,
+) {
   return MedicineSummaryPdfService();
 });

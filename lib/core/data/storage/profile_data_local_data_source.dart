@@ -46,7 +46,10 @@ class ProfileDataLocalDataSource {
     return OnboardingProfile.fromMap(rawOnboarding);
   }
 
-  Future<void> writeOnboardingProfile(String profileId, OnboardingProfile profile) async {
+  Future<void> writeOnboardingProfile(
+    String profileId,
+    OnboardingProfile profile,
+  ) async {
     final data = _readRaw(profileId) ?? <String, dynamic>{};
     data[_onboardingKey] = profile.toMap();
     await _writeRaw(profileId, data);
@@ -78,11 +81,16 @@ class ProfileDataLocalDataSource {
   }
 
   Future<void> _writeRaw(String profileId, Map<String, dynamic> data) async {
-    await _preferences.setString('$_profileDataPrefix$profileId', jsonEncode(data));
+    await _preferences.setString(
+      '$_profileDataPrefix$profileId',
+      jsonEncode(data),
+    );
   }
 }
 
-final profileDataLocalDataSourceProvider = Provider<ProfileDataLocalDataSource>((ref) {
-  final preferences = ref.watch(sharedPreferencesProvider);
-  return ProfileDataLocalDataSource(preferences);
-});
+final profileDataLocalDataSourceProvider = Provider<ProfileDataLocalDataSource>(
+  (ref) {
+    final preferences = ref.watch(sharedPreferencesProvider);
+    return ProfileDataLocalDataSource(preferences);
+  },
+);

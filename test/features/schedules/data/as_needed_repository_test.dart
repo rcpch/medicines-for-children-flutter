@@ -69,7 +69,13 @@ void main() {
     );
 
     final current = DateTime.now();
-    final now = DateTime(current.year, current.month, current.day, current.hour, current.minute);
+    final now = DateTime(
+      current.year,
+      current.month,
+      current.day,
+      current.hour,
+      current.minute,
+    );
     await repository.recordAdministration(
       medicineId: medicine.id,
       dateTime: now,
@@ -241,7 +247,10 @@ void main() {
     expect(updated, isNotNull);
     expect(updated!.children.first.asNeededSchedules, isEmpty);
     expect(updated.children.last.asNeededSchedules, hasLength(1));
-    expect(updated.children.last.asNeededSchedules.first.medicineId, medicine.id);
+    expect(
+      updated.children.last.asNeededSchedules.first.medicineId,
+      medicine.id,
+    );
   });
 }
 
@@ -293,7 +302,10 @@ class _TestAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> changePasscode({String? currentPasscode, required String newPasscode}) async {}
+  Future<void> changePasscode({
+    String? currentPasscode,
+    required String newPasscode,
+  }) async {}
 
   @override
   Future<void> signOut() async {}

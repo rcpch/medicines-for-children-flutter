@@ -46,10 +46,7 @@ class AsNeededAdministrationEntry {
 enum TimeOfDayBucket { morning, afternoon, evening, night }
 
 class TimeOfDaySection {
-  const TimeOfDaySection({
-    required this.bucket,
-    required this.entries,
-  });
+  const TimeOfDaySection({required this.bucket, required this.entries});
 
   final TimeOfDayBucket bucket;
   final List<DailyScheduleEntry> entries;
@@ -97,8 +94,12 @@ class DailyScheduleBuilder {
         if (scheduledDateTime == null) {
           continue;
         }
-        final matchingAdministration = _findAdministration(schedule, scheduledDateTime);
-        final status = matchingAdministration?.status ?? AdministrationStatus.scheduled;
+        final matchingAdministration = _findAdministration(
+          schedule,
+          scheduledDateTime,
+        );
+        final status =
+            matchingAdministration?.status ?? AdministrationStatus.scheduled;
         entries.add(
           DailyScheduleEntry(
             id: '${schedule.id}-$time',
@@ -117,9 +118,12 @@ class DailyScheduleBuilder {
     return entries;
   }
 
-  List<TimeOfDaySection> buildTimeOfDaySections(List<DailyScheduleEntry> entries) {
+  List<TimeOfDaySection> buildTimeOfDaySections(
+    List<DailyScheduleEntry> entries,
+  ) {
     final Map<TimeOfDayBucket, List<DailyScheduleEntry>> bucketed = {
-      for (final bucket in TimeOfDayBucket.values) bucket: <DailyScheduleEntry>[],
+      for (final bucket in TimeOfDayBucket.values)
+        bucket: <DailyScheduleEntry>[],
     };
 
     for (final entry in entries) {
@@ -127,11 +131,17 @@ class DailyScheduleBuilder {
     }
 
     return TimeOfDayBucket.values
-        .map((bucket) => TimeOfDaySection(bucket: bucket, entries: bucketed[bucket]!))
+        .map(
+          (bucket) =>
+              TimeOfDaySection(bucket: bucket, entries: bucketed[bucket]!),
+        )
         .toList();
   }
 
-  List<AsNeededAdministrationEntry> buildAsNeededEntries(Child child, DateTime date) {
+  List<AsNeededAdministrationEntry> buildAsNeededEntries(
+    Child child,
+    DateTime date,
+  ) {
     final Map<String, Medicine> medicineById = {
       for (final medicine in child.medicines) medicine.id: medicine,
     };
@@ -146,7 +156,7 @@ class DailyScheduleBuilder {
       }
       for (final administration in schedule.administrations) {
         if (!administration.dateTime.isBefore(startOfDay) &&
-          administration.dateTime.isBefore(endOfDay)) {
+            administration.dateTime.isBefore(endOfDay)) {
           entries.add(
             AsNeededAdministrationEntry(
               medicine: medicine,

@@ -50,7 +50,9 @@ class LocalAsNeededRepository implements AsNeededRepository {
     );
 
     final schedules = [...context.child.asNeededSchedules];
-    final index = schedules.indexWhere((schedule) => schedule.medicineId == medicineId);
+    final index = schedules.indexWhere(
+      (schedule) => schedule.medicineId == medicineId,
+    );
     if (index == -1) {
       schedules.add(
         AsNeededSchedule(
@@ -105,7 +107,9 @@ class LocalAsNeededRepository implements AsNeededRepository {
     if (activeChildId == null || activeChildId.isEmpty) {
       return 0;
     }
-    final index = carer.children.indexWhere((child) => child.id == activeChildId);
+    final index = carer.children.indexWhere(
+      (child) => child.id == activeChildId,
+    );
     return index == -1 ? 0 : index;
   }
 
@@ -113,9 +117,15 @@ class LocalAsNeededRepository implements AsNeededRepository {
     return 'admin-${DateTime.now().millisecondsSinceEpoch}';
   }
 
-  List<Administration> _pruneAdministrations(List<Administration> administrations) {
-    final cutoff = DateTime.now().subtract(const Duration(days: _administrationRetentionDays));
-    return administrations.where((admin) => !admin.dateTime.isBefore(cutoff)).toList();
+  List<Administration> _pruneAdministrations(
+    List<Administration> administrations,
+  ) {
+    final cutoff = DateTime.now().subtract(
+      const Duration(days: _administrationRetentionDays),
+    );
+    return administrations
+        .where((admin) => !admin.dateTime.isBefore(cutoff))
+        .toList();
   }
 }
 

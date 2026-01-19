@@ -12,12 +12,12 @@ class SharedScheduleLinkPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authResultAsync = ref.watch(sharedScheduleAuthResultProvider(linkToken));
+    final authResultAsync = ref.watch(
+      sharedScheduleAuthResultProvider(linkToken),
+    );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Shared schedule link'),
-      ),
+      appBar: AppBar(title: const Text('Shared schedule link')),
       body: authResultAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Padding(
@@ -55,10 +55,7 @@ class SharedScheduleLinkPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  message,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
+                Text(message, style: Theme.of(context).textTheme.bodyLarge),
                 const SizedBox(height: 12),
                 Text(
                   'If you think this is a mistake, ask the primary carer to resend the link.',

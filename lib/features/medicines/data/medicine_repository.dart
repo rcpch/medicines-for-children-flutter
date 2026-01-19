@@ -106,7 +106,9 @@ class LocalMedicineRepository implements MedicineRepository {
     if (activeChildId == null || activeChildId.isEmpty) {
       return 0;
     }
-    final index = carer.children.indexWhere((child) => child.id == activeChildId);
+    final index = carer.children.indexWhere(
+      (child) => child.id == activeChildId,
+    );
     return index == -1 ? 0 : index;
   }
 

@@ -6,10 +6,7 @@ import 'package:medicines_for_children_flutter/features/medicines/data/medicine_
 import 'package:medicines_for_children_flutter/features/medicines/domain/medicine_draft.dart';
 
 class MedicineEditorState {
-  const MedicineEditorState({
-    this.isSaving = false,
-    this.errorMessage,
-  });
+  const MedicineEditorState({this.isSaving = false, this.errorMessage});
 
   final bool isSaving;
   final String? errorMessage;
@@ -27,7 +24,8 @@ class MedicineEditorState {
 }
 
 class MedicineEditorController extends StateNotifier<MedicineEditorState> {
-  MedicineEditorController(this._ref, this._repository) : super(const MedicineEditorState());
+  MedicineEditorController(this._ref, this._repository)
+    : super(const MedicineEditorState());
 
   final Ref _ref;
   final MedicineRepository _repository;
@@ -87,6 +85,6 @@ class MedicineEditorController extends StateNotifier<MedicineEditorState> {
 
 final medicineEditorControllerProvider =
     StateNotifierProvider<MedicineEditorController, MedicineEditorState>((ref) {
-  final repository = ref.watch(medicineRepositoryProvider);
-  return MedicineEditorController(ref, repository);
-});
+      final repository = ref.watch(medicineRepositoryProvider);
+      return MedicineEditorController(ref, repository);
+    });

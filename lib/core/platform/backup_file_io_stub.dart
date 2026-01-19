@@ -12,7 +12,9 @@ class _UnsupportedBackupFileIO implements BackupFileIO {
     required String filename,
     required String mimeType,
   }) async {
-    throw UnsupportedError('Backup file saving is not supported on this platform.');
+    throw UnsupportedError(
+      'Backup file saving is not supported on this platform.',
+    );
   }
 
   @override
@@ -20,7 +22,8 @@ class _UnsupportedBackupFileIO implements BackupFileIO {
     required String label,
     required List<String> extensions,
   }) async {
-    throw UnsupportedError('Backup file picking is not supported on this platform.');
+    throw UnsupportedError(
+      'Backup file picking is not supported on this platform.',
+    );
   }
 }
-

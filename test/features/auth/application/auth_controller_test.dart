@@ -17,9 +17,7 @@ void main() {
       final prefs = await SharedPreferences.getInstance();
       authRepository = LocalAuthRepository(LocalProfilesLocalDataSource(prefs));
       container = ProviderContainer(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(authRepository),
-        ],
+        overrides: [authRepositoryProvider.overrideWithValue(authRepository)],
       );
       addTearDown(() async {
         await authRepository.dispose();
@@ -29,7 +27,9 @@ void main() {
 
     test('starts unauthenticated with no profiles', () async {
       final controller = container.read(authControllerProvider.notifier);
-      final nextState = await controller.stream.firstWhere((state) => state.status == AuthStatus.unauthenticated);
+      final nextState = await controller.stream.firstWhere(
+        (state) => state.status == AuthStatus.unauthenticated,
+      );
       expect(nextState.status, AuthStatus.unauthenticated);
       expect(nextState.user, isNull);
     });
@@ -37,7 +37,9 @@ void main() {
     test('createProfile transitions to onboarding', () async {
       final controller = container.read(authControllerProvider.notifier);
 
-      final onboardingFuture = controller.stream.firstWhere((state) => state.status == AuthStatus.onboarding);
+      final onboardingFuture = controller.stream.firstWhere(
+        (state) => state.status == AuthStatus.onboarding,
+      );
       await controller.createProfile(name: 'Test Profile');
       final nextState = await onboardingFuture;
       expect(nextState.status, AuthStatus.onboarding);
@@ -62,7 +64,9 @@ void main() {
 
       await controller.createProfile(name: 'Protected', passcode: '123456');
       await controller.signOut();
-      await controller.selectProfile(container.read(authControllerProvider).profiles.first.id);
+      await controller.selectProfile(
+        container.read(authControllerProvider).profiles.first.id,
+      );
       await Future<void>.delayed(const Duration(milliseconds: 10));
 
       final lockedState = container.read(authControllerProvider);

@@ -9,8 +9,8 @@ class BackgroundSyncService {
   BackgroundSyncService({
     required Future<void> Function() onSync,
     Duration interval = const Duration(minutes: 5),
-  })  : _onSync = onSync,
-        _interval = interval;
+  }) : _onSync = onSync,
+       _interval = interval;
 
   final Future<void> Function() _onSync;
   final Duration _interval;
@@ -58,7 +58,9 @@ class BackgroundSyncService {
 
 final backgroundSyncServiceProvider = Provider<BackgroundSyncService>((ref) {
   final shareQueue = ref.watch(shareActionQueueServiceProvider);
-  final sharedScheduleQueue = ref.watch(sharedScheduleActionQueueServiceProvider);
+  final sharedScheduleQueue = ref.watch(
+    sharedScheduleActionQueueServiceProvider,
+  );
   final service = BackgroundSyncService(
     onSync: () async {
       await shareQueue.processQueue();

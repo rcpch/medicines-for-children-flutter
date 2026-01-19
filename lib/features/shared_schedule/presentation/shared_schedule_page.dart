@@ -70,7 +70,9 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
         appBar: AppBar(title: const Text('Shared schedule')),
         body: const Padding(
           padding: EdgeInsets.all(16),
-          child: Text('Missing shared schedule session. Please open the link again.'),
+          child: Text(
+            'Missing shared schedule session. Please open the link again.',
+          ),
         ),
       );
     }
@@ -79,9 +81,7 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
     final repository = ref.read(sharedScheduleRepositoryProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Shared schedule'),
-      ),
+      appBar: AppBar(title: const Text('Shared schedule')),
       body: modelAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Padding(
@@ -89,8 +89,10 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
           child: Text('Unable to load schedule.\n\n$error'),
         ),
         data: (model) {
-          final today = model.today ?? (model.days.isNotEmpty ? model.days.first : null);
-          final dateRange = '${DateFormat.yMMMd().format(model.dateFrom)} – ${DateFormat.yMMMd().format(model.dateTo)}';
+          final today =
+              model.today ?? (model.days.isNotEmpty ? model.days.first : null);
+          final dateRange =
+              '${DateFormat.yMMMd().format(model.dateFrom)} – ${DateFormat.yMMMd().format(model.dateTo)}';
           final pdfUrl = _generatedPdfUrl ?? model.pdfUrl;
 
           if (today == null) {
@@ -132,12 +134,8 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                   allergies: model.child.allergies,
                   pdfUrl: pdfUrl,
                   exportingPdf: _exportingPdf,
-                  onDownload: () => _handleDownloadPdf(
-                    context,
-                    repository,
-                    session,
-                    model,
-                  ),
+                  onDownload: () =>
+                      _handleDownloadPdf(context, repository, session, model),
                 )
               else ...[
                 if (_guidanceLoaded && _showGuidance)
@@ -145,10 +143,13 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                     parentName: model.parentId,
                     onDismiss: _dismissGuidance,
                   ),
-                if (_guidanceLoaded && _showGuidance) const SizedBox(height: 12),
+                if (_guidanceLoaded && _showGuidance)
+                  const SizedBox(height: 12),
                 if (model.status.toLowerCase() == 'pending')
                   Card(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -159,7 +160,9 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const SizedBox(height: 8),
-                          const Text('Let the primary carer know if you can cover this period.'),
+                          const Text(
+                            'Let the primary carer know if you can cover this period.',
+                          ),
                           const SizedBox(height: 12),
                           Row(
                             children: [
@@ -171,16 +174,20 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                                       authToken: session.authToken,
                                       approved: true,
                                     );
-                                    telemetry.trackEvent('share_schedule_approved', properties: {
-                                      'shareId': model.apiId,
-                                    });
-                                    ref.invalidate(sharedScheduleViewModelProvider(session));
+                                    telemetry.trackEvent(
+                                      'share_schedule_approved',
+                                      properties: {'shareId': model.apiId},
+                                    );
+                                    ref.invalidate(
+                                      sharedScheduleViewModelProvider(session),
+                                    );
                                   } catch (error) {
                                     if (_isNetworkError(error)) {
                                       await actionQueue.enqueue(
                                         PendingSharedScheduleAction(
                                           id: 'shared-confirm-${DateTime.now().millisecondsSinceEpoch}',
-                                          type: SharedScheduleActionType.confirm,
+                                          type:
+                                              SharedScheduleActionType.confirm,
                                           payload: {
                                             'apiId': model.apiId,
                                             'authToken': session.authToken,
@@ -192,7 +199,9 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                                       );
                                     }
                                     if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
                                         SnackBar(
                                           content: Text(
                                             _isNetworkError(error)
@@ -209,7 +218,9 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                               const SizedBox(width: 12),
                               TextButton(
                                 onPressed: () async {
-                                  final reason = await _promptDeclineReason(context);
+                                  final reason = await _promptDeclineReason(
+                                    context,
+                                  );
                                   if (reason == null) {
                                     return;
                                   }
@@ -220,16 +231,20 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                                       approved: false,
                                       reason: reason,
                                     );
-                                    telemetry.trackEvent('share_schedule_declined', properties: {
-                                      'shareId': model.apiId,
-                                    });
-                                    ref.invalidate(sharedScheduleViewModelProvider(session));
+                                    telemetry.trackEvent(
+                                      'share_schedule_declined',
+                                      properties: {'shareId': model.apiId},
+                                    );
+                                    ref.invalidate(
+                                      sharedScheduleViewModelProvider(session),
+                                    );
                                   } catch (error) {
                                     if (_isNetworkError(error)) {
                                       await actionQueue.enqueue(
                                         PendingSharedScheduleAction(
                                           id: 'shared-decline-${DateTime.now().millisecondsSinceEpoch}',
-                                          type: SharedScheduleActionType.confirm,
+                                          type:
+                                              SharedScheduleActionType.confirm,
                                           payload: {
                                             'apiId': model.apiId,
                                             'authToken': session.authToken,
@@ -241,7 +256,9 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                                       );
                                     }
                                     if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
                                         SnackBar(
                                           content: Text(
                                             _isNetworkError(error)
@@ -261,10 +278,7 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                       ),
                     ),
                   ),
-                Text(
-                  'Today',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+                Text('Today', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 8),
                 if (today.scheduledItemsForDay.isEmpty)
                   const Text('No scheduled medicines for today.')
@@ -286,7 +300,10 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                                     Expanded(child: Text(time)),
                                     TextButton(
                                       onPressed: () async {
-                                        final dateTime = _mergeDateAndTime(today.date, time);
+                                        final dateTime = _mergeDateAndTime(
+                                          today.date,
+                                          time,
+                                        );
                                         if (dateTime == null) {
                                           return;
                                         }
@@ -296,21 +313,36 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                                             authToken: session.authToken,
                                             parentId: model.parentId,
                                             adminBy:
-                                                model.carerFirstName.isEmpty ? 'Carer' : model.carerFirstName,
+                                                model.carerFirstName.isEmpty
+                                                ? 'Carer'
+                                                : model.carerFirstName,
                                             dateTime: dateTime,
                                             isAsNeeded: false,
                                             skipped: false,
                                             scheduledItemId: item.id,
                                           );
-                                          telemetry.trackEvent('share_schedule_admin_recorded', properties: {
-                                            'shareId': model.apiId,
-                                            'scheduledItemId': item.id,
-                                            'skipped': false,
-                                          });
-                                          ref.invalidate(sharedScheduleViewModelProvider(session));
+                                          telemetry.trackEvent(
+                                            'share_schedule_admin_recorded',
+                                            properties: {
+                                              'shareId': model.apiId,
+                                              'scheduledItemId': item.id,
+                                              'skipped': false,
+                                            },
+                                          );
+                                          ref.invalidate(
+                                            sharedScheduleViewModelProvider(
+                                              session,
+                                            ),
+                                          );
                                           if (context.mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('Recorded as given.')),
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Recorded as given.',
+                                                ),
+                                              ),
                                             );
                                           }
                                         } catch (error) {
@@ -318,15 +350,21 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                                             await actionQueue.enqueue(
                                               PendingSharedScheduleAction(
                                                 id: 'shared-record-${DateTime.now().millisecondsSinceEpoch}',
-                                                type: SharedScheduleActionType.record,
+                                                type: SharedScheduleActionType
+                                                    .record,
                                                 payload: {
                                                   'apiId': model.apiId,
-                                                  'authToken': session.authToken,
+                                                  'authToken':
+                                                      session.authToken,
                                                   'parentId': model.parentId,
-                                                  'adminBy': model.carerFirstName.isEmpty
+                                                  'adminBy':
+                                                      model
+                                                          .carerFirstName
+                                                          .isEmpty
                                                       ? 'Carer'
                                                       : model.carerFirstName,
-                                                  'dateTime': dateTime.toIso8601String(),
+                                                  'dateTime': dateTime
+                                                      .toIso8601String(),
                                                   'isAsNeeded': false,
                                                   'skipped': false,
                                                   'scheduledItemId': item.id,
@@ -338,7 +376,9 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                                             );
                                           }
                                           if (context.mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
                                               SnackBar(
                                                 content: Text(
                                                   _isNetworkError(error)
@@ -354,7 +394,10 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                                     ),
                                     TextButton(
                                       onPressed: () async {
-                                        final dateTime = _mergeDateAndTime(today.date, time);
+                                        final dateTime = _mergeDateAndTime(
+                                          today.date,
+                                          time,
+                                        );
                                         if (dateTime == null) {
                                           return;
                                         }
@@ -364,21 +407,36 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                                             authToken: session.authToken,
                                             parentId: model.parentId,
                                             adminBy:
-                                                model.carerFirstName.isEmpty ? 'Carer' : model.carerFirstName,
+                                                model.carerFirstName.isEmpty
+                                                ? 'Carer'
+                                                : model.carerFirstName,
                                             dateTime: dateTime,
                                             isAsNeeded: false,
                                             skipped: true,
                                             scheduledItemId: item.id,
                                           );
-                                          telemetry.trackEvent('share_schedule_admin_recorded', properties: {
-                                            'shareId': model.apiId,
-                                            'scheduledItemId': item.id,
-                                            'skipped': true,
-                                          });
-                                          ref.invalidate(sharedScheduleViewModelProvider(session));
+                                          telemetry.trackEvent(
+                                            'share_schedule_admin_recorded',
+                                            properties: {
+                                              'shareId': model.apiId,
+                                              'scheduledItemId': item.id,
+                                              'skipped': true,
+                                            },
+                                          );
+                                          ref.invalidate(
+                                            sharedScheduleViewModelProvider(
+                                              session,
+                                            ),
+                                          );
                                           if (context.mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('Recorded as skipped.')),
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Recorded as skipped.',
+                                                ),
+                                              ),
                                             );
                                           }
                                         } catch (error) {
@@ -386,15 +444,21 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                                             await actionQueue.enqueue(
                                               PendingSharedScheduleAction(
                                                 id: 'shared-skip-${DateTime.now().millisecondsSinceEpoch}',
-                                                type: SharedScheduleActionType.record,
+                                                type: SharedScheduleActionType
+                                                    .record,
                                                 payload: {
                                                   'apiId': model.apiId,
-                                                  'authToken': session.authToken,
+                                                  'authToken':
+                                                      session.authToken,
                                                   'parentId': model.parentId,
-                                                  'adminBy': model.carerFirstName.isEmpty
+                                                  'adminBy':
+                                                      model
+                                                          .carerFirstName
+                                                          .isEmpty
                                                       ? 'Carer'
                                                       : model.carerFirstName,
-                                                  'dateTime': dateTime.toIso8601String(),
+                                                  'dateTime': dateTime
+                                                      .toIso8601String(),
                                                   'isAsNeeded': false,
                                                   'skipped': true,
                                                   'scheduledItemId': item.id,
@@ -406,7 +470,9 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
                                             );
                                           }
                                           if (context.mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
                                               SnackBar(
                                                 content: Text(
                                                   _isNetworkError(error)
@@ -474,7 +540,13 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
     for (final pattern in patterns) {
       try {
         final parsed = DateFormat(pattern).parseStrict(sanitized);
-        return DateTime(date.year, date.month, date.day, parsed.hour, parsed.minute);
+        return DateTime(
+          date.year,
+          date.month,
+          date.day,
+          parsed.hour,
+          parsed.minute,
+        );
       } catch (_) {
         continue;
       }
@@ -490,7 +562,9 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
   ) async {
     final pdfUrl = _generatedPdfUrl ?? model.pdfUrl;
     if (pdfUrl.isNotEmpty) {
-      SharePlus.instance.share(ShareParams(text: pdfUrl, subject: 'Shared schedule PDF'));
+      SharePlus.instance.share(
+        ShareParams(text: pdfUrl, subject: 'Shared schedule PDF'),
+      );
       return;
     }
     setState(() => _exportingPdf = true);
@@ -509,24 +583,23 @@ class _SharedSchedulePageState extends ConsumerState<SharedSchedulePage> {
         _generatedPdfUrl = url;
         _exportingPdf = false;
       });
-      SharePlus.instance.share(ShareParams(text: url, subject: 'Shared schedule PDF'));
+      SharePlus.instance.share(
+        ShareParams(text: url, subject: 'Shared schedule PDF'),
+      );
     } catch (error) {
       if (!context.mounted) {
         return;
       }
       setState(() => _exportingPdf = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Unable to generate PDF: $error')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Unable to generate PDF: $error')));
     }
   }
 }
 
 class _GuidanceCard extends StatelessWidget {
-  const _GuidanceCard({
-    required this.parentName,
-    required this.onDismiss,
-  });
+  const _GuidanceCard({required this.parentName, required this.onDismiss});
 
   final String parentName;
   final VoidCallback onDismiss;
@@ -545,10 +618,7 @@ class _GuidanceCard extends StatelessWidget {
               children: [
                 Text('Guidance', style: theme.textTheme.titleMedium),
                 const Spacer(),
-                TextButton(
-                  onPressed: onDismiss,
-                  child: const Text('Dismiss'),
-                ),
+                TextButton(onPressed: onDismiss, child: const Text('Dismiss')),
               ],
             ),
             const SizedBox(height: 8),
@@ -598,10 +668,7 @@ class _ImportantInfoSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Hello.',
-          style: theme.textTheme.titleLarge,
-        ),
+        Text('Hello.', style: theme.textTheme.titleLarge),
         const SizedBox(height: 6),
         Text('Thank you for helping to look after $childName.'),
         const SizedBox(height: 16),
@@ -621,7 +688,10 @@ class _ImportantInfoSection extends StatelessWidget {
           title: 'Important notes',
           child: Text(
             childCondition.isNotEmpty || childNotes.isNotEmpty
-                ? [childCondition, childNotes].where((item) => item.trim().isNotEmpty).join('\n')
+                ? [
+                    childCondition,
+                    childNotes,
+                  ].where((item) => item.trim().isNotEmpty).join('\n')
                 : 'No notes provided.',
           ),
         ),
@@ -649,7 +719,9 @@ class _ImportantInfoSection extends StatelessWidget {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.picture_as_pdf_outlined),
-            label: Text(pdfUrl.isEmpty ? 'Generate schedule PDF' : 'Share schedule PDF'),
+            label: Text(
+              pdfUrl.isEmpty ? 'Generate schedule PDF' : 'Share schedule PDF',
+            ),
           ),
         ),
       ],
@@ -658,10 +730,7 @@ class _ImportantInfoSection extends StatelessWidget {
 }
 
 class _InfoCard extends StatelessWidget {
-  const _InfoCard({
-    required this.title,
-    required this.child,
-  });
+  const _InfoCard({required this.title, required this.child});
 
   final String title;
   final Widget child;

@@ -56,7 +56,11 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     final storedProfile = profileId == null
         ? null
         : ref.read(onboardingLocalDataSourceProvider).readProfile(profileId);
-    final data = draft ?? (storedProfile != null ? OnboardingDraft.fromProfile(storedProfile) : null);
+    final data =
+        draft ??
+        (storedProfile != null
+            ? OnboardingDraft.fromProfile(storedProfile)
+            : null);
     if (data == null) {
       return;
     }
@@ -160,7 +164,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     final profileId = authState.user?.uid;
     if (profileId == null || profileId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Select a profile before completing onboarding.')),
+        const SnackBar(
+          content: Text('Select a profile before completing onboarding.'),
+        ),
       );
       return;
     }
@@ -209,9 +215,12 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     );
     await primaryCarerStorage.writeForProfile(profileId, primaryCarer);
 
-    await ref.read(authControllerProvider.notifier).completeOnboarding(
+    await ref
+        .read(authControllerProvider.notifier)
+        .completeOnboarding(
           displayName:
-              '${_carerFirstNameController.text.trim()} ${_carerLastNameController.text.trim()}'.trim(),
+              '${_carerFirstNameController.text.trim()} ${_carerLastNameController.text.trim()}'
+                  .trim(),
         );
     ref.read(onboardingDraftProvider.notifier).state = null;
 
@@ -220,7 +229,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Profile saved. Welcome to Medicines for Children.')),
+      const SnackBar(
+        content: Text('Profile saved. Welcome to Medicines for Children.'),
+      ),
     );
   }
 
@@ -230,8 +241,12 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
     ref.listen<AuthState>(authControllerProvider, (previous, next) {
       final message = next.errorMessage;
-      if (message != null && message.isNotEmpty && message != previous?.errorMessage) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      if (message != null &&
+          message.isNotEmpty &&
+          message != previous?.errorMessage) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
       }
     });
 
@@ -247,7 +262,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
-                  side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(24),
@@ -266,19 +283,29 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                           return Row(
                             children: [
                               ElevatedButton(
-                                onPressed: authState.isLoading ? null : details.onStepContinue,
+                                onPressed: authState.isLoading
+                                    ? null
+                                    : details.onStepContinue,
                                 child: authState.isLoading && _currentStep == 2
                                     ? const SizedBox(
                                         width: 20,
                                         height: 20,
-                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
                                       )
-                                    : Text(_currentStep == 2 ? 'Finish onboarding' : 'Continue'),
+                                    : Text(
+                                        _currentStep == 2
+                                            ? 'Finish onboarding'
+                                            : 'Continue',
+                                      ),
                               ),
                               const SizedBox(width: 12),
                               if (_currentStep > 0)
                                 TextButton(
-                                  onPressed: authState.isLoading ? null : details.onStepCancel,
+                                  onPressed: authState.isLoading
+                                      ? null
+                                      : details.onStepCancel,
                                   child: const Text('Back'),
                                 ),
                             ],
@@ -351,7 +378,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                                       prefixIcon: Icon(Icons.cake_outlined),
                                     ),
                                     onTap: _pickDateOfBirth,
-                                    validator: (_) => _childDob == null ? 'Choose a date of birth' : null,
+                                    validator: (_) => _childDob == null
+                                        ? 'Choose a date of birth'
+                                        : null,
                                   ),
                                   const SizedBox(height: 12),
                                   _buildTextField(
@@ -404,7 +433,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                                       if (_childDob != null)
                                         'DOB: ${DateFormat('d MMM y').format(_childDob!)}',
                                       _childConditionController.text,
-                                      if (_childAllergiesController.text.trim().isNotEmpty)
+                                      if (_childAllergiesController.text
+                                          .trim()
+                                          .isNotEmpty)
                                         'Allergies: ${_childAllergiesController.text.trim()}',
                                     ],
                                   ),
@@ -433,10 +464,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }) {
     return TextFormField(
       controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon),
-      ),
+      decoration: InputDecoration(labelText: label, prefixIcon: Icon(icon)),
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
           return 'Enter $label'.toLowerCase();
@@ -446,7 +474,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     );
   }
 
-  Widget _buildSummaryTile({required String title, required List<String> lines}) {
+  Widget _buildSummaryTile({
+    required String title,
+    required List<String> lines,
+  }) {
     final visibleLines = lines.where((line) => line.trim().isNotEmpty).toList();
     return Card(
       elevation: 0,

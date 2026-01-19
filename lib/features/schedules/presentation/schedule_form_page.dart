@@ -38,7 +38,8 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
     _startDate = schedule?.startDate ?? DateTime.now();
     _endDate = schedule?.endDate ?? DateTime.now().add(const Duration(days: 7));
     _weekdays = schedule?.weekdaysActive.toList() ?? List<bool>.filled(7, true);
-    _times = schedule?.times
+    _times =
+        schedule?.times
             .map((time) => _parseTime(time))
             .whereType<TimeOfDay>()
             .toList() ??
@@ -47,13 +48,15 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
     _enableNotifications = settings.notificationsEnabled;
     if (schedule != null) {
       Future<void>.microtask(() async {
-        final metadata =
-            await ref.read(notificationStoreProvider).readForSchedule(schedule.id);
+        final metadata = await ref
+            .read(notificationStoreProvider)
+            .readForSchedule(schedule.id);
         if (!mounted) {
           return;
         }
         setState(() {
-          _enableNotifications = settings.notificationsEnabled && metadata != null;
+          _enableNotifications =
+              settings.notificationsEnabled && metadata != null;
         });
       });
     }
@@ -101,7 +104,8 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
               children: [
                 FormField<String>(
                   initialValue: _selectedMedicineId,
-                  validator: (value) => value == null ? 'Choose a medicine' : null,
+                  validator: (value) =>
+                      value == null ? 'Choose a medicine' : null,
                   builder: (state) {
                     return InputDecorator(
                       decoration: InputDecoration(
@@ -114,11 +118,16 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
                           isExpanded: true,
                           value: state.value,
                           items: child.medicines
-                              .where((medicine) => medicine.status == MedicineStatus.inUse)
-                              .map((medicine) => DropdownMenuItem(
-                                    value: medicine.id,
-                                    child: Text(medicine.name),
-                                  ))
+                              .where(
+                                (medicine) =>
+                                    medicine.status == MedicineStatus.inUse,
+                              )
+                              .map(
+                                (medicine) => DropdownMenuItem(
+                                  value: medicine.id,
+                                  child: Text(medicine.name),
+                                ),
+                              )
                               .toList(),
                           onChanged: (value) {
                             setState(() => _selectedMedicineId = value);
@@ -147,7 +156,9 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
                 Wrap(
                   spacing: 8,
                   children: List.generate(7, (index) {
-                    final label = DateFormat.E().format(DateTime(2024, 1, index + 1));
+                    final label = DateFormat.E().format(
+                      DateTime(2024, 1, index + 1),
+                    );
                     return FilterChip(
                       label: Text(label),
                       selected: _weekdays[index],
@@ -160,7 +171,10 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
                   }),
                 ),
                 const SizedBox(height: 16),
-                Text('Times per day', style: Theme.of(context).textTheme.titleSmall),
+                Text(
+                  'Times per day',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -192,7 +206,9 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
                         ? 'Get notified for each scheduled dose.'
                         : 'Notifications are disabled in Settings.',
                   ),
-                  value: settings.notificationsEnabled ? _enableNotifications : false,
+                  value: settings.notificationsEnabled
+                      ? _enableNotifications
+                      : false,
                   onChanged: settings.notificationsEnabled
                       ? (value) {
                           setState(() {
@@ -210,7 +226,9 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
                           width: 18,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : Text(widget.isEditing ? 'Save schedule' : 'Add schedule'),
+                      : Text(
+                          widget.isEditing ? 'Save schedule' : 'Add schedule',
+                        ),
                 ),
               ],
             ),
@@ -236,9 +254,9 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
       return;
     }
     if (_times.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Add at least one time.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Add at least one time.')));
       return;
     }
 
@@ -276,12 +294,12 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
         weekdaysActive: _weekdays,
         times: _times.map(_formatTime).toList(),
       );
-      success = await controller
-              .createSchedule(
-                draft: draft,
-                medicine: medicine,
-                enableNotifications: _enableNotifications,
-              ) !=
+      success =
+          await controller.createSchedule(
+            draft: draft,
+            medicine: medicine,
+            enableNotifications: _enableNotifications,
+          ) !=
           null;
     }
 
@@ -290,15 +308,17 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
     }
     final state = ref.read(scheduleEditorControllerProvider);
     if (state.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(state.errorMessage!)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
       return;
     }
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(widget.isEditing ? 'Schedule updated.' : 'Schedule added.'),
+          content: Text(
+            widget.isEditing ? 'Schedule updated.' : 'Schedule added.',
+          ),
         ),
       );
       Navigator.of(context).pop();
@@ -308,12 +328,18 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
   Future<void> _pickTime() async {
     final picked = await showTimePicker(
       context: context,
-      initialTime: _times.isEmpty ? const TimeOfDay(hour: 8, minute: 0) : _times.last,
+      initialTime: _times.isEmpty
+          ? const TimeOfDay(hour: 8, minute: 0)
+          : _times.last,
     );
     if (picked != null) {
       setState(() {
         _times.add(picked);
-        _times.sort((a, b) => a.hour == b.hour ? a.minute.compareTo(b.minute) : a.hour.compareTo(b.hour));
+        _times.sort(
+          (a, b) => a.hour == b.hour
+              ? a.minute.compareTo(b.minute)
+              : a.hour.compareTo(b.hour),
+        );
       });
     }
   }
@@ -376,7 +402,9 @@ class _DateField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = value == null ? 'Select date' : DateFormat.yMMMd().format(value!);
+    final text = value == null
+        ? 'Select date'
+        : DateFormat.yMMMd().format(value!);
     return Semantics(
       button: true,
       label: '$label. ${value == null ? 'No date selected' : text}.',

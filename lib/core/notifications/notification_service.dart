@@ -10,8 +10,8 @@ import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
   NotificationService(this._store)
-      : _plugin = FlutterLocalNotificationsPlugin(),
-        _calculator = const NotificationScheduleCalculator();
+    : _plugin = FlutterLocalNotificationsPlugin(),
+      _calculator = const NotificationScheduleCalculator();
 
   final NotificationStore _store;
   final FlutterLocalNotificationsPlugin _plugin;
@@ -23,7 +23,9 @@ class NotificationService {
       return;
     }
     tz.initializeTimeZones();
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const linuxSettings = LinuxInitializationSettings(
       defaultActionName: 'Open notification',
     );

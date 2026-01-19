@@ -12,7 +12,10 @@ class PrimaryCarerLocalDataSource {
     return _profileData.readPrimaryCarer(profileId);
   }
 
-  Future<void> writeForProfile(String profileId, PrimaryCarer primaryCarer) async {
+  Future<void> writeForProfile(
+    String profileId,
+    PrimaryCarer primaryCarer,
+  ) async {
     await _profileData.writePrimaryCarer(profileId, primaryCarer);
   }
 
@@ -21,8 +24,8 @@ class PrimaryCarerLocalDataSource {
   }
 }
 
-final primaryCarerLocalDataSourceProvider = Provider<PrimaryCarerLocalDataSource>((ref) {
-  final profileData = ref.watch(profileDataLocalDataSourceProvider);
-  return PrimaryCarerLocalDataSource(profileData);
-});
-
+final primaryCarerLocalDataSourceProvider =
+    Provider<PrimaryCarerLocalDataSource>((ref) {
+      final profileData = ref.watch(profileDataLocalDataSourceProvider);
+      return PrimaryCarerLocalDataSource(profileData);
+    });

@@ -24,7 +24,9 @@ class OnboardingLocalDataSource {
   }
 }
 
-final onboardingLocalDataSourceProvider = Provider<OnboardingLocalDataSource>((ref) {
+final onboardingLocalDataSourceProvider = Provider<OnboardingLocalDataSource>((
+  ref,
+) {
   final profileData = ref.watch(profileDataLocalDataSourceProvider);
   return OnboardingLocalDataSource(profileData);
 });

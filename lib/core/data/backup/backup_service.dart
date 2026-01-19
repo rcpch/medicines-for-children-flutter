@@ -12,10 +12,7 @@ import 'package:medicines_for_children_flutter/features/auth/domain/local_profil
 import 'package:medicines_for_children_flutter/features/onboarding/domain/onboarding_profile.dart';
 
 class BackupService {
-  BackupService({
-    required this.authRepository,
-    required this.profileData,
-  });
+  BackupService({required this.authRepository, required this.profileData});
 
   static const _formatVersion = 1;
   static const _saltBytes = 16;
@@ -33,9 +30,9 @@ class BackupService {
 
     final profiles = await authRepository.listProfiles();
     final profile = profiles.cast<LocalProfile?>().firstWhere(
-          (p) => p?.id == user.uid,
-          orElse: () => null,
-        );
+      (p) => p?.id == user.uid,
+      orElse: () => null,
+    );
     if (profile == null) {
       throw StateError('Active profile metadata not found');
     }
@@ -47,10 +44,7 @@ class BackupService {
 
     final onboarding = profileData.readOnboardingProfile(profile.id);
     final payload = {
-      'profile': {
-        'name': profile.name,
-        'displayName': profile.displayName,
-      },
+      'profile': {'name': profile.name, 'displayName': profile.displayName},
       'primaryCarer': primaryCarer.toJson(),
       if (onboarding != null) 'onboardingProfile': onboarding.toMap(),
     };
@@ -77,7 +71,8 @@ class BackupService {
       throw StateError('Invalid backup payload');
     }
 
-    final profileDataMap = payload['profile'] as Map<String, dynamic>? ?? const {};
+    final profileDataMap =
+        payload['profile'] as Map<String, dynamic>? ?? const {};
     final profileName = (newProfileName?.trim().isNotEmpty ?? false)
         ? newProfileName!.trim()
         : (profileDataMap['name'] ?? 'Imported profile').toString();
@@ -96,7 +91,9 @@ class BackupService {
 
     final profile = await authRepository.createProfile(
       name: profileName,
-      passcode: newPasscode?.trim().isEmpty ?? true ? null : newPasscode!.trim(),
+      passcode: newPasscode?.trim().isEmpty ?? true
+          ? null
+          : newPasscode!.trim(),
     );
 
     await profileData.writePrimaryCarer(profile.id, primaryCarer);
@@ -110,7 +107,10 @@ class BackupService {
     return profile;
   }
 
-  Future<Map<String, dynamic>> _encryptPayload(String plaintext, String passphrase) async {
+  Future<Map<String, dynamic>> _encryptPayload(
+    String plaintext,
+    String passphrase,
+  ) async {
     final random = _secureRandom();
     final salt = List<int>.generate(_saltBytes, (_) => random.nextInt(256));
     final nonce = List<int>.generate(_nonceBytes, (_) => random.nextInt(256));
@@ -135,10 +135,7 @@ class BackupService {
     return {
       'formatVersion': _formatVersion,
       'createdAt': DateTime.now().toIso8601String(),
-      'kdf': {
-        'salt': base64Encode(salt),
-        'iterations': _iterations,
-      },
+      'kdf': {'salt': base64Encode(salt), 'iterations': _iterations},
       'cipher': {
         'nonce': base64Encode(secretBox.nonce),
         'cipherText': base64Encode(secretBox.cipherText),
@@ -147,7 +144,10 @@ class BackupService {
     };
   }
 
-  Future<String> _decryptPayload(Map<String, dynamic> encrypted, String passphrase) async {
+  Future<String> _decryptPayload(
+    Map<String, dynamic> encrypted,
+    String passphrase,
+  ) async {
     final formatVersion = (encrypted['formatVersion'] as num?)?.toInt() ?? 0;
     if (formatVersion != _formatVersion) {
       throw StateError('Unsupported backup format');
@@ -183,15 +183,8 @@ class BackupService {
     );
 
     final algorithm = AesGcm.with256bits();
-    final secretBox = SecretBox(
-      cipherText,
-      nonce: nonce,
-      mac: Mac(macBytes),
-    );
-    final clear = await algorithm.decrypt(
-      secretBox,
-      secretKey: key,
-    );
+    final secretBox = SecretBox(cipherText, nonce: nonce, mac: Mac(macBytes));
+    final clear = await algorithm.decrypt(secretBox, secretKey: key);
     return utf8.decode(clear);
   }
 
@@ -207,6 +200,8 @@ class BackupService {
 final backupServiceProvider = Provider<BackupService>((ref) {
   final authRepository = ref.watch(authRepositoryProvider);
   final profileData = ref.watch(profileDataLocalDataSourceProvider);
-  return BackupService(authRepository: authRepository, profileData: profileData);
+  return BackupService(
+    authRepository: authRepository,
+    profileData: profileData,
+  );
 });
-

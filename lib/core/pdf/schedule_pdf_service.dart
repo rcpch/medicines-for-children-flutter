@@ -23,10 +23,9 @@ class SchedulePdfService {
       bold: pw.Font.helveticaBold(),
     );
 
-    final medicinesById = {
-      for (final med in child.medicines) med.id: med,
-    };
-    final dateRange = '${DateFormat.yMMMd().format(dateFrom)} - ${DateFormat.yMMMd().format(dateTo)}';
+    final medicinesById = {for (final med in child.medicines) med.id: med};
+    final dateRange =
+        '${DateFormat.yMMMd().format(dateFrom)} - ${DateFormat.yMMMd().format(dateTo)}';
 
     doc.addPage(
       pw.MultiPage(
@@ -34,7 +33,10 @@ class SchedulePdfService {
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(32),
         build: (_) => [
-          pw.Text('Medicines schedule', style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold)),
+          pw.Text(
+            'Medicines schedule',
+            style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold),
+          ),
           pw.SizedBox(height: 6),
           pw.Text('Child: ${_childName(child)}'),
           pw.Text('Carer: ${carer.firstName} ${carer.lastName}'.trim()),
@@ -49,11 +51,16 @@ class SchedulePdfService {
             }),
           if (child.asNeededSchedules.isNotEmpty) ...[
             pw.SizedBox(height: 12),
-            pw.Text('As-needed medicines', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+            pw.Text(
+              'As-needed medicines',
+              style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
+            ),
             pw.SizedBox(height: 6),
             ...child.asNeededSchedules.map((schedule) {
               final medicine = medicinesById[schedule.medicineId];
-              return pw.Text(medicine == null ? 'Medicine' : _medicineName(medicine));
+              return pw.Text(
+                medicine == null ? 'Medicine' : _medicineName(medicine),
+              );
             }),
           ],
         ],
@@ -64,8 +71,11 @@ class SchedulePdfService {
   }
 
   pw.Widget _scheduleBlock(MedicineSchedule schedule, Medicine? medicine) {
-    final times = schedule.times.isEmpty ? 'No times recorded' : schedule.times.join(', ');
-    final dateRange = '${DateFormat.yMMMd().format(schedule.startDate)} - ${DateFormat.yMMMd().format(schedule.endDate)}';
+    final times = schedule.times.isEmpty
+        ? 'No times recorded'
+        : schedule.times.join(', ');
+    final dateRange =
+        '${DateFormat.yMMMd().format(schedule.startDate)} - ${DateFormat.yMMMd().format(schedule.endDate)}';
     final title = medicine == null ? 'Medicine' : _medicineName(medicine);
 
     return pw.Container(
@@ -78,7 +88,10 @@ class SchedulePdfService {
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Text(title, style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+          pw.Text(
+            title,
+            style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
+          ),
           pw.SizedBox(height: 6),
           pw.Text('Times: $times', style: const pw.TextStyle(fontSize: 11)),
           if (medicine != null)

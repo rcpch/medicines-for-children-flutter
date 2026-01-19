@@ -28,7 +28,9 @@ class PendingSharedScheduleAction {
         orElse: () => SharedScheduleActionType.record,
       ),
       payload: (json['payload'] as Map).cast<String, dynamic>(),
-      queuedAt: DateTime.tryParse(json['queuedAt'] as String? ?? '') ?? DateTime.now(),
+      queuedAt:
+          DateTime.tryParse(json['queuedAt'] as String? ?? '') ??
+          DateTime.now(),
     );
   }
 
@@ -52,9 +54,9 @@ class SharedScheduleActionQueueService {
     required SharedPreferences prefs,
     required SharedScheduleRepository repository,
     required AppConfig config,
-  })  : _prefs = prefs,
-        _repository = repository,
-        _config = config;
+  }) : _prefs = prefs,
+       _repository = repository,
+       _config = config;
 
   final SharedPreferences _prefs;
   final SharedScheduleRepository _repository;
@@ -69,7 +71,11 @@ class SharedScheduleActionQueueService {
   Future<List<PendingSharedScheduleAction>> loadQueue() async {
     final raw = _prefs.getStringList(_queueKey) ?? const [];
     return raw
-        .map((entry) => PendingSharedScheduleAction.fromJson(jsonDecode(entry) as Map<String, dynamic>))
+        .map(
+          (entry) => PendingSharedScheduleAction.fromJson(
+            jsonDecode(entry) as Map<String, dynamic>,
+          ),
+        )
         .toList();
   }
 
@@ -129,13 +135,14 @@ class SharedScheduleActionQueueService {
   }
 }
 
-final sharedScheduleActionQueueServiceProvider = Provider<SharedScheduleActionQueueService>((ref) {
-  final prefs = ref.watch(sharedPreferencesProvider);
-  final repository = ref.watch(sharedScheduleRepositoryProvider);
-  final config = ref.watch(appConfigProvider);
-  return SharedScheduleActionQueueService(
-    prefs: prefs,
-    repository: repository,
-    config: config,
-  );
-});
+final sharedScheduleActionQueueServiceProvider =
+    Provider<SharedScheduleActionQueueService>((ref) {
+      final prefs = ref.watch(sharedPreferencesProvider);
+      final repository = ref.watch(sharedScheduleRepositoryProvider);
+      final config = ref.watch(appConfigProvider);
+      return SharedScheduleActionQueueService(
+        prefs: prefs,
+        repository: repository,
+        config: config,
+      );
+    });

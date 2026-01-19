@@ -77,8 +77,9 @@ void main() {
     });
 
     test('refresh fetches latest data and caches it', () async {
-      final controller =
-          container.read(primaryCarerControllerProvider.notifier);
+      final controller = container.read(
+        primaryCarerControllerProvider.notifier,
+      );
 
       await _awaitAuthenticated(container);
       await controller.refresh();
@@ -93,8 +94,9 @@ void main() {
     });
 
     test('clear removes cache and resets state', () async {
-      final controller =
-          container.read(primaryCarerControllerProvider.notifier);
+      final controller = container.read(
+        primaryCarerControllerProvider.notifier,
+      );
       await _awaitAuthenticated(container);
       await controller.refresh();
 
@@ -106,8 +108,9 @@ void main() {
     });
 
     test('addChild appends child and selects it', () async {
-      final controller =
-          container.read(primaryCarerControllerProvider.notifier);
+      final controller = container.read(
+        primaryCarerControllerProvider.notifier,
+      );
       await _awaitAuthenticated(container);
       await controller.refresh();
 
@@ -141,7 +144,9 @@ void main() {
 
 Future<void> _awaitAuthenticated(ProviderContainer container) async {
   final controller = container.read(authControllerProvider.notifier);
-  await controller.stream.firstWhere((state) => state.status == AuthStatus.authenticated);
+  await controller.stream.firstWhere(
+    (state) => state.status == AuthStatus.authenticated,
+  );
 }
 
 PrimaryCarer samplePrimaryCarer() {
@@ -238,7 +243,10 @@ class TestAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> changePasscode({String? currentPasscode, required String newPasscode}) async {}
+  Future<void> changePasscode({
+    String? currentPasscode,
+    required String newPasscode,
+  }) async {}
 
   @override
   Future<void> signOut() async {}

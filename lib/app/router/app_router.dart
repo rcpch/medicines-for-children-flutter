@@ -136,7 +136,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     path: AppRoute.addMedicine.path,
                     name: AppRoute.addMedicine.name,
                     builder: (context, state) => MedicineFormPage(
-                      draft: state.extra is MedicineDraft ? state.extra as MedicineDraft : null,
+                      draft: state.extra is MedicineDraft
+                          ? state.extra as MedicineDraft
+                          : null,
                     ),
                   ),
                   GoRoute(
@@ -184,7 +186,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                       GoRoute(
                         path: AppRoute.shareCentreCreate.path,
                         name: AppRoute.shareCentreCreate.name,
-                        builder: (context, state) => const ShareCentreCreatePage(),
+                        builder: (context, state) =>
+                            const ShareCentreCreatePage(),
                       ),
                       GoRoute(
                         path: AppRoute.shareCentreDetail.path,
@@ -249,9 +252,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoute.sharedSchedule.path,
         name: AppRoute.sharedSchedule.name,
-        builder: (context, state) => SharedSchedulePage(
-          apiId: state.pathParameters['apiId'] ?? '',
-        ),
+        builder: (context, state) =>
+            SharedSchedulePage(apiId: state.pathParameters['apiId'] ?? ''),
       ),
     ],
   );

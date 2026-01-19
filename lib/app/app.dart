@@ -24,7 +24,8 @@ class MedicinesApp extends ConsumerStatefulWidget {
   ConsumerState<MedicinesApp> createState() => _MedicinesAppState();
 }
 
-class _MedicinesAppState extends ConsumerState<MedicinesApp> with WidgetsBindingObserver {
+class _MedicinesAppState extends ConsumerState<MedicinesApp>
+    with WidgetsBindingObserver {
   late final GoRouter _router;
   late final BackgroundSyncService _backgroundSyncService;
   ProviderSubscription<AuthState>? _authSubscription;
@@ -43,21 +44,20 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> with WidgetsBinding
       await _maybePromptForUpdate();
       await _backgroundSyncService.triggerSync();
     });
-    _authSubscription = ref.listenManual<AuthState>(
-      authControllerProvider,
-      (previous, next) {
-        final controller = ref.read(primaryCarerControllerProvider.notifier);
-        if (next.status == AuthStatus.authenticated &&
-            previous?.status != AuthStatus.authenticated) {
-          unawaited(controller.refresh());
-        }
-        if (next.status == AuthStatus.unauthenticated &&
-            previous?.status != AuthStatus.unauthenticated) {
-          unawaited(controller.clear());
-        }
-      },
-      fireImmediately: true,
-    );
+    _authSubscription = ref.listenManual<AuthState>(authControllerProvider, (
+      previous,
+      next,
+    ) {
+      final controller = ref.read(primaryCarerControllerProvider.notifier);
+      if (next.status == AuthStatus.authenticated &&
+          previous?.status != AuthStatus.authenticated) {
+        unawaited(controller.refresh());
+      }
+      if (next.status == AuthStatus.unauthenticated &&
+          previous?.status != AuthStatus.unauthenticated) {
+        unawaited(controller.clear());
+      }
+    }, fireImmediately: true);
   }
 
   Future<void> _maybePromptForUpdate() async {
@@ -71,17 +71,20 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> with WidgetsBinding
   void _configureErrorHandling() {
     final telemetry = ref.read(telemetryServiceProvider);
     FlutterError.onError = (details) {
-      telemetry.trackEvent('app_error', properties: {
-        'exception': details.exceptionAsString(),
-        'context': details.context?.toDescription(),
-      });
+      telemetry.trackEvent(
+        'app_error',
+        properties: {
+          'exception': details.exceptionAsString(),
+          'context': details.context?.toDescription(),
+        },
+      );
       FlutterError.presentError(details);
     };
     WidgetsBinding.instance.platformDispatcher.onError = (error, stack) {
-      telemetry.trackEvent('app_error', properties: {
-        'exception': error.toString(),
-        'stack': stack.toString(),
-      });
+      telemetry.trackEvent(
+        'app_error',
+        properties: {'exception': error.toString(), 'stack': stack.toString()},
+      );
       return false;
     };
 
@@ -94,10 +97,10 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> with WidgetsBinding
         final rasterMs = timing.rasterDuration.inMilliseconds;
         if (buildMs > 16 || rasterMs > 16) {
           _reportedSlowFrame = true;
-          telemetry.trackEvent('slow_frame_detected', properties: {
-            'buildMs': buildMs,
-            'rasterMs': rasterMs,
-          });
+          telemetry.trackEvent(
+            'slow_frame_detected',
+            properties: {'buildMs': buildMs, 'rasterMs': rasterMs},
+          );
           break;
         }
       }
@@ -141,7 +144,9 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp> with WidgetsBinding
       builder: (context, child) {
         final data = MediaQuery.of(context);
         return MediaQuery(
-          data: data.copyWith(textScaler: TextScaler.linear(settings.textScale)),
+          data: data.copyWith(
+            textScaler: TextScaler.linear(settings.textScale),
+          ),
           child: child ?? const SizedBox.shrink(),
         );
       },

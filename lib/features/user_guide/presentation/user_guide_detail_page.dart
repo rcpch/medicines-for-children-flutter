@@ -10,9 +10,9 @@ class UserGuideDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final section = userGuideSections.cast<UserGuideSection?>().firstWhere(
-          (item) => item?.id == sectionId,
-          orElse: () => null,
-        );
+      (item) => item?.id == sectionId,
+      orElse: () => null,
+    );
 
     if (section == null) {
       return Scaffold(
@@ -25,25 +25,22 @@ class UserGuideDetailPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(section.title),
-      ),
+      appBar: AppBar(title: Text(section.title)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Text(
             'Step-by-step guidance',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
           Text(section.summary),
           const SizedBox(height: 16),
           ...section.steps.asMap().entries.map(
-                (entry) => _StepCard(
-                  stepNumber: entry.key + 1,
-                  text: entry.value,
-                ),
-              ),
+            (entry) => _StepCard(stepNumber: entry.key + 1, text: entry.value),
+          ),
         ],
       ),
     );
@@ -51,10 +48,7 @@ class UserGuideDetailPage extends StatelessWidget {
 }
 
 class _StepCard extends StatelessWidget {
-  const _StepCard({
-    required this.stepNumber,
-    required this.text,
-  });
+  const _StepCard({required this.stepNumber, required this.text});
 
   final int stepNumber;
   final String text;
@@ -72,7 +66,10 @@ class _StepCard extends StatelessWidget {
               radius: 14,
               child: Text(
                 stepNumber.toString(),
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             const SizedBox(width: 12),

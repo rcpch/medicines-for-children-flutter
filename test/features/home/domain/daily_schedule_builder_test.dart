@@ -69,17 +69,28 @@ void main() {
       ];
 
       final sections = builder.buildTimeOfDaySections(entries);
-      final morning = sections.firstWhere((section) => section.bucket == TimeOfDayBucket.morning);
-      final afternoon = sections.firstWhere((section) => section.bucket == TimeOfDayBucket.afternoon);
-      final evening = sections.firstWhere((section) => section.bucket == TimeOfDayBucket.evening);
-      final night = sections.firstWhere((section) => section.bucket == TimeOfDayBucket.night);
+      final morning = sections.firstWhere(
+        (section) => section.bucket == TimeOfDayBucket.morning,
+      );
+      final afternoon = sections.firstWhere(
+        (section) => section.bucket == TimeOfDayBucket.afternoon,
+      );
+      final evening = sections.firstWhere(
+        (section) => section.bucket == TimeOfDayBucket.evening,
+      );
+      final night = sections.firstWhere(
+        (section) => section.bucket == TimeOfDayBucket.night,
+      );
 
       expect(morning.entries, hasLength(1));
       expect(afternoon.entries, hasLength(1));
       expect(evening.entries, hasLength(1));
       expect(night.entries, hasLength(1));
       expect(morning.entries.first.scheduledDateTime, DateTime(2025, 1, 6, 8));
-      expect(afternoon.entries.first.scheduledDateTime, DateTime(2025, 1, 6, 13));
+      expect(
+        afternoon.entries.first.scheduledDateTime,
+        DateTime(2025, 1, 6, 13),
+      );
       expect(evening.entries.first.scheduledDateTime, DateTime(2025, 1, 6, 22));
       expect(night.entries.first.scheduledDateTime, DateTime(2025, 1, 6, 1));
     });

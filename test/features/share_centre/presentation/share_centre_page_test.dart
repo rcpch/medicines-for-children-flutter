@@ -73,7 +73,9 @@ class FakeShareCentreRepository implements ShareCentreRepository {
   }
 
   @override
-  Future<List<ShareCentreSchedule>> fetchSharedSchedules({required String childId}) async {
+  Future<List<ShareCentreSchedule>> fetchSharedSchedules({
+    required String childId,
+  }) async {
     return [];
   }
 
@@ -160,13 +162,13 @@ void main() {
           shareCentreControllerProvider.overrideWith(
             (ref) => ShareCentreController(ref, FakeShareCentreRepository()),
           ),
-          shareCentreSchedulesProvider(child.id).overrideWith((ref) async => []),
+          shareCentreSchedulesProvider(
+            child.id,
+          ).overrideWith((ref) async => []),
           backupFileIOProvider.overrideWithValue(fakeFileIO),
           medicineSummaryPdfServiceProvider.overrideWithValue(fakePdfService),
         ],
-        child: const MaterialApp(
-          home: ShareCentrePage(),
-        ),
+        child: const MaterialApp(home: ShareCentrePage()),
       ),
     );
 

@@ -9,10 +9,7 @@ import 'package:medicines_for_children_flutter/features/schedules/data/schedule_
 import 'package:medicines_for_children_flutter/features/schedules/domain/schedule_draft.dart';
 
 class ScheduleEditorState {
-  const ScheduleEditorState({
-    this.isSaving = false,
-    this.errorMessage,
-  });
+  const ScheduleEditorState({this.isSaving = false, this.errorMessage});
 
   final bool isSaving;
   final String? errorMessage;
@@ -31,7 +28,7 @@ class ScheduleEditorState {
 
 class ScheduleEditorController extends StateNotifier<ScheduleEditorState> {
   ScheduleEditorController(this._ref, this._repository, this._notifications)
-      : super(const ScheduleEditorState());
+    : super(const ScheduleEditorState());
 
   final Ref _ref;
   final ScheduleRepository _repository;
@@ -48,7 +45,10 @@ class ScheduleEditorController extends StateNotifier<ScheduleEditorState> {
       final settings = _ref.read(settingsControllerProvider);
       if (enableNotifications && settings.notificationsEnabled) {
         try {
-          await _notifications.scheduleForSchedule(schedule: schedule, medicine: medicine);
+          await _notifications.scheduleForSchedule(
+            schedule: schedule,
+            medicine: medicine,
+          );
         } catch (_) {
           // Scheduling failures should not block saving the schedule.
         }
@@ -81,7 +81,10 @@ class ScheduleEditorController extends StateNotifier<ScheduleEditorState> {
       final settings = _ref.read(settingsControllerProvider);
       if (enableNotifications && settings.notificationsEnabled) {
         try {
-          await _notifications.scheduleForSchedule(schedule: schedule, medicine: medicine);
+          await _notifications.scheduleForSchedule(
+            schedule: schedule,
+            medicine: medicine,
+          );
         } catch (_) {
           // Scheduling failures should not block saving the schedule.
         }
@@ -126,7 +129,7 @@ class ScheduleEditorController extends StateNotifier<ScheduleEditorState> {
 
 final scheduleEditorControllerProvider =
     StateNotifierProvider<ScheduleEditorController, ScheduleEditorState>((ref) {
-  final repository = ref.watch(scheduleRepositoryProvider);
-  final notifications = ref.watch(notificationServiceProvider);
-  return ScheduleEditorController(ref, repository, notifications);
-});
+      final repository = ref.watch(scheduleRepositoryProvider);
+      final notifications = ref.watch(notificationServiceProvider);
+      return ScheduleEditorController(ref, repository, notifications);
+    });

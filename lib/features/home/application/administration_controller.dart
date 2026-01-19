@@ -5,10 +5,7 @@ import 'package:medicines_for_children_flutter/features/home/application/primary
 import 'package:medicines_for_children_flutter/features/home/data/administration_repository.dart';
 
 class AdministrationState {
-  const AdministrationState({
-    this.isSaving = false,
-    this.errorMessage,
-  });
+  const AdministrationState({this.isSaving = false, this.errorMessage});
 
   final bool isSaving;
   final String? errorMessage;
@@ -26,7 +23,8 @@ class AdministrationState {
 }
 
 class AdministrationController extends StateNotifier<AdministrationState> {
-  AdministrationController(this._ref, this._repository) : super(const AdministrationState());
+  AdministrationController(this._ref, this._repository)
+    : super(const AdministrationState());
 
   final Ref _ref;
   final AdministrationRepository _repository;
@@ -80,6 +78,6 @@ class AdministrationController extends StateNotifier<AdministrationState> {
 
 final administrationControllerProvider =
     StateNotifierProvider<AdministrationController, AdministrationState>((ref) {
-  final repository = ref.watch(administrationRepositoryProvider);
-  return AdministrationController(ref, repository);
-});
+      final repository = ref.watch(administrationRepositoryProvider);
+      return AdministrationController(ref, repository);
+    });

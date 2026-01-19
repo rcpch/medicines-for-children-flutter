@@ -92,14 +92,18 @@ void main() {
         overrides: [
           appConfigProvider.overrideWithValue(config),
           sharedPreferencesProvider.overrideWithValue(prefs),
-          notificationServiceProvider.overrideWithValue(FakeNotificationService()),
+          notificationServiceProvider.overrideWithValue(
+            FakeNotificationService(),
+          ),
         ],
         child: const MedicinesApp(),
       ),
     );
     await tester.pumpAndSettle();
 
-    final container = ProviderScope.containerOf(tester.element(find.byType(MedicinesApp)));
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(MedicinesApp)),
+    );
     final router = container.read(appRouterProvider);
 
     await tester.tap(find.text('Medicines'));
@@ -116,7 +120,9 @@ void main() {
     await tester.enterText(fields.at(4), 'oral');
     await tester.enterText(fields.at(5), 'Twice daily');
 
-    final addMedicineButton = find.widgetWithText(ElevatedButton, 'Add medicine').first;
+    final addMedicineButton = find
+        .widgetWithText(ElevatedButton, 'Add medicine')
+        .first;
     await tester.scrollUntilVisible(
       addMedicineButton,
       200,
@@ -147,7 +153,10 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle();
 
-    final saveMedicineButton = find.widgetWithText(ElevatedButton, 'Save changes');
+    final saveMedicineButton = find.widgetWithText(
+      ElevatedButton,
+      'Save changes',
+    );
     expect(saveMedicineButton, findsOneWidget);
     final updateSucceeded = await container
         .read(medicineEditorControllerProvider.notifier)
@@ -164,7 +173,9 @@ void main() {
     router.goNamed(AppRoute.addSchedule.name);
     await tester.pumpAndSettle();
 
-    final addScheduleButton = find.widgetWithText(ElevatedButton, 'Add schedule').first;
+    final addScheduleButton = find
+        .widgetWithText(ElevatedButton, 'Add schedule')
+        .first;
     await tester.scrollUntilVisible(
       addScheduleButton,
       200,

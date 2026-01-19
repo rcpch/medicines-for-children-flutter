@@ -28,7 +28,9 @@ class PendingShareAction {
         orElse: () => ShareActionType.update,
       ),
       payload: (json['payload'] as Map).cast<String, dynamic>(),
-      queuedAt: DateTime.tryParse(json['queuedAt'] as String? ?? '') ?? DateTime.now(),
+      queuedAt:
+          DateTime.tryParse(json['queuedAt'] as String? ?? '') ??
+          DateTime.now(),
     );
   }
 
@@ -52,9 +54,9 @@ class ShareActionQueueService {
     required SharedPreferences prefs,
     required ShareCentreRepository repository,
     required AppConfig config,
-  })  : _prefs = prefs,
-        _repository = repository,
-        _config = config;
+  }) : _prefs = prefs,
+       _repository = repository,
+       _config = config;
 
   final SharedPreferences _prefs;
   final ShareCentreRepository _repository;
@@ -69,7 +71,11 @@ class ShareActionQueueService {
   Future<List<PendingShareAction>> loadQueue() async {
     final raw = _prefs.getStringList(_queueKey) ?? const [];
     return raw
-        .map((entry) => PendingShareAction.fromJson(jsonDecode(entry) as Map<String, dynamic>))
+        .map(
+          (entry) => PendingShareAction.fromJson(
+            jsonDecode(entry) as Map<String, dynamic>,
+          ),
+        )
         .toList();
   }
 
@@ -140,7 +146,9 @@ class ShareActionQueueService {
   }
 }
 
-final shareActionQueueServiceProvider = Provider<ShareActionQueueService>((ref) {
+final shareActionQueueServiceProvider = Provider<ShareActionQueueService>((
+  ref,
+) {
   final prefs = ref.watch(sharedPreferencesProvider);
   final repository = ref.watch(shareCentreRepositoryProvider);
   final config = ref.watch(appConfigProvider);

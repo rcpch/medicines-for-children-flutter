@@ -34,11 +34,17 @@ class ChildSwitcherAction extends ConsumerWidget {
               child: Row(
                 children: [
                   if (child.id == selected.id)
-                    Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.primary)
+                    Icon(
+                      Icons.check,
+                      size: 18,
+                      color: Theme.of(context).colorScheme.primary,
+                    )
                   else
                     const SizedBox(width: 18),
                   const SizedBox(width: 8),
-                  Expanded(child: Text('${child.firstName} ${child.lastName}'.trim())),
+                  Expanded(
+                    child: Text('${child.firstName} ${child.lastName}'.trim()),
+                  ),
                 ],
               ),
             ),

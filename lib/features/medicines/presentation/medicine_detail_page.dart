@@ -74,7 +74,9 @@ class MedicineDetailPage extends ConsumerWidget {
                 color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 child: const Padding(
                   padding: EdgeInsets.all(12),
-                  child: Text('This medicine is archived and no longer in active use.'),
+                  child: Text(
+                    'This medicine is archived and no longer in active use.',
+                  ),
                 ),
               ),
             MedicinePhotoGallery(photos: photos),
@@ -85,7 +87,9 @@ class MedicineDetailPage extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    medicine.alias.isNotEmpty ? medicine.alias : 'No alias provided',
+                    medicine.alias.isNotEmpty
+                        ? medicine.alias
+                        : 'No alias provided',
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   const SizedBox(height: 8),
@@ -106,12 +110,10 @@ class MedicineDetailPage extends ConsumerWidget {
               title: 'Dose',
               child: Text('${medicine.dose} ${medicine.doseUnit}'),
             ),
-            if (medicine.notes != null && medicine.notes!.trim().isNotEmpty) ...[
+            if (medicine.notes != null &&
+                medicine.notes!.trim().isNotEmpty) ...[
               const SizedBox(height: 16),
-              _SectionCard(
-                title: 'Notes',
-                child: Text(medicine.notes!),
-              ),
+              _SectionCard(title: 'Notes', child: Text(medicine.notes!)),
             ],
             const SizedBox(height: 16),
             _SectionCard(
@@ -150,11 +152,14 @@ class MedicineDetailPage extends ConsumerWidget {
     WidgetRef ref,
     Medicine medicine,
   ) async {
-    final shouldArchive = await showDialog<bool>(
+    final shouldArchive =
+        await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Archive medicine?'),
-            content: const Text('This medicine will be moved to archived history.'),
+            content: const Text(
+              'This medicine will be moved to archived history.',
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
@@ -179,14 +184,16 @@ class MedicineDetailPage extends ConsumerWidget {
       return;
     }
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Medicine archived.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Medicine archived.')));
       context.pop();
     } else {
       final message = ref.read(medicineEditorControllerProvider).errorMessage;
       if (message != null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
       }
     }
   }
@@ -242,10 +249,7 @@ class _MedicinePhotoGalleryState extends State<MedicinePhotoGallery> {
                 clipBehavior: Clip.antiAlias,
                 child: provider == null
                     ? _EmptyPhotoCard()
-                    : Image(
-                        image: provider,
-                        fit: BoxFit.cover,
-                      ),
+                    : Image(image: provider, fit: BoxFit.cover),
               );
             },
           ),
