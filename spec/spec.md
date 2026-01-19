@@ -1,18 +1,100 @@
 # Functional Specification: Medicines for Children (Flutter Port)
 
+## Universal navigation and structure
+
+- M4C logo in top-left corner as a home button
+- Navigation row at the bottom of the screen with tabs for:
+  - Home (daily schedule overview)
+  - Medicines (list of medicines)
+  - Child (child and carer profile, settings)
+  - Guide (in-app user guide and FAQs)
+
+## Top-level screens
+
+### 'Home' screen
+
+- Dismissible 'welcome' banner at login
+- Displays the current Child
+
+## 'Medicines' screen
+
+- Lists all medicines for the current Child
+- Filter toggle for "Everyday" and "As-needed" medicines
+- Button to add a new medicine
+- Button to add medicine by QR code
+
+### 'Child' screen
+
+- Displays Child profile information
+- Button to add a new Child (top right corner)
+- 
+
+### 'Guide' screen
+
+- In-app user guide and FAQs
+
+---
+
+## Detailed flows
+
+### Signup flow
+
+  - User creates a local profile (name + optional passcode).
+  - A guided onboarding flow collects primary carer profile
+    - First Name
+    - Last Name
+    - Relationship to child (e.g., parent, guardian)
+    - Contact number
+    - 
+  - Data is written into a local, offline-first JSON file store scoped to the profile.
+  - **Onboarding screens** explain app purpose and set up the first child before reaching the home screen.
+
+### Add Child flow
+
+
+### Add Medicine flow
+
+- Click on "Add Medicine" button
+- Form to enter medicine details:
+  - Medicine Name
+  - Known as (optional)
+  - Dose
+  - Unit
+  - Route
+  - Frequency
+  - Type (Everyday, As-needed, Both) (optional)
+  - Status (In use, No longer used) (optional)
+  - Notes (optional)
+  - Add photo from camera or gallery (optional) - do we need to limit number of photos, size, resolution? At present no limit.
+  - 
+
+At present there is no lookup of medicines against a master list to ensure correct spelling etc. This could be a future enhancement.
+
+
+
+### Edit Medicine flow
+- Select a medicine from the Medicines list by tapping on it
+- Form pre-populated with existing medicine details
+- Photos are shown at the top of the view.
+- It should be possible to select which photo is the primary photo shown in lists.
+- It should be possible to selectively delete photos.
+- Add or change details as needed
+
+---
+
 ## User Roles and Authentication
 
-- **Primary carer (account owner)**
-  - Uses the native iOS app and Flutter app to manage one or more children, their medicines, schedules, and care network.
-  - Authenticates locally via a device profile with an optional passcode (no mandatory backend).
+### Primary carer (account owner)
+  - Uses the app to manage one or more children, their medicines, schedules, and care network.
+  - Authenticates locally via a device profile with an optional passcode.
   - Can:
-    - Create a local profile and onboard their child’s profile.
+    - Create a local profile and onboard profiles for multiple children.
     - Add/edit medicines and schedules.
     - Set up secondary carers and shared schedules.
     - Export schedules as PDFs or digital links.
     - Export an encrypted backup file for personal cloud/USB/email storage.
 
-- **Secondary carer (invited carer)**
+### Secondary carer (invited carer)
   - Accesses a web-based schedule and information view via a unique link sent by the primary carer.
   - Does not have a password-based login; instead uses a one-time/action token embedded in the URL.
   - After token verification, receives a short-lived “auth token” to:
@@ -21,18 +103,10 @@
     - Record administrations (scheduled and as-needed) against the shared schedule.
     - Download the shared schedule (PDF or view online), and see key child information.
 
-- **System / backend roles**
-  - **Backend API** enforces:
-    - API key (“ApiKey” header) for primary-carer initiated operations (creating and listing shared schedules, exporting PDFs, etc.).
-    - Token-based auth (“Authorization: token …”) for secondary-carer operations (viewing schedule, confirming, recording administrations).
-  - **Action tokens** (one-time link tokens) are issued and validated by backend repositories for secure access to shared schedules.
 
-- **Registration and onboarding (primary carer, Flutter app)**
-  - **Signup flow**:
-    - User creates a local profile (name + optional passcode).
-    - A guided onboarding flow collects primary carer profile (name, relationship, contact numbers) and initial child data (name, DOB, condition, allergies, etc.).
-    - Data is written into a local, offline-first JSON store scoped to the profile.
-  - **Onboarding screens** explain app purpose and set up the first child before reaching the home screen.
+
+### Registration and onboarding (primary carer, Flutter app)
+ 
 
 - **Login / logout (Flutter)**
   - **Login**:
@@ -46,18 +120,18 @@
   - Secondary carer receives a **link containing a token** parameter.
   - **Authorization step**:
     - Web app extracts the token from the query string.
-    - Calls  on the backend.
+    - Calls on the backend.
     - Backend:
       - Verifies that token is valid, not revoked, within allowed timeframe, and bound to a specific shared schedule.
       - Returns a structure including:
-        -  (the  of the schedule).
-        -  for authenticated API use.
+        - (the of the schedule).
+        - for authenticated API use.
   - **Authenticated operations**:
     - Web app calls:
-      -  with  to retrieve the schedule.
-      -  to approve or decline the care period.
-      -  and  to record or update medicine administrations.
-      -  to generate a shared schedule PDF when authenticated.
+      - with to retrieve the schedule.
+      - to approve or decline the care period.
+      - and to record or update medicine administrations.
+      - to generate a shared schedule PDF when authenticated.
   - If any authentication or authorization step fails, the user is redirected to an “unavailable” screen.
 
 ---
@@ -82,8 +156,8 @@
 - **Represents**: A child whose medications and care schedule are being managed.
 - **Key fields (Flutter local model)**
   - Personal: , , `dob`, , `ageMonths`, , .
-  - Medical:  (main condition/diagnosis), , ,  (important notes),  (personal preferences/notes), `nhs_number`.
-  - Media:  for child photo.
+  - Medical: (main condition/diagnosis), , , (important notes), (personal preferences/notes), `nhs_number`.
+  - Media: for child photo.
 - **Relationships**
   - : list of Medicine records.
   - : dictionary keyed by schedule ID → Schedule (regular schedules).
@@ -96,17 +170,17 @@
 
 - **Represents**: A specific medication the child takes.
 - **Key fields (Flutter local model)**
-  - Identification: locally generated ID, ,  (alias/brand/common name).
-  - Classification:  (e.g. “Everyday”, “As-needed”, “Both”),  (what condition/symptom it treats).
+  - Identification: locally generated ID, , (alias/brand/common name).
+  - Classification: (e.g. “Everyday”, “As-needed”, “Both”), (what condition/symptom it treats).
   - Dosage/frequency:
-    -  (numeric or textual dose),  (displayed unit portion),  (e.g. daily, weekly).
-    -  (times per day).
-    -  (e.g. oral, inhaled, injected).
-    -  (measure description; in old model might map to ml, tablet, etc.).
-    -  (e.g. mg/ml).
-  - Status: `in_use`, `no_longer_used`,  (backend).
-  - Notes:  (free text, instructions, special considerations).
-  - Media: , ,  for visual identification (packaging, tablet, device).
+    - (numeric or textual dose), (displayed unit portion), (e.g. daily, weekly).
+    - (times per day).
+    - (e.g. oral, inhaled, injected).
+    - (measure description; in old model might map to ml, tablet, etc.).
+    - (e.g. mg/ml).
+  - Status: `in_use`, `no_longer_used`, (backend).
+  - Notes: (free text, instructions, special considerations).
+  - Media: , , for visual identification (packaging, tablet, device).
 - **Relationships**
   - A Child has many Medicines.
   - Schedules refer to medicines by ID, and the app re-hydrates full medicine details when loading schedules.
@@ -116,10 +190,10 @@
 
 - **Represents**: A repeating medication schedule for a given medicine (e.g. “Amoxicillin twice a day for 7 days”).
 - **Key fields**
-  - Identification:  (schedule document ID).
-  - Associated medicine:  (full Medicine object on iOS; ID on backend).
+  - Identification: (schedule document ID).
+  - Associated medicine: (full Medicine object on iOS; ID on backend).
   - Timing:
-    - ,  (as strings in iOS; Dates on backend).
+    - , (as strings in iOS; Dates on backend).
     - : array of times as strings in “hh:mma” format (e.g. “8:00am”).
     - : array of booleans length 7 for each weekday, indicating which days the schedule runs.
   - Administrations:
@@ -134,15 +208,15 @@
 - **AsNeededSchedule**
   - Represents a medicine which is taken on an as-needed basis rather than by fixed schedule.
   - Fields:
-    -  (often same as medicine ID).
+    - (often same as medicine ID).
     - : Medicine object.
     - `asNeededAdministrations`: dictionary keyed by “yyyy-MM-dd h:mma” → AsNeededAdministration.
 - **AsNeededAdministration**
   - Represents a single recorded as-needed dose.
   - Fields:
     - `datetime` string (“yyyy-MM-dd h:mma”).
-    -  (email of person administering).
-    -  (optional comment).
+    - (email of person administering).
+    - (optional comment).
 - **Relationships**
   - Child → many AsNeededSchedules (one per as-needed medicine).
   - AsNeededSchedule → many AsNeededAdministrations.
@@ -151,52 +225,52 @@
 
 - **iOS local administration**
   - Simple record with:
-    - `datetime` string, ,  (bool), .
+    - `datetime` string, , (bool), .
 - **Backend Administration**
   - More structured administration record used for shared schedules:
-    -  (Date) and  (date normalized to midnight for grouping).
-    -  (ID of schedule item or “ASNEEDED” special marker).
-    -  (true for as-needed doses).
-    -  (user ID or email).
+    - (Date) and (date normalized to midnight for grouping).
+    - (ID of schedule item or “ASNEEDED” special marker).
+    - (true for as-needed doses).
+    - (user ID or email).
     - , .
-    -  (medicine reference, or “SCHEDULED”/“ASNEEDED” markers).
-    -  (string representation used by frontend).
-    - ,  (internal flags).
+    - (medicine reference, or “SCHEDULED”/“ASNEEDED” markers).
+    - (string representation used by frontend).
+    - , (internal flags).
 - **Relationships**
   - Associations to either:
     - A ScheduledItem (regular scheduled dose).
-    - A medicine as as-needed, marked via  and .
+    - A medicine as as-needed, marked via and .
 
 ### Carer / Secondary Carer
 
 - **Represents**: People other than the primary carer who may care for the child.
 - **Key fields**
-  -  /  (for secondary carers who have user docs).
+  - / (for secondary carers who have user docs).
   - `firstName`, `lastName`.
-  -  (e.g. grandparent, friend).
+  - (e.g. grandparent, friend).
   - Contact: `emailAddress`, mobile/home phone, `photoURL`.
 - **Data storage**
   - Secondary carers are stored in backend documents, with:
     - `addedBy` (primary user UID).
-    -  flag for soft delete.
+    - flag for soft delete.
     - Relationship and contact details.
 - **Relationships**
   - Child → many Carer entries.
-  - SharedSchedule references one  and resolves to a corresponding user record.
+  - SharedSchedule references one and resolves to a corresponding user record.
 
 ### SharedSchedule
 
 - **Represents**: A sharing period where a child’s medications and schedule are shared with a secondary carer for a defined time window.
 - **Key fields (iOS + backend)**
   - Identification:
-    -  (often  in backend).
-    -  used as external ID for APIs and web client.
+    - (often in backend).
+    - used as external ID for APIs and web client.
   - Time window:
-    - ,  (Dates in backend; string + `dateFromObj`/`dateToObj` in iOS).
-    - On backend,  /  are integer comparisons derived from / times.
+    - , (Dates in backend; string + `dateFromObj`/`dateToObj` in iOS).
+    - On backend, / are integer comparisons derived from / times.
   - Participants:
     - : email identifier for the invited carer.
-    -  (Carer object with name, relationship, contact).
+    - (Carer object with name, relationship, contact).
     - Backend view model includes , , .
   - Settings:
     - : true for digital (web-based) schedule; false for non-digital (PDF-only).
@@ -211,8 +285,8 @@
   - The SharedScheduleViewModel enriches this with:
     - : array of SharedScheduleDay objects (one per date in the range).
     - : a MinChild with key information (allergies, condition, notes).
-    -  and  arrays.
-    -  captured in the shared context.
+    - and arrays.
+    - captured in the shared context.
 - **Relationships**
   - Links a single Child (by path) and a single PrimaryCarer / secondary carer pair.
   - Pulls underlying child data (medicines, schedule, administrations) into a share-specific snapshot.
@@ -221,10 +295,10 @@
 
 - **Represents**: A single recurring scheduled medication pattern in a shared schedule context.
 - **Key fields**
-  -  (identifier for the scheduled item).
-  -  (medicine ID).
-  - ,  (Date).
-  -  (booleans per weekday).
+  - (identifier for the scheduled item).
+  - (medicine ID).
+  - , (Date).
+  - (booleans per weekday).
   - : original AM/PM times as strings.
   - : numeric times used for comparison.
   - : earliest scheduled dose time (for business logic).
@@ -236,9 +310,9 @@
 
 - **Represents**: A single calendar day within a shared schedule period.
 - **Key fields**
-  -  (Date).
-  -  (index of weekday 0–6).
-  -  (string for administration documents).
+  - (Date).
+  - (index of weekday 0–6).
+  - (string for administration documents).
   - : array of ScheduledItem instances scheduled for that day.
   - : boolean marking the current day for UI emphasis.
 
@@ -248,8 +322,8 @@
 - **Key fields**
   - , , .
   - Contact: , , , .
-  -  (to the child).
-  - Optional  array (used for primary carers).
+  - (to the child).
+  - Optional array (used for primary carers).
 - **Relationships**
   - For secondary carers, used to augment SharedSchedule view model with carer details.
   - For primary carers, underlying data for the iOS app.
@@ -264,12 +338,12 @@
     - Additional metadata to support authorization checks.
 - **newAdministration**
   - Payload for creating/updating an administration via backend:
-    -  (shared schedule ID).
+    - (shared schedule ID).
     - , , .
-    -  (Date),  (Timestamp).
-    -  or  depending on scheduled vs as-needed.
-    -  linking to the primary carer.
-    - Optional , ,  fields for internal use.
+    - (Date), (Timestamp).
+    - or depending on scheduled vs as-needed.
+    - linking to the primary carer.
+    - Optional , , fields for internal use.
 
 ---
 
@@ -381,7 +455,7 @@
       - Loads medicines via local storage (or backend if sync is enabled).
       - Applies the last used filter (“Everyday” or “As-needed”) from app state.
     - Filter logic:
-      - Shows medicines whose  matches filter or is “Both”.
+      - Shows medicines whose matches filter or is “Both”.
     - Row selection:
       - Navigates to medicine details screen (MedicineViewController) with the selected medicine.
   - Navigation:
@@ -477,7 +551,7 @@
     - Actions for adding, editing, and deleting carers.
   - Behaviour:
     - Uses NetworkHelper.getCarers to load carers (based on `addedBy` filter).
-    - Deletion triggers NetworkHelper.deleteCarer to set  flag.
+    - Deletion triggers NetworkHelper.deleteCarer to set flag.
     - Adding/editing uses NetworkHelper.addEditSecondaryCarer.
   - Navigation:
     - From Child or Profile sections; integrated with Share Centre flows.
@@ -591,9 +665,9 @@
 
 - The web app serves **secondary carers** who open a link for a specific shared schedule.
 - A typical flow:
-  1. Link with  opened in browser.
-  2. ScheduleView mounted; it extracts the token and calls  (GET /auth/:token).
-  3. If authorization returns  and , it calls  (GET /sharedSchedule/:apiId).
+  1. Link with opened in browser.
+  2. ScheduleView mounted; it extracts the token and calls (GET /auth/:token).
+  3. If authorization returns and , it calls (GET /sharedSchedule/:apiId).
   4. Based on returned schedule :
      - If “Pending” → route to /confirm flow.
      - If approved → route to /schedule view.
@@ -604,7 +678,7 @@
 
 ### Routes and Views
 
-- **/confirm –  (confirmation)**
+- **/confirm – (confirmation)**
   - Purpose:
     - Ask the secondary carer explicitly whether they agree to take on the care period.
   - UI:
@@ -626,7 +700,7 @@
       - “No, take me back”.
   - Behaviour:
     - On yes:
-      - Calls  via scheduleService.
+      - Calls via scheduleService.
       - Routes to /thanks (decline acknowledgement).
     - On no:
       - Routes back to /confirm.
@@ -663,7 +737,7 @@
       - Performs auth and schedule loading as described above.
       - If schedule not found or user unauthorized, routes to /unavailable.
     - `syncSchedule`:
-      - Fetches latest schedule data via getSchedule using stored  and .
+      - Fetches latest schedule data via getSchedule using stored and .
       - Rebuilds takingPills lists and updates store.
     - Creates local “takingPills” structures with time-sorted entries for each day, integrating existing scheduled and as-needed administrations.
 
@@ -680,7 +754,7 @@
       - “Important notes” showing child condition and notes.
       - “Allergies” section listing allergies.
   - Behaviour:
-    - Computes difference between  and  to show the run duration.
+    - Computes difference between and to show the run duration.
 
 - **/record – **
   - Purpose:
@@ -729,14 +803,14 @@
       - Subcollections:
         - : documents with Medicine fields.
         - `schedule`: documents representing regular schedules with:
-          - , ,  array,  boolean array,  reference ID.
+          - , , array, boolean array, reference ID.
         - `administered`:
           - Document per schedule ID.
           - Subcollection :
             - Documents keyed by exact datetime string (“yyyy-MM-dd h:mma”).
             - Fields: , , , .
         - `asneeded`:
-          - Document per medicine ID with  flag.
+          - Document per medicine ID with flag.
           - Subcollection :
             - Documents keyed by datetime string.
             - Fields: , , .
@@ -744,14 +818,14 @@
 - **Shared schedules**
   - Collection group `sharedSchedule`:
     - Each document holds a SharedSchedule record:
-      - , , ,  (email), , , , , , , , etc.
+      - , , , (email), , , , , , , , etc.
     - The parent path encodes the primary user and child path, allowing the backend to locate the underlying child doc.
   - `mySharedSchedules` is retrieved by querying relevant sharedSchedule docs filtered by .
 
 - **Actions and tokens**
   - Action tokens stored in an actions-like collection (ActionsRepository):
     - Contain the action type (“view-shared-schedule”), token, encryption IV, deletion flags, etc.
-    - Used to validate incoming  requests.
+    - Used to validate incoming requests.
 
 ### HTTP Endpoints (mfcapi)
 
@@ -760,30 +834,29 @@
     - Returns .
 
 - **Shared schedule retrieval**
-  - 
-    - Auth:
+  - - Auth:
       - Requires AuthRepository.authenticate(req) to verify .
       - Requires AuthRepository.authorize(req, apiId) to ensure token is associated with this specific shared schedule.
       - On failure: 401 Unauthorized or 403 Unauthorized (forbidden).
     - Behaviour:
-      - Queries `sharedSchedule` group where  equals .
+      - Queries `sharedSchedule` group where equals .
       - If matching document found:
         - Finds underlying child path from the schedule’s reference path.
         - Loads child document and its subcollections:
           - `administered` and `asneeded` to build Administration lists.
           - `schedule` to build ScheduledItem list.
-          -  to build Medicine list.
+          - to build Medicine list.
         - Computes:
-          -  and  from /.
+          - and from /.
           - All dates in range using DateRepository.
           - For each day:
             - Day index () and whether it is today.
-            -  filtered by that weekday.
+            - filtered by that weekday.
           - MinChild summary from child data.
           - Parent and secondary-carer WcUser records by email.
         - Constructs and returns:
-          - If  is “Pending”:
-            - A simpler pending view with config (no  array).
+          - If is “Pending”:
+            - A simpler pending view with config (no array).
           - Otherwise:
             - Full SharedScheduleViewModel with , , , , , , etc.
       - Response:
@@ -791,17 +864,16 @@
         - 500 on internal error.
 
 - **Web auth for secondary carers**
-  - 
-    - Behaviour:
+  - - Behaviour:
       - Looks up ActionToken with type “view-shared-schedule” by token.
       - If token not found, revoked ( true), or invalid:
         - 403 Unauthorized.
       - If token has :
-        - Decrypts token to extract  (shared schedule ID).
+        - Decrypts token to extract (shared schedule ID).
         - Calls AuthRepository.authorizeActionToken to:
           - Validate action token for that shared schedule.
           - Possibly create a derived .
-        - If successful: 200 with result including  and .
+        - If successful: 200 with result including and .
       - Errors: 500 with error message.
 
 - **PDF exports**
@@ -811,36 +883,34 @@
       - 401 Unauthorized if api key invalid.
     - Request:
       - JSON body with:
-        -  and  as simple date/time strings.
+        - and as simple date/time strings.
         - .
     - Behaviour:
       - PdfRepository.generatePdf(dateFrom, dateTo, primaryCarerEmail).
       - On success: 200 with .
-      - On failure: 500 with  and .
+      - On failure: 500 with and .
 
-  - 
-    - Auth:
-      - Requires  and passes  + .
+  - - Auth:
+      - Requires and passes + .
     - Request:
       - Body similar to above: , , .
     - Behaviour and responses similar to `exportSchedulePdf`, but scoped to a shared schedule.
 
 - **Shared schedule creation and management (primary carer)**
-
   - `POST /sharedSchedule`
     - Auth:
       - Requires API key ().
     - Request body:
-      -  and  as decomposed objects:
-        - , , , , .
-      - ,  flag (boolean), , .
+      - and as decomposed objects:
+      - , , , , .
+      - , flag (boolean), , .
     - Behaviour:
       - Constructs Date objects for from/to.
       - Validates that all necessary fields are present.
-      - Builds NewScheduleConfig with date range, notes, digital and email addresses, sets  = “Pending” and  = "0" (to be replaced).
+      - Builds NewScheduleConfig with date range, notes, digital and email addresses, sets = “Pending” and = "0" (to be replaced).
       - Calls SharedScheduleRepository.createSharedSchedule(config).
       - If :
-        - Generates PDF using PdfRepository and attaches  to response.
+        - Generates PDF using PdfRepository and attaches to response.
       - Returns:
         - 200 with created shared schedule object (including , status, scheduleUrl or pdfUrl).
         - 500 if creation or PDF generation fails.
@@ -849,15 +919,14 @@
     - Auth:
       - Requires API key.
     - Request body:
-      -  (required).
+      - (required).
       - Optional filters: , , , .
     - Behaviour:
       - Builds MySchedulesFilter from provided fields.
       - Calls SharedScheduleRepository.getAllSharedSchedules(filter).
       - Returns 200 with list of schedules.
 
-  - 
-    - Auth:
+  - - Auth:
       - Requires API key.
     - Behaviour:
       - Calls SharedScheduleRepository.endSharedSchedule(apiId) to:
@@ -865,48 +934,44 @@
       - On success: 200 with updated schedule.
       - On failure: 500 with error.
 
-  - 
-    - Auth:
+  - - Auth:
       - Requires API key.
     - Request:
       - Similar dateFrom/dateTo structure as creation.
-      - Fields: ,  (optional),  (optional), , .
+      - Fields: , (optional), (optional), , .
     - Behaviour:
-      - Builds NewScheduleConfig with  and new values.
+      - Builds NewScheduleConfig with and new values.
       - Applies only provided digital/deleted flags.
       - Calls SharedScheduleRepository.updateSharedSchedule(config).
       - On success: 200 with updated schedule.
       - On failure: 500 with error.
 
 - **Administration creation and updates (secondary carer)**
-
-  - 
-    - Auth:
-      - Requires  and  for this apiId.
+  - - Auth:
+      - Requires and for this apiId.
     - Request body:
       - For scheduled administration:
-        -  = false.
-        -  (ID of scheduled dose).
+        - = false.
+        - (ID of scheduled dose).
       - For as-needed administration:
-        -  = true.
-        -  (ID of medicine).
+        - = true.
+        - (ID of medicine).
       - Both need:
-        -  (ISO string), , , , .
+        - (ISO string), , , , .
     - Behaviour:
       - Normalizes Date/time zone.
       - Builds newAdministration object.
-      - If  false:
+      - If false:
         - Calls SharedScheduleRepository.createScheduledAdmininstration.
-      - If  true:
+      - If true:
         - Calls SharedScheduleRepository.createAsNeededAdmininstration.
       - On success: 200 with newly created admin record.
-      - On failed create: 500 with  describing failure.
+      - On failed create: 500 with describing failure.
 
-  - 
-    - Auth:
+  - - Auth:
       - Same as POST.
     - Request:
-      - Similar to POST but with  field to append.
+      - Similar to POST but with field to append.
     - Behaviour:
       - Builds newAdministration object.
       - Calls SharedScheduleRepository.appendAdministraionNote.
@@ -914,13 +979,11 @@
       - On failure: 500 with error.
 
 - **Confirmation of shared schedule (secondary carer)**
-
-  - 
-    - Auth:
-      - Requires  and .
+  - - Auth:
+      - Requires and .
     - Request body:
-      -  (boolean) – whether the carer can look after the child.
-      -  (string) – optional reason, especially when declining.
+      - (boolean) – whether the carer can look after the child.
+      - (string) – optional reason, especially when declining.
     - Behaviour:
       - Builds ConfirmScheduleConfig with apiId, approved, reason.
       - Calls SharedScheduleRepository.confirmSharedSchedule.
@@ -950,8 +1013,8 @@
     - Relies on backend fetches on view appearance (legacy iOS behaviour).
   - Web:
     - Uses Vuex store to retain:
-      -  (shared schedule, carer, child, medicines, days, administrations).
-      -  (implicitly part of state, though actual variable names differ).
+      - (shared schedule, carer, child, medicines, days, administrations).
+      - (implicitly part of state, though actual variable names differ).
       - , and simple UI flags like .
 
 - **Notifications and background tasks**
@@ -994,9 +1057,9 @@
         - Not revoked ( flag).
         - Bound to a particular shared schedule.
         - Valid for the action type “view-shared-schedule”.
-      - Backend issues a restricted  for continued access to that schedule only.
+      - Backend issues a restricted for continued access to that schedule only.
     - Authorization rules ensure:
-      - Only the right combination of  and apiId can retrieve a given shared schedule or modify its data.
+      - Only the right combination of and apiId can retrieve a given shared schedule or modify its data.
       - Action tokens are revocable (if a share is withdrawn or invalidated).
   - Shared data scope:
     - SharedSchedule view exposes only necessary child data:
@@ -1031,10 +1094,10 @@
   - The Flutter spec should support a standard logout flow even if current app’s placement is not entirely clear.
 
 - **Secondary carer interface for recording administrations (web)**
-  - Backend provides full endpoints for creating and updating administrations, and Vuex store contains  mutation.
+  - Backend provides full endpoints for creating and updating administrations, and Vuex store contains mutation.
   - The views provided:
     - Schedule view (`o-schedule`) likely contains UI for adding administrations, but this implementation lies in components not included in the snippet.
-    -  suggests a confirmation step for marking medicine as given but has stubbed code.
+    - suggests a confirmation step for marking medicine as given but has stubbed code.
   - Assumptions:
     - The intended design is:
       - Secondary carers can record scheduled and as-needed administrations.
@@ -1060,7 +1123,7 @@
       - Secondary carers have limited, invitation-scoped interaction.
 
 - **Firestorm structure for shared schedules**
-  - Logic deriving  from sharedSchedule doc path is somewhat opaque and fragile-looking.
+  - Logic deriving from sharedSchedule doc path is somewhat opaque and fragile-looking.
   - There is an assumption embedded in path layout that a shared schedule is attached to a single child under a single primary.
   - For Flutter:
     - Treat this as a backend implementation detail:
@@ -1075,8 +1138,8 @@
       - Creation: Pending.
       - Secondary carer approves: Approved.
       - Secondary carer declines: Declined with a reason.
-      - Primary carer ends schedule: Ended/updated dateTo; may optionally have  set.
-      - Primary carer deletes share:  and removed from primary UI list.
+      - Primary carer ends schedule: Ended/updated dateTo; may optionally have set.
+      - Primary carer deletes share: and removed from primary UI list.
     - Flutter should support these states as separate conceptual statuses (Pending, Approved, Declined, Ended, Archived).
 
 - **Offline mode behaviour**
@@ -1088,7 +1151,7 @@
 
 - **Privacy and data sharing scope**
   - MinChild model for shared schedules explicitly limits child information to:
-    - , , ,  and an ID.
+    - , , , and an ID.
   - Other personal identifiers (NHS number, full birthdate, etc.) are not passed into shared schedule responses.
   - Assumption:
     - This is intentional for privacy; Flutter should:
@@ -1099,7 +1162,7 @@
   - Secondary Carer user records (care network) can exist even if no shared schedules are active.
   - Shared schedules reference carers primarily by email.
   - Ambiguity:
-    - It’s not guaranteed every carer user in the backend store is visible in the care network list (filters based on `addedBy` and  apply).
+    - It’s not guaranteed every carer user in the backend store is visible in the care network list (filters based on `addedBy` and apply).
   - Assumption:
     - Flutter “Care Network” should:
       - Show non-deleted carers added by the logged-in primary.
