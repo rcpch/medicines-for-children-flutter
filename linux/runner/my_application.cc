@@ -20,6 +20,35 @@ static void my_application_activate(GApplication* application) {
   GtkWindow* window =
       GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
 
+  // Set a window/taskbar icon from the bundled Flutter assets.
+  // Note: assets declared in pubspec.yaml are copied into:
+  //   <bundle>/data/flutter_assets/
+  // so we can resolve this path relative to the running executable.
+  {
+    g_autoptr(GError) exe_error = nullptr;
+    g_autofree gchar* exe_path = g_file_read_link("/proc/self/exe", &exe_error);
+    if (exe_path != nullptr) {
+      g_autofree gchar* exe_dir = g_path_get_dirname(exe_path);
+      g_autofree gchar* icon_path = g_build_filename(
+          exe_dir,
+          "data",
+          "flutter_assets",
+          "assets",
+          "images",
+          "MfC-logo-Favicon-RGB-300x300-1-270x270.png",
+          nullptr);
+      if (g_file_test(icon_path, G_FILE_TEST_EXISTS)) {
+        g_autoptr(GError) icon_error = nullptr;
+        gtk_window_set_icon_from_file(window, icon_path, &icon_error);
+        if (icon_error != nullptr) {
+          g_warning("Failed to set window icon: %s", icon_error->message);
+        }
+      }
+    } else if (exe_error != nullptr) {
+      g_warning("Failed to resolve executable path: %s", exe_error->message);
+    }
+  }
+
   // Use a header bar when running in GNOME as this is the common style used
   // by applications and is the setup most users will be using (e.g. Ubuntu
   // desktop).

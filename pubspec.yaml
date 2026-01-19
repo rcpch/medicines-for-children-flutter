@@ -63,12 +63,30 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
   fake_async: ^1.3.1
   local_auth_platform_interface: ^1.0.0
   build_runner: ^2.4.10
   build_runner_core: ^9.2.0
   freezed: ^3.2.3
   json_serializable: ^6.9.2
+
+flutter_launcher_icons:
+  image_path: assets/images/MfC-logo-Favicon-RGB-300x300-1-270x270.png
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  web:
+    generate: true
+    image_path: assets/images/MfC-logo-Favicon-RGB-300x300-1-270x270.png
+    background_color: "#FFFFFF"
+    theme_color: "#FFFFFF"
+  windows:
+    generate: true
+    image_path: assets/images/MfC-logo-Favicon-RGB-300x300-1-270x270.png
+  macos:
+    generate: true
+    image_path: assets/images/MfC-logo-Favicon-RGB-300x300-1-270x270.png
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

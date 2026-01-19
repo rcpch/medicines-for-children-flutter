@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:medicines_for_children_flutter/core/config/app_config.dart';
+import 'package:medicines_for_children_flutter/core/domain/active_child_provider.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/administration.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.dart';
@@ -77,6 +78,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     final state = ref.watch(primaryCarerControllerProvider);
     final controller = ref.read(primaryCarerControllerProvider.notifier);
     final selectedDate = ref.watch(selectedDateProvider);
+    final activeChild = ref.watch(activeChildProvider);
     final telemetry = ref.read(telemetryServiceProvider);
     ref.listen<PrimaryCarerState>(primaryCarerControllerProvider, (_, next) {
       if (next.carer != null) {
@@ -99,11 +101,12 @@ class _HomePageState extends ConsumerState<HomePage> {
         ],
       ),
       body: SafeArea(
-        child: _HomeBody(
+        child: HomeBody(
           state: state,
           onRefresh: controller.refresh,
           theme: theme,
           dailyScheduleBuilder: ref.watch(dailyScheduleBuilderProvider),
+          activeChild: activeChild,
           selectedDate: selectedDate,
           onSelectDate: (date) {
             ref.read(selectedDateProvider.notifier).state = date;
@@ -127,12 +130,13 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 }
 
-class _HomeBody extends StatelessWidget {
-  const _HomeBody({
+class HomeBody extends StatelessWidget {
+  const HomeBody({
     required this.state,
     required this.onRefresh,
     required this.theme,
     required this.dailyScheduleBuilder,
+    required this.activeChild,
     required this.selectedDate,
     required this.onSelectDate,
     required this.onAddSchedule,
@@ -144,6 +148,7 @@ class _HomeBody extends StatelessWidget {
   final Future<void> Function() onRefresh;
   final ThemeData theme;
   final DailyScheduleBuilder dailyScheduleBuilder;
+  final Child? activeChild;
   final DateTime selectedDate;
   final ValueChanged<DateTime> onSelectDate;
   final VoidCallback onAddSchedule;
@@ -165,17 +170,13 @@ class _HomeBody extends StatelessWidget {
       );
     }
 
-    final List<Child> children = state.carer!.children;
-    final Child? primaryChild = children.isEmpty ? null : children.first;
-    final scheduleEntries = primaryChild == null
+    final child = activeChild;
+    final scheduleEntries = child == null
         ? <DailyScheduleEntry>[]
-        : dailyScheduleBuilder.buildScheduledEntries(
-            primaryChild,
-            selectedDate,
-          );
-    final asNeededEntries = primaryChild == null
+        : dailyScheduleBuilder.buildScheduledEntries(child, selectedDate);
+    final asNeededEntries = child == null
         ? <AsNeededAdministrationEntry>[]
-        : dailyScheduleBuilder.buildAsNeededEntries(primaryChild, selectedDate);
+        : dailyScheduleBuilder.buildAsNeededEntries(child, selectedDate);
     final timeOfDaySections = dailyScheduleBuilder.buildTimeOfDaySections(
       scheduleEntries,
     );
@@ -211,8 +212,8 @@ class _HomeBody extends StatelessWidget {
             ),
           _CarerSummary(carer: state.carer!),
           const SizedBox(height: 16),
-          if (primaryChild != null) ...[
-            _ChildCard(child: primaryChild),
+          if (child != null) ...[
+            _ChildCard(child: child),
             const SizedBox(height: 16),
             _CalendarStrip(
               selectedDate: selectedDate,
