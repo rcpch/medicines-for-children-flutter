@@ -1,5 +1,6 @@
 // HTTP client wrapper for backend calls.
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/config/app_config.dart';
 
@@ -15,7 +16,18 @@ final dioProvider = Provider<Dio>((ref) {
         'Content-Type': 'application/json',
       },
     ),
-  )..interceptors.add(LogInterceptor(requestBody: true, responseBody: true));
+  );
+
+  if (kDebugMode) {
+    dio.interceptors.add(
+      LogInterceptor(
+        requestHeader: false,
+        responseHeader: false,
+        requestBody: true,
+        responseBody: true,
+      ),
+    );
+  }
 
   return dio;
 });

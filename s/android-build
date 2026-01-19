@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Build a release APK.
-flutter build apk --release
+# Build a release APK for the prod flavor.
+flutter build apk --release --flavor prod --target lib/main_prod.dart

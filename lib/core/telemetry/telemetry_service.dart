@@ -11,11 +11,17 @@ abstract class TelemetryService {
 class DebugTelemetryService implements TelemetryService {
   @override
   void trackEvent(String name, {Map<String, Object?>? properties}) {
+    if (!kDebugMode) {
+      return;
+    }
     debugPrint('Telemetry event: $name ${properties ?? {}}');
   }
 
   @override
   void trackScreen(String name, {Map<String, Object?>? properties}) {
+    if (!kDebugMode) {
+      return;
+    }
     debugPrint('Telemetry screen: $name ${properties ?? {}}');
   }
 }

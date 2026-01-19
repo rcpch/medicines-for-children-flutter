@@ -133,14 +133,23 @@
   - [x] Add global notifications on/off control and make scheduling respect it.
   - [x] Update user guide to explain the new settings controls.
 
-## Milestone 13 – UI/UX Polish & Accessibility Improvements
+## Milestone 13 – UI/UX & Bug Fixes
 
-  - [ ] Use Quicksand Rounded for headings and Montserrat for body text throughout the app.
+  - [ ] Use Quicksand Rounded Semi-bold for headings and Montserrat for body text throughout the app.
   - [ ] Refine color palette to draw from RCPCH official colour set.
+  - [ ] Text size should be adjustable via settings (small, medium, large) and persist to profile.
+  - [ ] Create user testing scripts to gather feedback on usability and accessibility.
+  - [ ] BUG: Changing the Current Child in the Home view does not change which child is shown 
+
+
+## Milestone 14 – QA and Release Prep
+
+  - [ ] Ensure the app can be built for Linux and AVD emulators without errors.
+  - [ ] Test build of an APK to allow installation on physical Android devices.
+  - [ ] Review codebase for any included files which constitute a security risk (e.g., hardcoded API keys).
+  - [ ] Extend test coverage
+  - [ ] Improve granularity of comments in codebase for maintainability.
   - [ ] 
-
-
-
 
 ## Stretch Goals – Significant Additions Beyond Baseline Spec
 
