@@ -17,7 +17,7 @@ This repository hosts the Flutter implementation of the Medicines for Children m
 
 ## Prerequisites
 
-- Flutter 3.32.0+ with Dart 3.8+
+- Flutter 3.38.0+ with Dart 3.10+
 - Xcode 15 / Android Studio Iguana+ for platform builds
 
 ## Quick start

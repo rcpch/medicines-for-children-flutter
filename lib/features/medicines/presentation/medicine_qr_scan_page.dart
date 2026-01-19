@@ -35,7 +35,7 @@ class _MedicineQrScanPageState extends ConsumerState<MedicineQrScanPage> {
           Expanded(
             child: MobileScanner(
               onDetect: _handleDetect,
-              errorBuilder: (context, error, _) {
+              errorBuilder: (context, error) {
                 return _ScannerError(message: _errorMessage(error));
               },
             ),

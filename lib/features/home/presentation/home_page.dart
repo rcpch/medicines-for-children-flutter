@@ -132,6 +132,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
 class HomeBody extends StatelessWidget {
   const HomeBody({
+    super.key,
     required this.state,
     required this.onRefresh,
     required this.theme,

@@ -23,10 +23,9 @@ class BiometricAuthService {
     try {
       return await _auth.authenticate(
         localizedReason: 'Unlock your profile with biometrics.',
-        options: const AuthenticationOptions(
-          biometricOnly: true,
-          stickyAuth: true,
-        ),
+        biometricOnly: true,
+        persistAcrossBackgrounding: true,
+        sensitiveTransaction: false,
       );
     } catch (_) {
       return false;

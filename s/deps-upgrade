@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Update Flutter/Dart dependencies.
+#
+# Usage:
+#   s/deps-upgrade            # conservative upgrades within constraints
+#   s/deps-upgrade --major    # attempt major version upgrades
+#   s/deps-upgrade --outdated # show what's outdated (no changes)
+
+cd "$(dirname "$0")/.."
+
+mode="upgrade"
+if [[ ${1:-} == "--major" ]]; then
+  mode="major"
+  shift
+elif [[ ${1:-} == "--outdated" ]]; then
+  mode="outdated"
+  shift
+elif [[ ${1:-} == "-h" || ${1:-} == "--help" ]]; then
+  mode="help"
+fi
+
+case "$mode" in
+  help)
+    cat <<'EOF'
+Usage:
+  s/deps-upgrade            Upgrade dependencies within existing constraints
+  s/deps-upgrade --major    Upgrade dependencies allowing major versions
+  s/deps-upgrade --outdated Show outdated deps (no changes)
+EOF
+    exit 0
+    ;;
+  outdated)
+    flutter pub outdated
+    exit 0
+    ;;
+  major)
+    flutter pub upgrade --major-versions
+    ;;
+  upgrade)
+    flutter pub upgrade
+    ;;
+  *)
+    echo "Unknown mode: $mode" >&2
+    exit 2
+    ;;
+esac
+
+# Helpful summary after changes.
+flutter pub outdated || true

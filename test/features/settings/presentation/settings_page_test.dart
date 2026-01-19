@@ -105,7 +105,9 @@ class _FakeLocalAuth implements LocalAuthentication {
   Future<bool> authenticate({
     required String localizedReason,
     Iterable<AuthMessages> authMessages = const <AuthMessages>[],
-    AuthenticationOptions options = const AuthenticationOptions(),
+    bool biometricOnly = false,
+    bool persistAcrossBackgrounding = false,
+    bool sensitiveTransaction = false,
   }) async {
     return false;
   }
