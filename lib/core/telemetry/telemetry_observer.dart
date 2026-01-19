@@ -1,3 +1,4 @@
+// Navigator observer for telemetry events.
 import 'package:flutter/widgets.dart';
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 

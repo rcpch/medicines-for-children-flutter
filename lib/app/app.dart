@@ -1,3 +1,4 @@
+// App root widget wiring theme, routing, and providers.
 import 'dart:async';
 
 import 'package:flutter/material.dart';

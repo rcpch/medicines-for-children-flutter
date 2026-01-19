@@ -1,3 +1,4 @@
+// Draft model for medicine form edits.
 import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';
 
 class MedicineDraft {

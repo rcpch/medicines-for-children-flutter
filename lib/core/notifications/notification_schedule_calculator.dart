@@ -1,3 +1,4 @@
+// Notification timing calculations for schedules.
 import 'package:intl/intl.dart';
 
 class NotificationScheduleCalculator {

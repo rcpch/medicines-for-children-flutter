@@ -1,3 +1,4 @@
+// Controller for dose administration actions.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/administration.dart';
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_controller.dart';

@@ -1,3 +1,4 @@
+// Biometric auth checks and prompts.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_auth/local_auth.dart';
 

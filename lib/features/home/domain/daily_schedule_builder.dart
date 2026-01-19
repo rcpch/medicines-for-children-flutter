@@ -1,3 +1,4 @@
+// Builds daily schedule view models.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/administration.dart';

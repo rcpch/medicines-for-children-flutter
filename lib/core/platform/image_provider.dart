@@ -1,3 +1,4 @@
+// Platform-agnostic image picker/provider interface.
 import 'package:flutter/widgets.dart';
 
 import 'image_provider_stub.dart'

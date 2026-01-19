@@ -1,3 +1,4 @@
+// Controller for global app settings.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/data/storage/shared_preferences_provider.dart';
 import 'package:medicines_for_children_flutter/core/notifications/notification_service.dart';

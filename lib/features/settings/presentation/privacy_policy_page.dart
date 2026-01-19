@@ -1,3 +1,4 @@
+// Privacy policy screen UI.
 import 'package:flutter/material.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {

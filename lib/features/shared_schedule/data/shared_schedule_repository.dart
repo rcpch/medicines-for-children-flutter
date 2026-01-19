@@ -1,3 +1,4 @@
+// Shared schedule data access layer.
 import 'package:dio/dio.dart';
 
 class SharedScheduleAuthResult {

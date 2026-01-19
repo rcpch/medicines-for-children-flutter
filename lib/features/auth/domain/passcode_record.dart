@@ -1,3 +1,4 @@
+// Passcode record model.
 import 'dart:convert';
 
 class PasscodeRecord {

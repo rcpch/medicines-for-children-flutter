@@ -1,3 +1,4 @@
+// User guide detail screen UI.
 import 'package:flutter/material.dart';
 import 'package:medicines_for_children_flutter/features/user_guide/domain/user_guide_content.dart';
 

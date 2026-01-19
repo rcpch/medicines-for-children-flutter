@@ -1,3 +1,4 @@
+// Provider for selected date on home schedule.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final selectedDateProvider = StateProvider<DateTime>((ref) {

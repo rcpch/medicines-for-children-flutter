@@ -1,3 +1,4 @@
+// Auth status value types.
 enum AuthStatus {
   unknown,
   unauthenticated,

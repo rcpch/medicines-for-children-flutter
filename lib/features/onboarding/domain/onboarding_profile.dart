@@ -1,3 +1,4 @@
+// Onboarding profile model.
 import 'dart:convert';
 
 class CarerProfile {

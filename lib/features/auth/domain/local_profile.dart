@@ -1,3 +1,4 @@
+// Local profile model for passcode users.
 import 'dart:convert';
 
 class LocalProfile {

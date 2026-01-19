@@ -1,3 +1,4 @@
+// Telemetry event logging and consent.
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/settings/settings_controller.dart';

@@ -1,3 +1,4 @@
+// UI action for switching active child.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/domain/active_child_provider.dart';

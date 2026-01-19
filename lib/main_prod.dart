@@ -1,3 +1,4 @@
+// Production entrypoint with production config.
 import 'package:medicines_for_children_flutter/bootstrap.dart';
 import 'package:medicines_for_children_flutter/core/config/app_config.dart';
 

@@ -1,3 +1,4 @@
+// Notification scheduling and delivery wiring.
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';

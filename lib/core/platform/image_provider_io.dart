@@ -1,3 +1,4 @@
+// Image provider implementation for IO platforms.
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';

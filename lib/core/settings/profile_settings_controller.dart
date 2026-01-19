@@ -1,3 +1,4 @@
+// Controller for profile-specific settings.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/data/storage/shared_preferences_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -1,3 +1,4 @@
+// HTTP client wrapper for backend calls.
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/config/app_config.dart';

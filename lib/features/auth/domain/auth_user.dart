@@ -1,3 +1,4 @@
+// Auth user model.
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'auth_user.freezed.dart';

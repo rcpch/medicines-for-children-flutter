@@ -1,3 +1,4 @@
+// App theme definitions and styling tokens.
 import 'package:flutter/material.dart';
 
 class AppTheme {

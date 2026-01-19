@@ -1,3 +1,4 @@
+// Home dashboard UI and schedule overview.
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';

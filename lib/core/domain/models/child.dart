@@ -1,3 +1,4 @@
+// Child domain model.
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/schedule.dart';

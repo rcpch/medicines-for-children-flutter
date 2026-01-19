@@ -1,3 +1,4 @@
+// Settings screen UI.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/security/biometric_auth_service.dart';

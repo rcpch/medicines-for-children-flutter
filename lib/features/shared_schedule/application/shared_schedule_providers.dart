@@ -1,3 +1,4 @@
+// Providers for shared schedule state.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/network/api_client.dart';
 import 'package:medicines_for_children_flutter/features/shared_schedule/data/shared_schedule_repository.dart';

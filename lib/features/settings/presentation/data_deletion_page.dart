@@ -1,3 +1,4 @@
+// Data deletion and reset screen UI.
 import 'package:flutter/material.dart';
 
 class DataDeletionPage extends StatelessWidget {

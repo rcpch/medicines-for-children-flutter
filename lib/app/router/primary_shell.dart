@@ -1,3 +1,4 @@
+// Primary shell layout for routed pages.
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

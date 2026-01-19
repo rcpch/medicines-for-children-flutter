@@ -1,3 +1,4 @@
+// Splash/loading screen UI.
 import 'package:flutter/material.dart';
 
 class SplashPage extends StatelessWidget {

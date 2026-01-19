@@ -1,3 +1,4 @@
+// Draft model for schedule form edits.
 class ScheduleDraft {
   const ScheduleDraft({
     required this.medicineId,

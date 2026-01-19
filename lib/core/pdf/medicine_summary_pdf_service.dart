@@ -1,3 +1,4 @@
+// PDF generation for medicine summaries.
 import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';

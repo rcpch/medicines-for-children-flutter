@@ -1,3 +1,4 @@
+// App settings model and defaults.
 enum AppThemeMode { system, light, dark }
 
 class AppSettings {

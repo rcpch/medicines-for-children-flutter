@@ -1,3 +1,4 @@
+// Queue for share centre actions while offline.
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';

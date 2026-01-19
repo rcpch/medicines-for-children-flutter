@@ -1,3 +1,4 @@
+// User guide content model and copy.
 class UserGuideSection {
   const UserGuideSection({
     required this.id,

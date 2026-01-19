@@ -1,3 +1,4 @@
+// Stub backup file IO for unsupported platforms.
 import 'dart:typed_data';
 
 import 'backup_file_io.dart';

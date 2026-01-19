@@ -1,3 +1,4 @@
+// Lookup for QR-scanned medicines.
 class QrMedicineEntry {
   const QrMedicineEntry({
     required this.url,

@@ -1,3 +1,4 @@
+// Local storage for auth profiles.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/data/storage/shared_preferences_provider.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/local_profile.dart';

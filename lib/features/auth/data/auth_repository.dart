@@ -1,3 +1,4 @@
+// Auth data access and persistence.
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';

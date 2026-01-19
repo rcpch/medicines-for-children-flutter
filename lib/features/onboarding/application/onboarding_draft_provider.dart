@@ -1,3 +1,4 @@
+// Provider for onboarding draft state.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/features/onboarding/domain/onboarding_profile.dart';
 

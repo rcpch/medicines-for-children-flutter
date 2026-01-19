@@ -1,3 +1,4 @@
+// User guide list screen UI.
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:medicines_for_children_flutter/app/router/app_router.dart';

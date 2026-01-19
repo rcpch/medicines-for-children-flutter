@@ -1,3 +1,4 @@
+// Medicine domain model.
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'medicine.freezed.dart';
