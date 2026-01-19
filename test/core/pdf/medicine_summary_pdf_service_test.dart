@@ -5,6 +5,8 @@ import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.
 import 'package:medicines_for_children_flutter/core/pdf/medicine_summary_pdf_service.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   test('buildPdf returns bytes for medicines summary', () async {
     final child = Child(
       id: 'child-1',

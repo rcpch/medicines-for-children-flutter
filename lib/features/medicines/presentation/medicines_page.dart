@@ -7,6 +7,7 @@ import 'package:medicines_for_children_flutter/core/domain/active_child_provider
 import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';
 import 'package:medicines_for_children_flutter/core/platform/image_provider.dart';
 import 'package:medicines_for_children_flutter/core/presentation/child_switcher_action.dart';
+import 'package:medicines_for_children_flutter/core/presentation/main_menu.dart';
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_state_provider.dart';
 
 enum MedicineFilter { everyday, asNeeded }
@@ -34,7 +35,7 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
       return Scaffold(
         appBar: AppBar(
           title: const Text('Medicines'),
-          actions: const [ChildSwitcherAction()],
+          actions: const [ChildSwitcherAction(), MainMenu()],
         ),
         body: Padding(
           padding: const EdgeInsets.all(16),
@@ -48,7 +49,7 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Medicines'),
-        actions: const [ChildSwitcherAction()],
+        actions: const [ChildSwitcherAction(), MainMenu()],
       ),
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,

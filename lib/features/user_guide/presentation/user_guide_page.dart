@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:medicines_for_children_flutter/app/router/app_router.dart';
+import 'package:medicines_for_children_flutter/core/presentation/main_menu.dart';
 import 'package:medicines_for_children_flutter/features/user_guide/domain/user_guide_content.dart';
 
 class UserGuidePage extends StatelessWidget {
@@ -12,7 +13,10 @@ class UserGuidePage extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('User guide')),
+      appBar: AppBar(
+        title: const Text('User guide'),
+        actions: const [MainMenu()],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

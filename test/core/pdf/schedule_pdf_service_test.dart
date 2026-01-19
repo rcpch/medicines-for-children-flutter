@@ -6,6 +6,8 @@ import 'package:medicines_for_children_flutter/core/domain/models/schedule.dart'
 import 'package:medicines_for_children_flutter/core/pdf/schedule_pdf_service.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   test('buildPdf returns bytes for schedule', () async {
     final medicine = Medicine(
       id: 'med-1',

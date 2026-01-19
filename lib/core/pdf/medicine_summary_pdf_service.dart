@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.dart';
+import 'package:medicines_for_children_flutter/core/pdf/pdf_fonts.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -14,10 +15,7 @@ class MedicineSummaryPdfService {
     required Child child,
   }) async {
     final doc = pw.Document();
-    final theme = pw.ThemeData.withFont(
-      base: pw.Font.helvetica(),
-      bold: pw.Font.helveticaBold(),
-    );
+    final theme = await loadPdfTheme();
 
     doc.addPage(
       pw.MultiPage(

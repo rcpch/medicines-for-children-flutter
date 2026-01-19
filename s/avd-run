@@ -7,23 +7,181 @@ set -euo pipefail
 
 EMULATOR_ID="${1:-${ANDROID_EMULATOR_ID:-}}"
 
-if [[ -z "${EMULATOR_ID}" ]]; then
-  EMULATOR_ID=$(flutter emulators --machine | python - <<'PY'
+get_emulator_ids() {
+  # `flutter emulators` output is human-readable; extract the first column of
+  # the table (Id) and stop once we reach the usage/help footer.
+  flutter emulators 2>/dev/null | awk '
+    BEGIN { in_table=0 }
+    /^Id[[:space:]]+/ { in_table=1; next }
+    in_table && ($1=="To" || $1=="You") { exit }
+    in_table && NF>0 { print $1 }
+  '
+}
+
+get_android_device_ids_machine() {
+  flutter devices --machine 2>/dev/null | python - <<'PY'
 import json,sys
+
+raw = sys.stdin.read().strip()
+if not raw:
+  sys.exit(0)
+
 try:
-    data=json.load(sys.stdin)
+  data = json.loads(raw)
 except json.JSONDecodeError:
-    sys.exit(1)
-if not data:
-    sys.exit(1)
-print(data[0].get("id",""))
+  sys.exit(0)
+
+for d in data:
+  if not d.get("isSupported", False):
+    continue
+  platform = str(d.get("targetPlatform", ""))
+  if not platform.startswith("android"):
+    continue
+  device_id = d.get("id", "")
+  if device_id:
+    print(device_id)
 PY
-  )
+}
+
+get_android_emulator_device_ids_machine() {
+  flutter devices --machine 2>/dev/null | python - <<'PY'
+import json,sys
+
+raw = sys.stdin.read().strip()
+if not raw:
+  sys.exit(0)
+
+try:
+  data = json.loads(raw)
+except json.JSONDecodeError:
+  sys.exit(0)
+
+for d in data:
+  if not d.get("isSupported", False):
+    continue
+  platform = str(d.get("targetPlatform", ""))
+  if not platform.startswith("android"):
+    continue
+  if not d.get("emulator", False):
+    continue
+  device_id = d.get("id", "")
+  if device_id:
+    print(device_id)
+PY
+}
+
+select_from_list() {
+  local title="$1"; shift
+  local -a items=("$@")
+
+  if [[ ${#items[@]} -eq 0 ]]; then
+    return 1
+  fi
+
+  if [[ ${#items[@]} -eq 1 ]]; then
+    printf '%s\n' "${items[0]}"
+    return 0
+  fi
+
+  echo "${title}" >&2
+  local item
+  for item in "${items[@]}"; do
+    echo "- ${item}" >&2
+  done
+
+  echo "" >&2
+  local PS3="Select number (or Ctrl+C to quit): "
+  select item in "${items[@]}"; do
+    if [[ -n "${item:-}" ]]; then
+      printf '%s\n' "${item}"
+      return 0
+    fi
+    echo "Invalid selection." >&2
+  done
+}
+
+wait_for_android_device() {
+  # Wait for an Android device to appear in `flutter devices`.
+  # $1: "emulator" or "any"
+  local mode="${1:-any}"
+  local -i timeout_seconds=90
+
+  local -a ids=()
+  local -i i
+  for ((i=0; i<timeout_seconds; i++)); do
+    if [[ "${mode}" == "emulator" ]]; then
+      mapfile -t ids < <(get_android_emulator_device_ids_machine || true)
+    else
+      mapfile -t ids < <(get_android_device_ids_machine || true)
+    fi
+
+    if [[ ${#ids[@]} -gt 0 ]]; then
+      select_from_list "Available Android devices:" "${ids[@]}"
+      return 0
+    fi
+
+    sleep 1
+  done
+
+  return 1
+}
+
+select_emulator_id() {
+  local -a ids=()
+  mapfile -t ids < <(get_emulator_ids || true)
+
+  if [[ ${#ids[@]} -eq 0 ]]; then
+    echo "No Android emulators found via 'flutter emulators'." >&2
+    echo "Create one with: flutter emulators --create" >&2
+    return 1
+  fi
+
+  if [[ ${#ids[@]} -eq 1 ]]; then
+    echo "Only one emulator found (${ids[0]}). Launching it..." >&2
+    printf '%s\n' "${ids[0]}"
+    return 0
+  fi
+
+  echo "Available emulators:" >&2
+  local id
+  for id in "${ids[@]}"; do
+    echo "- ${id}" >&2
+  done
+
+  echo "" >&2
+  echo "Select an emulator to launch:" >&2
+  local PS3="Emulator number (or Ctrl+C to quit): "
+  select id in "${ids[@]}"; do
+    if [[ -n "${id:-}" ]]; then
+      printf '%s\n' "${id}"
+      return 0
+    fi
+    echo "Invalid selection." >&2
+  done
+}
+
+if [[ -z "${EMULATOR_ID}" ]]; then
+  EMULATOR_ID="$(select_emulator_id)"
 fi
 
 if [[ -n "${EMULATOR_ID}" ]]; then
   flutter emulators --launch "${EMULATOR_ID}"
 fi
 
-# Use the first available Android device/emulator.
-flutter run -d android
+# Prefer running on an Android emulator if we launched one.
+DEVICE_ID=""
+if [[ -n "${EMULATOR_ID}" ]]; then
+  DEVICE_ID="$(wait_for_android_device emulator || true)"
+fi
+
+if [[ -z "${DEVICE_ID}" ]]; then
+  DEVICE_ID="$(wait_for_android_device any || true)"
+fi
+
+if [[ -z "${DEVICE_ID}" ]]; then
+  echo "No supported Android devices found." >&2
+  flutter devices >&2 || true
+  exit 1
+fi
+
+flutter run -d "${DEVICE_ID}"

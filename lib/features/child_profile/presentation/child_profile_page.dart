@@ -7,6 +7,7 @@ import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/core/domain/active_child_provider.dart';
 import 'package:medicines_for_children_flutter/core/platform/image_provider.dart';
 import 'package:medicines_for_children_flutter/core/presentation/child_switcher_action.dart';
+import 'package:medicines_for_children_flutter/core/presentation/main_menu.dart';
 
 class ChildProfilePage extends ConsumerWidget {
   const ChildProfilePage({super.key});
@@ -25,6 +26,7 @@ class ChildProfilePage extends ConsumerWidget {
               onPressed: () => context.pushNamed(AppRoute.addChild.name),
             ),
             const ChildSwitcherAction(),
+            const MainMenu(),
           ],
         ),
         body: Padding(
@@ -60,6 +62,7 @@ class ChildProfilePage extends ConsumerWidget {
             onPressed: () => context.pushNamed(AppRoute.addChild.name),
           ),
           const ChildSwitcherAction(),
+          const MainMenu(),
         ],
       ),
       body: SafeArea(

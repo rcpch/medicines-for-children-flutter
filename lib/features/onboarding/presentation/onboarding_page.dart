@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:medicines_for_children_flutter/core/theme/rcpch_colours.dart';
 import 'package:medicines_for_children_flutter/core/data/storage/primary_carer_local_data_source.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.dart';
@@ -282,25 +283,36 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                         controlsBuilder: (context, details) {
                           return Row(
                             children: [
-                              ElevatedButton(
-                                onPressed: authState.isLoading
-                                    ? null
-                                    : details.onStepContinue,
-                                child: authState.isLoading && _currentStep == 2
-                                    ? const SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
+                              Expanded(
+                                child: FilledButton(
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: rcpchPink,
+                                    foregroundColor: rcpchWhite,
+                                    minimumSize: const Size.fromHeight(52),
+                                  ),
+                                  onPressed: authState.isLoading
+                                      ? null
+                                      : details.onStepContinue,
+                                  child:
+                                      authState.isLoading && _currentStep == 2
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor: AlwaysStoppedAnimation(
+                                              rcpchWhite,
+                                            ),
+                                          ),
+                                        )
+                                      : Text(
+                                          _currentStep == 2
+                                              ? 'Finish onboarding'
+                                              : 'Continue',
                                         ),
-                                      )
-                                    : Text(
-                                        _currentStep == 2
-                                            ? 'Finish onboarding'
-                                            : 'Continue',
-                                      ),
+                                ),
                               ),
-                              const SizedBox(width: 12),
+                              if (_currentStep > 0) const SizedBox(width: 12),
                               if (_currentStep > 0)
                                 TextButton(
                                   onPressed: authState.isLoading
@@ -343,7 +355,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                                     controller: _phoneController,
                                     keyboardType: TextInputType.phone,
                                     decoration: const InputDecoration(
-                                      labelText: 'Best contact number',
+                                      labelText: 'Phone',
                                       prefixIcon: Icon(Icons.call_outlined),
                                     ),
                                   ),
