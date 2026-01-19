@@ -38,9 +38,9 @@ class ShareCentreDetailPage extends ConsumerWidget {
         child: schedulesAsync.when(
           data: (schedules) {
             final schedule = schedules.cast<ShareCentreSchedule?>().firstWhere(
-                  (item) => item?.apiId == shareId,
-                  orElse: () => null,
-                );
+              (item) => item?.apiId == shareId,
+              orElse: () => null,
+            );
             if (schedule == null) {
               return const Padding(
                 padding: EdgeInsets.all(16),
@@ -59,8 +59,8 @@ class ShareCentreDetailPage extends ConsumerWidget {
                       child: Text(
                         actionState.errorMessage!,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onErrorContainer,
-                            ),
+                          color: Theme.of(context).colorScheme.onErrorContainer,
+                        ),
                       ),
                     ),
                   ),
@@ -70,20 +70,33 @@ class ShareCentreDetailPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(schedule.displayCarer, style: Theme.of(context).textTheme.titleMedium),
+                        Text(
+                          schedule.displayCarer,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
                         const SizedBox(height: 8),
-                        _InfoRow(label: 'Status', value: _statusLabel(schedule)),
+                        _InfoRow(
+                          label: 'Status',
+                          value: _statusLabel(schedule),
+                        ),
                         _InfoRow(
                           label: 'Dates',
-                          value: '${DateFormat.yMMMd().format(schedule.dateFrom)} – '
+                          value:
+                              '${DateFormat.yMMMd().format(schedule.dateFrom)} – '
                               '${DateFormat.yMMMd().format(schedule.dateTo)}',
                         ),
-                        _InfoRow(label: 'Format', value: schedule.isDigital ? 'Digital' : 'PDF'),
+                        _InfoRow(
+                          label: 'Format',
+                          value: schedule.isDigital ? 'Digital' : 'PDF',
+                        ),
                         if (schedule.carerEmail.isNotEmpty)
                           _InfoRow(label: 'Email', value: schedule.carerEmail),
                         if (schedule.notes.isNotEmpty) ...[
                           const SizedBox(height: 8),
-                          Text('Notes', style: Theme.of(context).textTheme.titleSmall),
+                          Text(
+                            'Notes',
+                            style: Theme.of(context).textTheme.titleSmall,
+                          ),
                           const SizedBox(height: 4),
                           Text(schedule.notes),
                         ],
@@ -96,7 +109,11 @@ class ShareCentreDetailPage extends ConsumerWidget {
                   FilledButton.icon(
                     onPressed: actionState.isSaving
                         ? null
-                        : () => _copyToClipboard(context, schedule.scheduleUrl, 'Schedule link copied.'),
+                        : () => _copyToClipboard(
+                            context,
+                            schedule.scheduleUrl,
+                            'Schedule link copied.',
+                          ),
                     icon: const Icon(Icons.link),
                     label: const Text('Copy schedule link'),
                   ),
@@ -105,7 +122,10 @@ class ShareCentreDetailPage extends ConsumerWidget {
                   OutlinedButton.icon(
                     onPressed: actionState.isSaving
                         ? null
-                        : () => _shareLink(schedule.scheduleUrl, subject: 'Shared schedule link'),
+                        : () => _shareLink(
+                            schedule.scheduleUrl,
+                            subject: 'Shared schedule link',
+                          ),
                     icon: const Icon(Icons.share_outlined),
                     label: const Text('Share schedule link'),
                   ),
@@ -115,7 +135,11 @@ class ShareCentreDetailPage extends ConsumerWidget {
                   OutlinedButton.icon(
                     onPressed: actionState.isSaving
                         ? null
-                        : () => _copyToClipboard(context, schedule.pdfUrl, 'PDF link copied.'),
+                        : () => _copyToClipboard(
+                            context,
+                            schedule.pdfUrl,
+                            'PDF link copied.',
+                          ),
                     icon: const Icon(Icons.picture_as_pdf_outlined),
                     label: const Text('Copy PDF link'),
                   ),
@@ -123,7 +147,10 @@ class ShareCentreDetailPage extends ConsumerWidget {
                   OutlinedButton.icon(
                     onPressed: actionState.isSaving
                         ? null
-                        : () => _shareLink(schedule.pdfUrl, subject: 'Shared schedule PDF'),
+                        : () => _shareLink(
+                            schedule.pdfUrl,
+                            subject: 'Shared schedule PDF',
+                          ),
                     icon: const Icon(Icons.share_outlined),
                     label: const Text('Share PDF link'),
                   ),
@@ -136,7 +163,11 @@ class ShareCentreDetailPage extends ConsumerWidget {
                         : () async {
                             if (carerEmail.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Add a primary carer email to export a PDF.')),
+                                const SnackBar(
+                                  content: Text(
+                                    'Add a primary carer email to export a PDF.',
+                                  ),
+                                ),
                               );
                               return;
                             }
@@ -147,7 +178,10 @@ class ShareCentreDetailPage extends ConsumerWidget {
                               primaryCarerEmail: carerEmail,
                             );
                             if (pdfUrl != null && context.mounted) {
-                              await _shareLink(pdfUrl, subject: 'Shared schedule PDF');
+                              await _shareLink(
+                                pdfUrl,
+                                subject: 'Shared schedule PDF',
+                              );
                             }
                           },
                     icon: const Icon(Icons.picture_as_pdf_outlined),
@@ -155,7 +189,10 @@ class ShareCentreDetailPage extends ConsumerWidget {
                   ),
                 ],
                 const SizedBox(height: 24),
-                Text('Manage share', style: Theme.of(context).textTheme.titleSmall),
+                Text(
+                  'Manage share',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
                 const SizedBox(height: 8),
                 OutlinedButton(
                   onPressed: actionState.isSaving
@@ -191,7 +228,9 @@ class ShareCentreDetailPage extends ConsumerWidget {
                           final confirmed = await _confirmAction(
                             context,
                             title: 'End this share?',
-                            message: 'The carer will no longer have access after today.',
+                            message:
+                                'The carer will no longer have access after today.',
+                            confirmLabel: 'End',
                           );
                           if (confirmed != true) {
                             return;
@@ -216,7 +255,10 @@ class ShareCentreDetailPage extends ConsumerWidget {
                           final confirmed = await _confirmAction(
                             context,
                             title: 'Delete this share?',
-                            message: 'This will remove the share from your list.',
+                            message:
+                                'This will remove the share from your list.',
+                            confirmLabel: 'Delete',
+                            confirmIsDanger: true,
                           );
                           if (confirmed != true) {
                             return;
@@ -235,7 +277,9 @@ class ShareCentreDetailPage extends ConsumerWidget {
                         },
                   child: Text(
                     'Delete share',
-                    style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                   ),
                 ),
               ],
@@ -258,12 +302,18 @@ class ShareCentreDetailPage extends ConsumerWidget {
     return schedule.isDeleted ? 'Ended' : 'Pending';
   }
 
-  Future<void> _copyToClipboard(BuildContext context, String text, String message) async {
+  Future<void> _copyToClipboard(
+    BuildContext context,
+    String text,
+    String message,
+  ) async {
     await Clipboard.setData(ClipboardData(text: text));
     if (!context.mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _shareLink(String url, {String? subject}) async {
@@ -290,6 +340,8 @@ class ShareCentreDetailPage extends ConsumerWidget {
     BuildContext context, {
     required String title,
     required String message,
+    String confirmLabel = 'Confirm',
+    bool confirmIsDanger = false,
   }) {
     return showDialog<bool>(
       context: context,
@@ -302,8 +354,14 @@ class ShareCentreDetailPage extends ConsumerWidget {
             child: const Text('Cancel'),
           ),
           FilledButton(
+            style: confirmIsDanger
+                ? FilledButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                    foregroundColor: Theme.of(context).colorScheme.onError,
+                  )
+                : null,
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Confirm'),
+            child: Text(confirmLabel),
           ),
         ],
       ),
@@ -326,10 +384,7 @@ class _InfoRow extends StatelessWidget {
         children: [
           SizedBox(
             width: 72,
-            child: Text(
-              label,
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
+            child: Text(label, style: Theme.of(context).textTheme.bodySmall),
           ),
           Expanded(
             child: Text(value, style: Theme.of(context).textTheme.bodyMedium),

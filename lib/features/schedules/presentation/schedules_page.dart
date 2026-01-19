@@ -66,17 +66,24 @@ class SchedulesPage extends ConsumerWidget {
               title: Text(medicine?.name ?? 'Medicine schedule'),
               subtitle: Text(subtitle),
               trailing: PopupMenuButton<_ScheduleAction>(
-                onSelected: (action) => _handleAction(context, ref, action, schedule.id),
-                itemBuilder: (context) => const [
-                  PopupMenuItem(
-                    value: _ScheduleAction.edit,
-                    child: Text('Edit'),
-                  ),
-                  PopupMenuItem(
-                    value: _ScheduleAction.delete,
-                    child: Text('Delete'),
-                  ),
-                ],
+                onSelected: (action) =>
+                    _handleAction(context, ref, action, schedule.id),
+                itemBuilder: (context) {
+                  final theme = Theme.of(context);
+                  return [
+                    const PopupMenuItem(
+                      value: _ScheduleAction.edit,
+                      child: Text('Edit'),
+                    ),
+                    PopupMenuItem(
+                      value: _ScheduleAction.delete,
+                      child: Text(
+                        'Delete',
+                        style: TextStyle(color: theme.colorScheme.error),
+                      ),
+                    ),
+                  ];
+                },
               ),
             ),
           );
@@ -99,17 +106,24 @@ class SchedulesPage extends ConsumerWidget {
         );
         return;
       case _ScheduleAction.delete:
-        final confirm = await showDialog<bool>(
+        final confirm =
+            await showDialog<bool>(
               context: context,
               builder: (context) => AlertDialog(
                 title: const Text('Delete schedule?'),
-                content: const Text('This will remove all future doses for this schedule.'),
+                content: const Text(
+                  'This will remove all future doses for this schedule.',
+                ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(false),
                     child: const Text('Cancel'),
                   ),
-                  ElevatedButton(
+                  FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                      foregroundColor: Theme.of(context).colorScheme.onError,
+                    ),
                     onPressed: () => Navigator.of(context).pop(true),
                     child: const Text('Delete'),
                   ),
@@ -126,13 +140,17 @@ class SchedulesPage extends ConsumerWidget {
           return;
         }
         if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Schedule deleted.')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Schedule deleted.')));
         } else {
-          final message = ref.read(scheduleEditorControllerProvider).errorMessage;
+          final message = ref
+              .read(scheduleEditorControllerProvider)
+              .errorMessage;
           if (message != null) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(message)));
           }
         }
         return;
