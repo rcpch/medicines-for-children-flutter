@@ -87,7 +87,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Medicines Home'),
+        title: const Text('Home'),
         actions: [
           const ChildSwitcherAction(),
           IconButton(
