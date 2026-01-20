@@ -10,11 +10,14 @@ import 'package:medicines_for_children_flutter/core/presentation/child_switcher_
 import 'package:medicines_for_children_flutter/core/presentation/main_menu.dart';
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_state_provider.dart';
 
+// Filter options for the medicines list.
 enum MedicineFilter { everyday, asNeeded }
 
+// Medicines list screen for the active child.
 class MedicinesPage extends ConsumerStatefulWidget {
   const MedicinesPage({super.key});
 
+  // Creates the medicines page state.
   @override
   ConsumerState<MedicinesPage> createState() => _MedicinesPageState();
 }
@@ -22,6 +25,7 @@ class MedicinesPage extends ConsumerStatefulWidget {
 class _MedicinesPageState extends ConsumerState<MedicinesPage> {
   MedicineFilter _filter = MedicineFilter.everyday;
 
+  // Builds the medicines list UI.
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(primaryCarerStateProvider);
@@ -136,6 +140,7 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
     );
   }
 
+  // Returns medicines that match the active filter.
   List<Medicine> _filterMedicines(List<Medicine> medicines) {
     return medicines.where((medicine) {
       if (medicine.status == MedicineStatus.noLongerUsed) {
@@ -153,12 +158,14 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
   }
 }
 
+// List tile for a single medicine entry.
 class _MedicineTile extends StatelessWidget {
   const _MedicineTile({required this.medicine, required this.onTap});
 
   final Medicine medicine;
   final VoidCallback onTap;
 
+  // Builds the medicine list tile UI.
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -190,6 +197,7 @@ class _MedicineTile extends StatelessWidget {
     );
   }
 
+  // Resolves photo URLs from legacy and list fields.
   List<String> _resolvePhotos(Medicine medicine) {
     if (medicine.photoUrls.isNotEmpty) {
       return medicine.photoUrls;
@@ -200,6 +208,7 @@ class _MedicineTile extends StatelessWidget {
     return const [];
   }
 
+  // Returns a display label for the medicine type.
   String _typeLabel(MedicineType type) {
     switch (type) {
       case MedicineType.everyday:

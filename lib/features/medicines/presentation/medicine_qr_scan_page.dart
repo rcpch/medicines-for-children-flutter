@@ -10,9 +10,11 @@ import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart'
 import 'package:medicines_for_children_flutter/features/medicines/domain/medicine_draft.dart';
 import 'package:medicines_for_children_flutter/features/medicines/domain/qr_medicine_catalog.dart';
 
+// Screen for scanning medicine QR codes.
 class MedicineQrScanPage extends ConsumerStatefulWidget {
   const MedicineQrScanPage({super.key});
 
+  // Creates the QR scan page state.
   @override
   ConsumerState<MedicineQrScanPage> createState() => _MedicineQrScanPageState();
 }
@@ -20,6 +22,7 @@ class MedicineQrScanPage extends ConsumerStatefulWidget {
 class _MedicineQrScanPageState extends ConsumerState<MedicineQrScanPage> {
   bool _isHandling = false;
 
+  // Builds the QR scanner UI.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,6 +48,7 @@ class _MedicineQrScanPageState extends ConsumerState<MedicineQrScanPage> {
     );
   }
 
+  // Handles detected barcodes and routes based on scan result.
   Future<void> _handleDetect(BarcodeCapture capture) async {
     if (_isHandling) {
       return;
@@ -114,6 +118,7 @@ class _MedicineQrScanPageState extends ConsumerState<MedicineQrScanPage> {
     }
   }
 
+  // Shows a dialog with a URL and optional launch action.
   Future<void> _showLinkDialog(
     BuildContext context, {
     required String title,
@@ -146,16 +151,19 @@ class _MedicineQrScanPageState extends ConsumerState<MedicineQrScanPage> {
     );
   }
 
+  // Returns a human-friendly error message for scanner errors.
   String _errorMessage(MobileScannerException error) {
     return 'Camera not available on this device. Use a device with a camera to scan QR codes.';
   }
 }
 
+// Error panel shown when the scanner fails.
 class _ScannerError extends StatelessWidget {
   const _ScannerError({required this.message});
 
   final String message;
 
+  // Builds the error message UI.
   @override
   Widget build(BuildContext context) {
     return Center(

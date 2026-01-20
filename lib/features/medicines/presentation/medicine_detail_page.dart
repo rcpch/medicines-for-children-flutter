@@ -9,11 +9,13 @@ import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart'
 import 'package:medicines_for_children_flutter/core/platform/image_provider.dart';
 import 'package:medicines_for_children_flutter/features/medicines/application/medicine_editor_controller.dart';
 
+// Detail screen for a single medicine.
 class MedicineDetailPage extends ConsumerWidget {
   const MedicineDetailPage({super.key, required this.medicineId});
 
   final String medicineId;
 
+  // Builds the medicine detail UI for the active child.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final child = ref.watch(activeChildProvider);
@@ -126,6 +128,7 @@ class MedicineDetailPage extends ConsumerWidget {
     );
   }
 
+  // Resolves photo URLs from legacy and list fields.
   List<String> _resolvePhotos(Medicine medicine) {
     if (medicine.photoUrls.isNotEmpty) {
       return medicine.photoUrls;
@@ -136,6 +139,7 @@ class MedicineDetailPage extends ConsumerWidget {
     return const [];
   }
 
+  // Returns a human-readable label for the medicine type.
   String _typeLabel(MedicineType type) {
     switch (type) {
       case MedicineType.everyday:
@@ -147,6 +151,7 @@ class MedicineDetailPage extends ConsumerWidget {
     }
   }
 
+  // Confirms and archives the medicine, showing feedback.
   Future<void> _archiveMedicine(
     BuildContext context,
     WidgetRef ref,
@@ -199,11 +204,13 @@ class MedicineDetailPage extends ConsumerWidget {
   }
 }
 
+// Gallery widget for medicine photos.
 class MedicinePhotoGallery extends StatefulWidget {
   const MedicinePhotoGallery({super.key, required this.photos});
 
   final List<String> photos;
 
+  // Creates the photo gallery state.
   @override
   State<MedicinePhotoGallery> createState() => _MedicinePhotoGalleryState();
 }
@@ -212,18 +219,21 @@ class _MedicinePhotoGalleryState extends State<MedicinePhotoGallery> {
   late final PageController _controller;
   int _activeIndex = 0;
 
+  // Initializes the page controller for photo paging.
   @override
   void initState() {
     super.initState();
     _controller = PageController();
   }
 
+  // Disposes the page controller.
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
+  // Builds the photo gallery with pager indicators.
   @override
   Widget build(BuildContext context) {
     if (widget.photos.isEmpty) {
@@ -278,7 +288,9 @@ class _MedicinePhotoGalleryState extends State<MedicinePhotoGallery> {
   }
 }
 
+// Placeholder card used when no photos are available.
 class _EmptyPhotoCard extends StatelessWidget {
+  // Builds an empty photo placeholder card.
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -296,11 +308,13 @@ class _EmptyPhotoCard extends StatelessWidget {
   }
 }
 
+// Small label chip used for medicine metadata.
 class _InfoChip extends StatelessWidget {
   const _InfoChip({required this.label});
 
   final String label;
 
+  // Builds a styled chip with the provided label.
   @override
   Widget build(BuildContext context) {
     return Chip(
@@ -310,12 +324,14 @@ class _InfoChip extends StatelessWidget {
   }
 }
 
+// Reusable card section for medicine details.
 class _SectionCard extends StatelessWidget {
   const _SectionCard({required this.title, required this.child});
 
   final String title;
   final Widget child;
 
+  // Builds a titled card section.
   @override
   Widget build(BuildContext context) {
     return Card(

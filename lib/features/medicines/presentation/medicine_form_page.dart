@@ -8,14 +8,17 @@ import 'package:medicines_for_children_flutter/core/platform/image_provider.dart
 import 'package:medicines_for_children_flutter/features/medicines/application/medicine_editor_controller.dart';
 import 'package:medicines_for_children_flutter/features/medicines/domain/medicine_draft.dart';
 
+// Form screen for adding or editing a medicine.
 class MedicineFormPage extends ConsumerStatefulWidget {
   const MedicineFormPage({super.key, this.medicineId, this.draft});
 
   final String? medicineId;
   final MedicineDraft? draft;
 
+  // Returns true when editing an existing medicine.
   bool get isEditing => medicineId != null;
 
+  // Creates the medicine form state.
   @override
   ConsumerState<MedicineFormPage> createState() => _MedicineFormPageState();
 }
@@ -35,6 +38,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
   MedicineStatus _status = MedicineStatus.inUse;
   late List<String> _photoUrls;
 
+  // Initializes form controllers and draft values.
   @override
   void initState() {
     super.initState();
@@ -66,6 +70,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
     _photoUrls = _resolvePhotos(medicine, draft);
   }
 
+  // Disposes form controllers.
   @override
   void dispose() {
     _nameController.dispose();
@@ -78,6 +83,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
     super.dispose();
   }
 
+  // Validates and saves the medicine draft or update.
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) {
       return;
@@ -152,6 +158,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
     }
   }
 
+  // Builds the medicine form UI.
   @override
   Widget build(BuildContext context) {
     final editorState = ref.watch(medicineEditorControllerProvider);
@@ -329,6 +336,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
     );
   }
 
+  // Loads the medicine being edited from the active child.
   Medicine? _loadMedicine() {
     if (!widget.isEditing || widget.medicineId == null) {
       return null;
@@ -343,6 +351,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
     );
   }
 
+  // Merges photo URLs from an existing medicine and draft.
   List<String> _resolvePhotos(Medicine? medicine, MedicineDraft? draft) {
     final urls = <String>[];
     if (medicine != null) {
@@ -360,6 +369,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
     return urls.toSet().toList();
   }
 
+  // Builds the photo picker and preview section.
   Widget _buildPhotoSection(BuildContext context) {
     final theme = Theme.of(context);
     return Column(
@@ -436,6 +446,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
     );
   }
 
+  // Uses the image picker to add a photo URL.
   Future<void> _pickPhoto(BuildContext context, ImageSource source) async {
     final picker = ImagePicker();
     try {
@@ -462,6 +473,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
     }
   }
 
+  // Builds a labeled text field with optional validation.
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
@@ -475,6 +487,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
     );
   }
 
+  // Returns a display label for medicine type.
   String _typeLabel(MedicineType type) {
     switch (type) {
       case MedicineType.everyday:
@@ -486,6 +499,7 @@ class _MedicineFormPageState extends ConsumerState<MedicineFormPage> {
     }
   }
 
+  // Returns a display label for medicine status.
   String _statusLabel(MedicineStatus status) {
     switch (status) {
       case MedicineStatus.inUse:

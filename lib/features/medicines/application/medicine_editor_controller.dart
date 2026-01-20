@@ -5,12 +5,14 @@ import 'package:medicines_for_children_flutter/features/home/application/primary
 import 'package:medicines_for_children_flutter/features/medicines/data/medicine_repository.dart';
 import 'package:medicines_for_children_flutter/features/medicines/domain/medicine_draft.dart';
 
+// Holds UI state for medicine create/edit actions.
 class MedicineEditorState {
   const MedicineEditorState({this.isSaving = false, this.errorMessage});
 
   final bool isSaving;
   final String? errorMessage;
 
+  // Returns a copy with updated state fields.
   MedicineEditorState copyWith({
     bool? isSaving,
     String? errorMessage,
@@ -23,15 +25,18 @@ class MedicineEditorState {
   }
 }
 
+// Coordinates medicine create/update/archive actions.
 class MedicineEditorController extends Notifier<MedicineEditorState> {
   late MedicineRepository _repository;
 
+  // Loads the repository and initial controller state.
   @override
   MedicineEditorState build() {
     _repository = ref.watch(medicineRepositoryProvider);
     return const MedicineEditorState();
   }
 
+  // Creates a medicine from a draft and refreshes local cache.
   Future<Medicine?> createMedicine(MedicineDraft draft) async {
     state = state.copyWith(isSaving: true, clearError: true);
     try {
@@ -48,6 +53,7 @@ class MedicineEditorController extends Notifier<MedicineEditorState> {
     }
   }
 
+  // Updates an existing medicine and refreshes local cache.
   Future<bool> updateMedicine(Medicine medicine) async {
     state = state.copyWith(isSaving: true, clearError: true);
     try {
@@ -64,6 +70,7 @@ class MedicineEditorController extends Notifier<MedicineEditorState> {
     }
   }
 
+  // Archives a medicine and refreshes local cache.
   Future<bool> archiveMedicine(String medicineId) async {
     state = state.copyWith(isSaving: true, clearError: true);
     try {
@@ -80,11 +87,13 @@ class MedicineEditorController extends Notifier<MedicineEditorState> {
     }
   }
 
+  // Refreshes the primary carer data from local storage.
   Future<void> _refreshCarerCache() async {
     await ref.read(primaryCarerControllerProvider.notifier).refreshFromLocal();
   }
 }
 
+// Provides the medicine editor controller and state.
 final medicineEditorControllerProvider =
     NotifierProvider<MedicineEditorController, MedicineEditorState>(
       MedicineEditorController.new,

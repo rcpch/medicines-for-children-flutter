@@ -1,4 +1,5 @@
 // Lookup for QR-scanned medicines.
+// Lookup entry for a medicine QR code.
 class QrMedicineEntry {
   const QrMedicineEntry({
     required this.url,
@@ -11,6 +12,7 @@ class QrMedicineEntry {
   final String title;
 }
 
+// Lookup entry for advice QR codes.
 class QrAdviceEntry {
   const QrAdviceEntry({required this.url, required this.title});
 
@@ -18,6 +20,7 @@ class QrAdviceEntry {
   final String title;
 }
 
+// Lookup entry for external QR codes.
 class QrExternalEntry {
   const QrExternalEntry({required this.url, required this.title});
 
@@ -25,8 +28,10 @@ class QrExternalEntry {
   final String title;
 }
 
+// Type of QR scan result.
 enum QrScanType { medicine, advice, external, unknown }
 
+// Result wrapper for a parsed QR scan.
 class QrScanResult {
   const QrScanResult._({
     required this.type,
@@ -42,6 +47,7 @@ class QrScanResult {
   final QrExternalEntry? external;
   final String? rawValue;
 
+  // Creates a medicine QR scan result.
   factory QrScanResult.medicine(QrMedicineEntry entry, String rawValue) =>
       QrScanResult._(
         type: QrScanType.medicine,
@@ -49,6 +55,7 @@ class QrScanResult {
         rawValue: rawValue,
       );
 
+  // Creates an advice QR scan result.
   factory QrScanResult.advice(QrAdviceEntry entry, String rawValue) =>
       QrScanResult._(
         type: QrScanType.advice,
@@ -56,6 +63,7 @@ class QrScanResult {
         rawValue: rawValue,
       );
 
+  // Creates an external QR scan result.
   factory QrScanResult.external(QrExternalEntry entry, String rawValue) =>
       QrScanResult._(
         type: QrScanType.external,
@@ -63,10 +71,12 @@ class QrScanResult {
         rawValue: rawValue,
       );
 
+  // Creates an unknown QR scan result.
   factory QrScanResult.unknown(String rawValue) =>
       QrScanResult._(type: QrScanType.unknown, rawValue: rawValue);
 }
 
+// Parses a raw QR value into a typed QR scan result.
 QrScanResult parseQrScanResult(String rawValue) {
   final normalized = _normalizeUrl(rawValue);
   if (normalized.isEmpty) {
@@ -87,6 +97,7 @@ QrScanResult parseQrScanResult(String rawValue) {
   return QrScanResult.unknown(rawValue);
 }
 
+// Normalizes QR URLs for matching against known entries.
 String _normalizeUrl(String rawValue) {
   final trimmed = rawValue.trim();
   if (trimmed.isEmpty) {
@@ -109,6 +120,8 @@ String _normalizeUrl(String rawValue) {
   return value;
 }
 
+// Known QR medicine entries for quick add.
+// Known QR medicine entries for quick add.
 const qrMedicineEntries = <QrMedicineEntry>[
   QrMedicineEntry(
     url:
@@ -504,6 +517,7 @@ const qrMedicineEntries = <QrMedicineEntry>[
   ),
 ];
 
+// Known QR advice entries for education links.
 const qrAdviceEntries = <QrAdviceEntry>[
   QrAdviceEntry(
     url:
@@ -585,6 +599,7 @@ const qrAdviceEntries = <QrAdviceEntry>[
   ),
 ];
 
+// Known QR external entries for third-party resources.
 const qrExternalEntries = <QrExternalEntry>[
   QrExternalEntry(
     url: 'https://eric.org.uk/childrens-bowels/constipation-in-children/',
@@ -596,18 +611,22 @@ const qrExternalEntries = <QrExternalEntry>[
   ),
 ];
 
+// Index for medicine entries keyed by normalized URL.
 final Map<String, QrMedicineEntry> qrMedicineByUrl = {
   ..._buildUrlMap(qrMedicineEntries, (entry) => entry.url),
 };
 
+// Index for advice entries keyed by normalized URL.
 final Map<String, QrAdviceEntry> qrAdviceByUrl = {
   ..._buildUrlMap(qrAdviceEntries, (entry) => entry.url),
 };
 
+// Index for external entries keyed by normalized URL.
 final Map<String, QrExternalEntry> qrExternalByUrl = {
   ..._buildUrlMap(qrExternalEntries, (entry) => entry.url),
 };
 
+// Builds a map of normalized URLs to entries.
 Map<String, T> _buildUrlMap<T>(
   List<T> entries,
   String Function(T entry) urlFor,
