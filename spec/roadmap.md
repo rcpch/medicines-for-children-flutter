@@ -138,7 +138,7 @@
   - [x] Use Quicksand Rounded Semi-bold for headings and Montserrat for body text throughout the app.
   - [x] Refine color palette to draw from RCPCH official colour set.
   - [x] Text size should be adjustable via settings (small/default/large/extra large) and persist.
-  - [ ] Create user testing scripts to gather feedback on usability and accessibility.
+  - [x] Create user testing scripts to gather feedback on usability and accessibility.
   - [x] BUG: Changing the Current Child in the Home view does not change which child is shown.
 
 
