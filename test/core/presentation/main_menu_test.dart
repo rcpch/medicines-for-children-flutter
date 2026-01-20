@@ -6,9 +6,9 @@ import 'package:medicines_for_children_flutter/core/presentation/main_menu.dart'
 void main() {
   testWidgets('Main menu includes About', (tester) async {
     await tester.pumpWidget(
-      const ProviderScope(
+      ProviderScope(
         child: MaterialApp(
-          home: Scaffold(appBar: AppBar(actions: [MainMenu()])),
+          home: Scaffold(appBar: AppBar(actions: const [MainMenu()])),
         ),
       ),
     );

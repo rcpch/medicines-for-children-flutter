@@ -1,4 +1,6 @@
 // App route definitions and navigation setup.
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -268,6 +270,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
 class RouterNotifier extends ChangeNotifier {
   RouterNotifier(this._ref) {
+    _splashTimer = Timer(_minimumSplashDuration, () {
+      _hasShownMinimumSplash = true;
+      notifyListeners();
+    });
+
     _subscription = _ref.listen<AuthState>(
       authControllerProvider,
       (previous, next) => notifyListeners(),
@@ -277,6 +284,10 @@ class RouterNotifier extends ChangeNotifier {
 
   final Ref _ref;
   ProviderSubscription<AuthState>? _subscription;
+  Timer? _splashTimer;
+
+  static const Duration _minimumSplashDuration = Duration(seconds: 3);
+  bool _hasShownMinimumSplash = false;
 
   // Returns a route redirect based on auth state and current location.
   String? handleRedirect(BuildContext context, GoRouterState state) {
@@ -292,6 +303,14 @@ class RouterNotifier extends ChangeNotifier {
     final isOnLogin = location == AppRoute.login.path;
     final isOnSignup = location == AppRoute.signup.path;
     final isOnOnboarding = location == AppRoute.onboarding.path;
+
+    // Always show the splash screen briefly at startup so it is visible.
+    if (!_hasShownMinimumSplash) {
+      if (isSharedScheduleRoute) {
+        return null;
+      }
+      return isOnSplash ? null : AppRoute.splash.path;
+    }
 
     if (status == AuthStatus.unknown) {
       if (isSharedScheduleRoute) {
@@ -331,6 +350,7 @@ class RouterNotifier extends ChangeNotifier {
   // Cancels auth subscriptions when router notifier is disposed.
   void dispose() {
     _subscription?.close();
+    _splashTimer?.cancel();
     super.dispose();
   }
 }

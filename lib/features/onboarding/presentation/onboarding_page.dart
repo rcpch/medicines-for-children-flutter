@@ -127,7 +127,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     try {
       final parsed = raw.startsWith('+')
           ? PhoneNumber.parse(raw)
-          : PhoneNumber.parse(raw, destinationCountry: _selectedDialCode.isoCode);
+          : PhoneNumber.parse(
+              raw,
+              destinationCountry: _selectedDialCode.isoCode,
+            );
       _selectedDialCode = _dialCodeOptions.firstWhere(
         (option) => option.isoCode == parsed.isoCode,
         orElse: () => _selectedDialCode,
@@ -147,7 +150,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     try {
       final parsed = raw.startsWith('+')
           ? PhoneNumber.parse(raw)
-          : PhoneNumber.parse(raw, destinationCountry: _selectedDialCode.isoCode);
+          : PhoneNumber.parse(
+              raw,
+              destinationCountry: _selectedDialCode.isoCode,
+            );
       if (!parsed.isValid()) {
         return 'Enter a valid phone number';
       }
@@ -166,7 +172,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     try {
       final parsed = raw.startsWith('+')
           ? PhoneNumber.parse(raw)
-          : PhoneNumber.parse(raw, destinationCountry: _selectedDialCode.isoCode);
+          : PhoneNumber.parse(
+              raw,
+              destinationCountry: _selectedDialCode.isoCode,
+            );
       return parsed.international;
     } catch (_) {
       return raw;
@@ -442,41 +451,41 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                                     children: [
                                       Flexible(
                                         flex: 3,
-                                        child: DropdownButtonFormField<
-                                          _DialCodeOption
-                                        >(
-                                          value: _selectedDialCode,
-                                          isExpanded: true,
-                                          decoration: const InputDecoration(
-                                            labelText: 'Code',
-                                          ),
-                                          items:
-                                              _dialCodeOptions
+                                        child:
+                                            DropdownButtonFormField<
+                                              _DialCodeOption
+                                            >(
+                                              initialValue: _selectedDialCode,
+                                              isExpanded: true,
+                                              decoration: const InputDecoration(
+                                                labelText: 'Code',
+                                              ),
+                                              items: _dialCodeOptions
                                                   .map(
-                                                    (option) =>
-                                                        DropdownMenuItem(
-                                                          key: ValueKey(
-                                                            'dial-code-${option.isoCode.name}',
-                                                          ),
-                                                          value: option,
-                                                          child: Text(
-                                                            option.label,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                          ),
-                                                        ),
+                                                    (
+                                                      option,
+                                                    ) => DropdownMenuItem(
+                                                      key: ValueKey(
+                                                        'dial-code-${option.isoCode.name}',
+                                                      ),
+                                                      value: option,
+                                                      child: Text(
+                                                        option.label,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ),
                                                   )
                                                   .toList(),
-                                          onChanged: (value) {
-                                            if (value == null) {
-                                              return;
-                                            }
-                                            setState(() {
-                                              _selectedDialCode = value;
-                                            });
-                                          },
-                                        ),
+                                              onChanged: (value) {
+                                                if (value == null) {
+                                                  return;
+                                                }
+                                                setState(() {
+                                                  _selectedDialCode = value;
+                                                });
+                                              },
+                                            ),
                                       ),
                                       const SizedBox(width: 12),
                                       Flexible(
@@ -665,15 +674,14 @@ class _DialCodeOption {
 
   // Builds a sorted list of dial codes for all ISO regions.
   static List<_DialCodeOption> buildOptions() {
-    final options =
-        IsoCode.values
-            .map(
-              (isoCode) => _DialCodeOption(
-                isoCode: isoCode,
-                dialCode: PhoneNumber(isoCode: isoCode, nsn: '0').countryCode,
-              ),
-            )
-            .toList();
+    final options = IsoCode.values
+        .map(
+          (isoCode) => _DialCodeOption(
+            isoCode: isoCode,
+            dialCode: PhoneNumber(isoCode: isoCode, nsn: '0').countryCode,
+          ),
+        )
+        .toList();
     options.sort((a, b) {
       final dialCompare = a.dialCode.compareTo(b.dialCode);
       if (dialCompare != 0) {

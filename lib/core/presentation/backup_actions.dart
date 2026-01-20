@@ -61,9 +61,13 @@ class BackupActions {
       if (!context.mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Unable to open backup: $error')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Unable to open backup: $error')));
+      return;
+    }
+
+    if (!context.mounted) {
       return;
     }
 
@@ -72,12 +76,18 @@ class BackupActions {
     }
 
     final details = await _promptImportDetails(context);
+    if (!context.mounted) {
+      return;
+    }
     if (details == null) {
       return;
     }
 
     final backupService = ref.read(backupServiceProvider);
     while (true) {
+      if (!context.mounted) {
+        return;
+      }
       final passphrase = await _promptImportPassphrase(context);
       if (!context.mounted) {
         return;
