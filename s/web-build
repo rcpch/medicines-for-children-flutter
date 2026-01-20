@@ -2,10 +2,13 @@
 set -euo pipefail
 
 # Build the Flutter web app.
-# Usage: ./s/build_web.sh
+# Usage: ./s/web-build
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
-flutter build web --release
+# Flutter now runs a WebAssembly compatibility "dry run" by default.
+# Some transitive dependencies (currently via pdf -> image) aren't wasm-clean yet,
+# which produces warnings even for a normal JS web build.
+flutter build web --release --no-wasm-dry-run
 printf "Web build output: %s\n" "$repo_root/build/web"
