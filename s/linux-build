@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Build the Linux desktop target.
+#
+# Notes:
+# - On some Ubuntu setups, clang is installed under /usr/lib/llvm-*/bin but that
+#   directory may not include all of the toolchain utilities Dart expects to
+#   find alongside the compiler (ld/ld.lld, ar/llvm-ar, ranlib, etc.).
+# - Dart's native-asset build treats this as a hard error.
+#
+# This script injects a small shim toolchain directory at the front of PATH for
+# this invocation when needed.
+
+clang_path="$(command -v clang || true)"
+if [[ -n "$clang_path" ]]; then
+  clang_real="$(readlink -f "$clang_path" || echo "$clang_path")"
+  clang_dir="$(dirname "$clang_real")"
+
+  if [[ -d "$clang_dir" && ! -x "$clang_dir/ld.lld" && ! -x "$clang_dir/ld" ]]; then
+    echo "clang found at $clang_real but no ld/ld.lld in $clang_dir; adding a local toolchain shim for this build." >&2
+    echo "Tip: installing lld (e.g. \"sudo apt install lld\") also fixes this permanently." >&2
+
+    shim_dir="$(mktemp -d)"
+    cleanup_shim() {
+      rm -rf "$shim_dir" || true
+    }
+    trap cleanup_shim EXIT
+
+    make_shim() {
+      local name="$1"
+      local target="$2"
+      cat >"$shim_dir/$name" <<EOF
+#!/usr/bin/env bash
+exec "$target" "\$@"
+EOF
+      chmod +x "$shim_dir/$name"
+    }
+
+    resolve_tool() {
+      command -v "$1" || true
+    }
+
+    real_clang="$clang_real"
+    real_clangxx="$(resolve_tool clang++ || true)"
+    if [[ -n "$real_clangxx" ]]; then
+      real_clangxx="$(readlink -f "$real_clangxx" || echo "$real_clangxx")"
+    fi
+
+    real_ld_lld="$(resolve_tool ld.lld || true)"
+    if [[ -n "$real_ld_lld" ]]; then
+      real_ld_lld="$(readlink -f "$real_ld_lld" || echo "$real_ld_lld")"
+    else
+      real_ld_lld="/usr/bin/ld"
+    fi
+
+    real_ld="$(resolve_tool ld || true)"
+    if [[ -n "$real_ld" ]]; then
+      real_ld="$(readlink -f "$real_ld" || echo "$real_ld")"
+    else
+      real_ld="/usr/bin/ld"
+    fi
+
+    # Compilers.
+    make_shim clang "$real_clang"
+    make_shim clang++ "${real_clangxx:-$real_clang}"
+
+    # Linkers.
+    make_shim ld "$real_ld"
+    make_shim ld.lld "$real_ld_lld"
+
+    # Archiver / binutils.
+    real_ar="$(resolve_tool llvm-ar || true)"
+    if [[ -z "$real_ar" ]]; then
+      real_ar="$(resolve_tool ar || true)"
+    fi
+    if [[ -n "$real_ar" ]]; then
+      make_shim ar "$real_ar"
+      make_shim llvm-ar "$real_ar"
+    fi
+
+    real_ranlib="$(resolve_tool llvm-ranlib || true)"
+    if [[ -z "$real_ranlib" ]]; then
+      real_ranlib="$(resolve_tool ranlib || true)"
+    fi
+    if [[ -n "$real_ranlib" ]]; then
+      make_shim ranlib "$real_ranlib"
+      make_shim llvm-ranlib "$real_ranlib"
+    fi
+
+    real_nm="$(resolve_tool llvm-nm || true)"
+    if [[ -z "$real_nm" ]]; then
+      real_nm="$(resolve_tool nm || true)"
+    fi
+    if [[ -n "$real_nm" ]]; then
+      make_shim nm "$real_nm"
+      make_shim llvm-nm "$real_nm"
+    fi
+
+    real_strip="$(resolve_tool llvm-strip || true)"
+    if [[ -z "$real_strip" ]]; then
+      real_strip="$(resolve_tool strip || true)"
+    fi
+    if [[ -n "$real_strip" ]]; then
+      make_shim strip "$real_strip"
+      make_shim llvm-strip "$real_strip"
+    fi
+
+    real_objcopy="$(resolve_tool llvm-objcopy || true)"
+    if [[ -z "$real_objcopy" ]]; then
+      real_objcopy="$(resolve_tool objcopy || true)"
+    fi
+    if [[ -n "$real_objcopy" ]]; then
+      make_shim objcopy "$real_objcopy"
+      make_shim llvm-objcopy "$real_objcopy"
+    fi
+
+    real_objdump="$(resolve_tool llvm-objdump || true)"
+    if [[ -z "$real_objdump" ]]; then
+      real_objdump="$(resolve_tool objdump || true)"
+    fi
+    if [[ -n "$real_objdump" ]]; then
+      make_shim objdump "$real_objdump"
+      make_shim llvm-objdump "$real_objdump"
+    fi
+
+    real_readelf="$(resolve_tool llvm-readelf || true)"
+    if [[ -z "$real_readelf" ]]; then
+      real_readelf="$(resolve_tool readelf || true)"
+    fi
+    if [[ -n "$real_readelf" ]]; then
+      make_shim readelf "$real_readelf"
+      make_shim llvm-readelf "$real_readelf"
+    fi
+
+    real_addr2line="$(resolve_tool llvm-addr2line || true)"
+    if [[ -z "$real_addr2line" ]]; then
+      real_addr2line="$(resolve_tool addr2line || true)"
+    fi
+    if [[ -n "$real_addr2line" ]]; then
+      make_shim addr2line "$real_addr2line"
+      make_shim llvm-addr2line "$real_addr2line"
+    fi
+
+    export PATH="$shim_dir:$PATH"
+  fi
+fi
+
+flutter build linux --debug "$@"
