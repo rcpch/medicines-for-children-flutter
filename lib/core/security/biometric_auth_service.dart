@@ -2,11 +2,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_auth/local_auth.dart';
 
+/// Provides biometric authentication checks and prompts.
 class BiometricAuthService {
   BiometricAuthService(this._auth);
 
   final LocalAuthentication _auth;
 
+  /// Returns true when biometric authentication is available.
   Future<bool> isSupported() async {
     try {
       final supported = await _auth.isDeviceSupported();
@@ -19,6 +21,7 @@ class BiometricAuthService {
     }
   }
 
+  /// Prompts the user for biometric authentication.
   Future<bool> authenticate() async {
     try {
       return await _auth.authenticate(
@@ -33,6 +36,7 @@ class BiometricAuthService {
   }
 }
 
+/// Provides the biometric authentication service.
 final biometricAuthServiceProvider = Provider<BiometricAuthService>((ref) {
   return BiometricAuthService(LocalAuthentication());
 });
