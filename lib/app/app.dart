@@ -17,9 +17,11 @@ import 'package:medicines_for_children_flutter/features/auth/domain/auth_status.
 import 'package:medicines_for_children_flutter/core/update/update_prompt_service.dart';
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_controller.dart';
 
+/// Root application widget wiring providers, routing, and app theme.
 class MedicinesApp extends ConsumerStatefulWidget {
   const MedicinesApp({super.key});
 
+  /// Creates the state object that drives app lifecycle wiring.
   @override
   ConsumerState<MedicinesApp> createState() => _MedicinesAppState();
 }
@@ -32,6 +34,7 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp>
   bool _reportedSlowFrame = false;
   bool _checkedForUpdates = false;
 
+  /// Initializes routing, background sync, and telemetry listeners.
   @override
   void initState() {
     super.initState();
@@ -60,6 +63,7 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp>
     }, fireImmediately: true);
   }
 
+  /// Prompts for app updates once per session.
   Future<void> _maybePromptForUpdate() async {
     if (_checkedForUpdates) {
       return;
@@ -68,6 +72,7 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp>
     await ref.read(updatePromptServiceProvider).maybePrompt(context);
   }
 
+  /// Installs telemetry-backed error and performance reporting hooks.
   void _configureErrorHandling() {
     final telemetry = ref.read(telemetryServiceProvider);
     FlutterError.onError = (details) {
@@ -107,6 +112,7 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp>
     });
   }
 
+  /// Cleans up observers and background work when the app exits.
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -115,6 +121,7 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp>
     super.dispose();
   }
 
+  /// Starts or stops background sync based on app lifecycle state.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -131,6 +138,7 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp>
     }
   }
 
+  /// Builds the Material app with routing, theming, and localization.
   @override
   Widget build(BuildContext context) {
     final config = ref.watch(appConfigProvider);
@@ -161,6 +169,7 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp>
     );
   }
 
+  /// Maps persisted theme settings to Material theme modes.
   ThemeMode _resolveThemeMode(AppThemeMode mode) {
     switch (mode) {
       case AppThemeMode.light:
