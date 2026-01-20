@@ -2,15 +2,18 @@
 import 'package:flutter/material.dart';
 import 'package:medicines_for_children_flutter/core/theme/rcpch_colours.dart';
 
+/// Centralized theme configuration for the app.
 class AppTheme {
   static const String _bodyFontFamily = 'Montserrat';
   static const String _headingFontFamily = 'Quicksand';
   static const FontWeight _headingWeight = FontWeight.w600;
 
+  /// Applies RCPCH typography styles to a base text theme.
   static TextTheme _applyRcpchTypography(
     TextTheme base, {
     required Color color,
   }) {
+    // Updates heading styles to use the configured font and weight.
     TextStyle? heading(TextStyle? style) => style?.copyWith(
       fontFamily: _headingFontFamily,
       fontWeight: _headingWeight,
@@ -35,6 +38,7 @@ class AppTheme {
     );
   }
 
+  /// Builds the default light theme for the app.
   static ThemeData get light {
     final scheme =
         ColorScheme.fromSeed(
@@ -105,6 +109,7 @@ class AppTheme {
     );
   }
 
+  /// Builds a high contrast theme for accessibility.
   static ThemeData get highContrast {
     final base = ThemeData(
       colorScheme: const ColorScheme.highContrastLight(),
@@ -122,6 +127,7 @@ class AppTheme {
     );
   }
 
+  /// Builds the dark theme variant for low-light environments.
   static ThemeData get dark {
     final scheme =
         ColorScheme.fromSeed(

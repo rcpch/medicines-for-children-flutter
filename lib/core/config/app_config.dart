@@ -2,8 +2,10 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// Supported app runtime environments.
 enum AppEnvironment { dev, staging, prod }
 
+/// Build/runtime configuration values loaded from environment.
 class AppConfig {
   const AppConfig({
     required this.environment,
@@ -15,9 +17,11 @@ class AppConfig {
     this.telemetryConsentEnabled = false,
   });
 
+  /// Builds configuration values from the loaded dotenv environment.
   factory AppConfig.fromEnvironment(AppEnvironment environment) {
     final env = dotenv.env;
 
+    // Reads a trimmed env var value or empty string when missing.
     String read(String key) {
       final value = env[key];
       return value == null ? '' : value.trim();
@@ -43,6 +47,7 @@ class AppConfig {
   final bool telemetryConsentEnabled;
 }
 
+/// Provides the current app configuration.
 final appConfigProvider = Provider<AppConfig>((ref) {
   throw UnimplementedError(
     'appConfig provider must be overridden at bootstrap',
