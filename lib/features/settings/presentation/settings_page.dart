@@ -9,10 +9,12 @@ import 'package:medicines_for_children_flutter/features/auth/application/auth_co
 import 'package:medicines_for_children_flutter/features/auth/domain/local_profile.dart';
 import 'package:medicines_for_children_flutter/features/settings/presentation/privacy_policy_page.dart';
 
+// Shows settings for profile, appearance, notifications, and privacy.
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
+  // Builds the settings list for the active profile.
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authControllerProvider);
     final settings = ref.watch(settingsControllerProvider);
@@ -193,6 +195,7 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
+  // Maps the text scale value to a user-friendly label.
   String _textScaleLabel(double scale) {
     if (scale <= 0.95) {
       return 'Small';
@@ -206,6 +209,7 @@ class SettingsPage extends ConsumerWidget {
     return 'Extra large';
   }
 
+  // Prompts for passcode confirmation before sensitive changes.
   Future<bool> _confirmPasscode(
     BuildContext context,
     AuthController controller, {
@@ -260,6 +264,7 @@ class SettingsPage extends ConsumerWidget {
     return confirmed;
   }
 
+  // Shows a dialog to set or update the profile passcode.
   Future<void> _showPasscodeDialog(
     BuildContext context,
     AuthController controller, {
@@ -349,6 +354,7 @@ class SettingsPage extends ConsumerWidget {
   }
 }
 
+// Switch tile for toggling biometric unlock for a profile.
 class _BiometricsTile extends ConsumerWidget {
   const _BiometricsTile({
     required this.profileName,
@@ -363,6 +369,7 @@ class _BiometricsTile extends ConsumerWidget {
   final ValueChanged<bool>? onChanged;
 
   @override
+  // Builds the biometric toggle based on device capability.
   Widget build(BuildContext context, WidgetRef ref) {
     return FutureBuilder<bool>(
       future: ref.read(biometricAuthServiceProvider).isSupported(),

@@ -1,10 +1,12 @@
 // Privacy policy screen UI.
 import 'package:flutter/material.dart';
 
+// Displays the app privacy policy text.
 class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({super.key});
 
   @override
+  // Builds the privacy policy content list.
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
