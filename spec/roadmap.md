@@ -137,9 +137,9 @@
 
   - [x] Use Quicksand Rounded Semi-bold for headings and Montserrat for body text throughout the app.
   - [x] Refine color palette to draw from RCPCH official colour set.
-  - [ ] Text size should be adjustable via settings (small, medium, large) and persist to profile.
+  - [x] Text size should be adjustable via settings (small/default/large/extra large) and persist.
   - [ ] Create user testing scripts to gather feedback on usability and accessibility.
-  - [ ] BUG: Changing the Current Child in the Home view does not change which child is shown 
+  - [x] BUG: Changing the Current Child in the Home view does not change which child is shown.
 
 
 ## Milestone 14 – QA and Release Prep
@@ -149,7 +149,13 @@
   - [x] Final review of codebase for any included files which constitute a security risk (e.g., hardcoded API keys).
   - [ ] Extend test coverage
   - [ ] Improve granularity of comments in codebase for maintainability.
-  - [ ] Set up CI to enable automated release builds to TestFlight and Google Play Internal Testing.
+  - [ ] Set up CI workflow (based on the DGC app workflow ) to automate build and Play Store upload.
+
+## Milestone 15 – Documentation & Community Building
+
+  - [x] Finalize README with setup instructions, contribution guidelines, and project overview.
+  - [x] Create a dedicated documentation site or wiki for detailed developer and user guides.
+  - [ ] Plan and announce community engagement activities (forums, chat channels, regular updates).
 
 ## Stretch Goals – Significant Additions Beyond Baseline Spec
 
