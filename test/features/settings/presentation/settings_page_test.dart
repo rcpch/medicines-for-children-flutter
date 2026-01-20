@@ -7,7 +7,6 @@ import 'package:medicines_for_children_flutter/core/notifications/notification_s
 import 'package:medicines_for_children_flutter/core/security/biometric_auth_service.dart';
 import 'package:medicines_for_children_flutter/features/settings/presentation/settings_page.dart';
 import 'package:medicines_for_children_flutter/features/settings/presentation/privacy_policy_page.dart';
-import 'package:medicines_for_children_flutter/features/settings/presentation/data_deletion_page.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_platform_interface/local_auth_platform_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -46,9 +45,7 @@ void main() {
     expect(prefs.getBool('telemetry_enabled'), isFalse);
   });
 
-  testWidgets('settings page navigates to privacy policy and data deletion', (
-    tester,
-  ) async {
+  testWidgets('settings page navigates to privacy policy', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
 
@@ -69,17 +66,10 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.scrollUntilVisible(find.text('Privacy policy'), 200);
+    expect(find.text('Request data deletion'), findsNothing);
     await tester.tap(find.text('Privacy policy'));
     await tester.pumpAndSettle();
     expect(find.byType(PrivacyPolicyPage), findsOneWidget);
-
-    Navigator.of(tester.element(find.byType(PrivacyPolicyPage))).pop();
-    await tester.pumpAndSettle();
-
-    await tester.scrollUntilVisible(find.text('Request data deletion'), 200);
-    await tester.tap(find.text('Request data deletion'));
-    await tester.pumpAndSettle();
-    expect(find.byType(DataDeletionPage), findsOneWidget);
   });
 }
 

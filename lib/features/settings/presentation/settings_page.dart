@@ -7,7 +7,6 @@ import 'package:medicines_for_children_flutter/core/settings/profile_settings_co
 import 'package:medicines_for_children_flutter/core/settings/settings_controller.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/local_profile.dart';
-import 'package:medicines_for_children_flutter/features/settings/presentation/data_deletion_page.dart';
 import 'package:medicines_for_children_flutter/features/settings/presentation/privacy_policy_page.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -195,19 +194,6 @@ class SettingsPage extends ConsumerWidget {
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => const PrivacyPolicyPage(),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Card(
-              child: ListTile(
-                title: const Text('Request data deletion'),
-                subtitle: const Text('Learn how to request data deletion.'),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const DataDeletionPage(),
                   ),
                 ),
               ),

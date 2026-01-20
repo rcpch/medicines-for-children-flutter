@@ -27,8 +27,8 @@ Validate Settings controls (theme, text size, analytics toggle) and User guide n
 4. Toggle **Share anonymous analytics**.
    - Expected: Toggle state persists when navigating away and back.
 
-5. Open **Privacy policy** and **Request data deletion**.
-   - Expected: Each opens a new screen without crashing, and back navigation returns to Settings.
+5. Open **Privacy policy**.
+   - Expected: It opens a new screen without crashing, and back navigation returns to Settings.
 
 ### B. User guide
 
@@ -39,6 +39,9 @@ Validate Settings controls (theme, text size, analytics toggle) and User guide n
 7. Open a guide section.
    - Action: Tap any section card.
    - Expected: You see the guide detail screen for that section.
+
+8. Verify the guide includes **Deleting your data**.
+   - Expected: A section exists explaining how to delete local data (delete backups and uninstall the app).
 
 8. Navigate back to the guide list.
    - Expected: You return to the list and can open a different section.

@@ -123,8 +123,19 @@ const userGuideSections = <UserGuideSection>[
       'Tap Biometric unlock to allow Face ID/Touch ID where available.',
       'Tap Change passcode to update the profile passcode.',
       'Tap Privacy policy to read the privacy information.',
-      'Tap Data deletion to read data removal guidance.',
       'Tap Back to return to the main app.',
+    ],
+  ),
+  UserGuideSection(
+    id: 'delete-data',
+    title: 'Deleting your data',
+    summary:
+        'Your information is stored on your device. Remove backups and uninstall to delete it.',
+    steps: [
+      'If you exported a backup (.mfc file), delete it from your device and any cloud storage you copied it to.',
+      'If you exported PDFs or shared screenshots, delete those files wherever they were saved or shared.',
+      'To remove all Medicines for Children data from a device, uninstall the app (or clear storage in system settings).',
+      'Repeat on every device where you used the app.',
     ],
   ),
   UserGuideSection(
