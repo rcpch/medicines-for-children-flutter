@@ -12,7 +12,9 @@ import 'package:local_auth_platform_interface/local_auth_platform_interface.dart
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  testWidgets('settings page toggles telemetry', (tester) async {
+  testWidgets('settings page shows privacy and notification controls', (
+    tester,
+  ) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
 
@@ -33,16 +35,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Settings'), findsOneWidget);
-    await tester.scrollUntilVisible(
-      find.text('Share anonymous analytics'),
-      200,
-    );
-    expect(find.text('Share anonymous analytics'), findsOneWidget);
-
-    await tester.tap(find.text('Share anonymous analytics'));
-    await tester.pumpAndSettle();
-
-    expect(prefs.getBool('telemetry_enabled'), isFalse);
+    await tester.scrollUntilVisible(find.text('Privacy policy'), 200);
+    expect(find.text('Privacy policy'), findsOneWidget);
+    expect(find.text('Enable reminders'), findsOneWidget);
   });
 
   testWidgets('settings page navigates to privacy policy', (tester) async {

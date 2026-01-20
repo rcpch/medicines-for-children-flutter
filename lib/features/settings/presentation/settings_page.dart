@@ -176,17 +176,6 @@ class SettingsPage extends ConsumerWidget {
             Text('Privacy', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             Card(
-              child: SwitchListTile.adaptive(
-                value: settings.telemetryEnabled,
-                title: const Text('Share anonymous analytics'),
-                subtitle: const Text(
-                  'Help improve the app by sharing usage data.',
-                ),
-                onChanged: (value) => controller.setTelemetryEnabled(value),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Card(
               child: ListTile(
                 title: const Text('Privacy policy'),
                 subtitle: const Text('Read how we handle your data.'),
