@@ -1,6 +1,6 @@
 # Medicines for Children
 
-![Coverage](https://img.shields.io/badge/coverage-32.7%25-yellow)
+![Coverage](https://img.shields.io/badge/coverage-39.8%25-red)
 
 This repository hosts the Flutter implementation of the Medicines for Children mobile and web client. The app delivers the sharing centre, secondary-carer flows, offline-first storage, and release readiness milestones.
 
@@ -9,7 +9,7 @@ This repository hosts the Flutter implementation of the Medicines for Children m
 - Onboarding flows for primary carers and first children.
 - Multi-child support with offline CRUD for medicines and schedules.
 - Notification scheduling for medicine administrations.
-- Share centre for secondary carers to access shared schedules.
+- Sharing options for secondary carers to access shared schedules.
 - QR code import for Medicines for Children poster codes.
 - PDF exports of medicine schedules.
 - Deep-link routing for secondary carers and shared schedules.
