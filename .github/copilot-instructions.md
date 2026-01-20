@@ -13,7 +13,6 @@
 - Follow `analysis_options.yaml` (flutter_lints v5). Prefer fixing lint warnings; only suppress with justification.
 
 ## Tooling & workflows
-- Use the provided `Makefile`: `make get`, `make analyze`, `make test`, `make gen`, `make run-dev`. These should stay green before opening PRs.
 - CI is enforced via `.github/workflows/flutter-ci.yml` (runs `flutter pub get`, `flutter analyze`, `flutter test --coverage`). Avoid adding steps that require secrets unless you also update the workflow.
 - Default flavor is `dev`; staging/prod flavours will be added in Milestone 1. Keep environment-specific logic behind an eventual config service (planned via `flutter_dotenv`).
 - For local notifications/timezone, rely on the dependencies already declared in `pubspec.yaml`—don’t reintroduce duplicates.
