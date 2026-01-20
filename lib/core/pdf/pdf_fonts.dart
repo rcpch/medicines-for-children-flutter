@@ -2,6 +2,7 @@
 import 'package:flutter/services.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+// Loads the PDF theme using bundled Montserrat fonts.
 Future<pw.ThemeData> loadPdfTheme() async {
   final regular = await rootBundle.load(
     'assets/fonts/Montserrat/static/Montserrat-Regular.ttf',
