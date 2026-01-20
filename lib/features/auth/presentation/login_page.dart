@@ -148,17 +148,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Choose profile'),
-        actions: [
-          IconButton(
-            tooltip: 'Refresh profiles',
-            onPressed: authState.isLoading
-                ? null
-                : () => ref
-                      .read(authControllerProvider.notifier)
-                      .refreshProfiles(),
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
       ),
       body: SafeArea(
         child: Center(

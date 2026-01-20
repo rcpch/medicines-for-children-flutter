@@ -92,11 +92,6 @@ class _HomePageState extends ConsumerState<HomePage> {
         title: const Text('Home'),
         actions: [
           const ChildSwitcherAction(),
-          IconButton(
-            tooltip: 'Refresh family data',
-            onPressed: state.isLoading ? null : () => controller.refresh(),
-            icon: const Icon(Icons.refresh),
-          ),
           const MainMenu(),
         ],
       ),
