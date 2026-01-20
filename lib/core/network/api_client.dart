@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/config/app_config.dart';
 
+/// Provides a configured Dio client for API calls.
 final dioProvider = Provider<Dio>((ref) {
   final config = ref.watch(appConfigProvider);
   final dio = Dio(
@@ -32,6 +33,7 @@ final dioProvider = Provider<Dio>((ref) {
   return dio;
 });
 
+/// Provides a Dio client that includes the shared schedule API key header.
 final securedApiClientProvider = Provider<Dio>((ref) {
   final dio = ref.watch(dioProvider);
   final apiKey = ref.watch(appConfigProvider).sharedScheduleApiKey;
