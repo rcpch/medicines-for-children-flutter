@@ -1,7 +1,7 @@
 // Passcode record model.
 import 'dart:convert';
 
-/// Stores hashed passcode metadata for a profile.
+// Stores hashed passcode metadata for a profile.
 class PasscodeRecord {
   const PasscodeRecord({
     required this.saltBase64,
@@ -9,7 +9,7 @@ class PasscodeRecord {
     required this.hashBase64,
   });
 
-  /// Builds a passcode record from a JSON map.
+  // Builds a passcode record from a JSON map.
   factory PasscodeRecord.fromJson(Map<String, dynamic> json) {
     return PasscodeRecord(
       saltBase64: (json['saltBase64'] ?? '').toString(),
@@ -18,7 +18,7 @@ class PasscodeRecord {
     );
   }
 
-  /// Parses a raw JSON string into a passcode record.
+  // Parses a raw JSON string into a passcode record.
   static PasscodeRecord? fromRawJson(String? raw) {
     if (raw == null || raw.isEmpty) {
       return null;
@@ -30,10 +30,10 @@ class PasscodeRecord {
     return PasscodeRecord.fromJson(decoded);
   }
 
-  /// Serializes the record to a raw JSON string.
+  // Serializes the record to a raw JSON string.
   String toRawJson() => jsonEncode(toJson());
 
-  /// Converts the record to a JSON map.
+  // Converts the record to a JSON map.
   Map<String, dynamic> toJson() {
     return {
       'saltBase64': saltBase64,

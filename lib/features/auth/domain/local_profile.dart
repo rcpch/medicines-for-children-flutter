@@ -1,7 +1,7 @@
 // Local profile model for passcode users.
 import 'dart:convert';
 
-/// Represents a locally stored profile and its metadata.
+// Represents a locally stored profile and its metadata.
 class LocalProfile {
   const LocalProfile({
     required this.id,
@@ -11,7 +11,7 @@ class LocalProfile {
     required this.hasPasscode,
   });
 
-  /// Builds a local profile from a JSON map.
+  // Builds a local profile from a JSON map.
   factory LocalProfile.fromJson(Map<String, dynamic> json) {
     return LocalProfile(
       id: (json['id'] ?? '').toString(),
@@ -24,7 +24,7 @@ class LocalProfile {
     );
   }
 
-  /// Parses a JSON list string into local profiles.
+  // Parses a JSON list string into local profiles.
   static List<LocalProfile> listFromRawJson(String raw) {
     if (raw.isEmpty) {
       return const [];
@@ -40,14 +40,14 @@ class LocalProfile {
         .toList(growable: false);
   }
 
-  /// Serializes local profiles into a JSON list string.
+  // Serializes local profiles into a JSON list string.
   static String listToRawJson(List<LocalProfile> profiles) {
     return jsonEncode(
       profiles.map((profile) => profile.toJson()).toList(growable: false),
     );
   }
 
-  /// Converts the profile to a JSON map.
+  // Converts the profile to a JSON map.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -58,7 +58,7 @@ class LocalProfile {
     };
   }
 
-  /// Returns a copy with updated profile fields.
+  // Returns a copy with updated profile fields.
   LocalProfile copyWith({
     String? name,
     String? displayName,

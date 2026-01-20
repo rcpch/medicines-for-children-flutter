@@ -4,7 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'auth_user.freezed.dart';
 part 'auth_user.g.dart';
 
-/// Represents an authenticated user session.
+// Represents an authenticated user session.
 @freezed
 abstract class AuthUser with _$AuthUser {
   const factory AuthUser({
@@ -13,7 +13,7 @@ abstract class AuthUser with _$AuthUser {
     String? displayName,
   }) = _AuthUser;
 
-  /// Builds an auth user from a JSON map.
+  // Builds an auth user from a JSON map.
   factory AuthUser.fromJson(Map<String, dynamic> json) =>
       _$AuthUserFromJson(json);
 }

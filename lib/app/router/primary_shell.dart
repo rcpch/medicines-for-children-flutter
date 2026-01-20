@@ -2,13 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-/// Main shell that hosts the bottom navigation scaffold.
+// Main shell that hosts the bottom navigation scaffold.
 class PrimaryShell extends StatelessWidget {
   const PrimaryShell({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
-  /// Builds the scaffold containing the navigation shell and tab bar.
+  // Builds the scaffold containing the navigation shell and tab bar.
   @override
   Widget build(BuildContext context) {
     return Scaffold(

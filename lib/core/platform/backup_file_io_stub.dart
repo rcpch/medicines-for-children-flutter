@@ -3,12 +3,12 @@ import 'dart:typed_data';
 
 import 'backup_file_io.dart';
 
-/// Creates the backup file IO implementation for unsupported platforms.
+// Creates the backup file IO implementation for unsupported platforms.
 BackupFileIO createBackupFileIO() => _UnsupportedBackupFileIO();
 
 class _UnsupportedBackupFileIO implements BackupFileIO {
   @override
-  /// Throws because backup saving is unsupported on this platform.
+  // Throws because backup saving is unsupported on this platform.
   Future<void> saveBytes({
     required Uint8List bytes,
     required String filename,
@@ -20,7 +20,7 @@ class _UnsupportedBackupFileIO implements BackupFileIO {
   }
 
   @override
-  /// Throws because backup picking is unsupported on this platform.
+  // Throws because backup picking is unsupported on this platform.
   Future<Uint8List?> pickFileBytes({
     required String label,
     required List<String> extensions,

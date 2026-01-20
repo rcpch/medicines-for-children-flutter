@@ -11,7 +11,7 @@ import 'package:medicines_for_children_flutter/features/auth/data/auth_repositor
 import 'package:medicines_for_children_flutter/features/auth/domain/local_profile.dart';
 import 'package:medicines_for_children_flutter/features/onboarding/domain/onboarding_profile.dart';
 
-/// Handles encrypted backup and restore of profile data.
+// Handles encrypted backup and restore of profile data.
 class BackupService {
   BackupService({required this.authRepository, required this.profileData});
 
@@ -23,7 +23,7 @@ class BackupService {
   final AuthRepository authRepository;
   final ProfileDataLocalDataSource profileData;
 
-  /// Builds an encrypted backup payload from the current profile data.
+  // Builds an encrypted backup payload from the current profile data.
   Future<Uint8List> createBackup({required String passphrase}) async {
     final user = await authRepository.currentUser();
     if (user == null) {
@@ -56,7 +56,7 @@ class BackupService {
     return Uint8List.fromList(utf8.encode(encoded));
   }
 
-  /// Restores a profile from backup bytes using the provided passphrase.
+  // Restores a profile from backup bytes using the provided passphrase.
   Future<LocalProfile> restoreBackup({
     required Uint8List bytes,
     required String passphrase,
@@ -110,7 +110,7 @@ class BackupService {
     return profile;
   }
 
-  /// Encrypts the JSON payload using a key derived from the passphrase.
+  // Encrypts the JSON payload using a key derived from the passphrase.
   Future<Map<String, dynamic>> _encryptPayload(
     String plaintext,
     String passphrase,
@@ -148,7 +148,7 @@ class BackupService {
     };
   }
 
-  /// Decrypts the stored payload using passphrase-derived key material.
+  // Decrypts the stored payload using passphrase-derived key material.
   Future<String> _decryptPayload(
     Map<String, dynamic> encrypted,
     String passphrase,
@@ -193,7 +193,7 @@ class BackupService {
     return utf8.decode(clear);
   }
 
-  /// Returns a secure random generator, falling back if unavailable.
+  // Returns a secure random generator, falling back if unavailable.
   Random _secureRandom() {
     try {
       return Random.secure();
@@ -203,7 +203,7 @@ class BackupService {
   }
 }
 
-/// Provides the backup service with injected data sources.
+// Provides the backup service with injected data sources.
 final backupServiceProvider = Provider<BackupService>((ref) {
   final authRepository = ref.watch(authRepositoryProvider);
   final profileData = ref.watch(profileDataLocalDataSourceProvider);

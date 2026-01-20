@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/offline/share_action_queue.dart';
 import 'package:medicines_for_children_flutter/core/offline/shared_schedule_action_queue.dart';
 
-/// Schedules periodic processing of offline action queues.
+// Schedules periodic processing of offline action queues.
 class BackgroundSyncService {
   BackgroundSyncService({
     required Future<void> Function() onSync,
@@ -19,7 +19,7 @@ class BackgroundSyncService {
   bool _active = false;
   bool _syncInFlight = false;
 
-  /// Starts periodic sync if not already running.
+  // Starts periodic sync if not already running.
   void start() {
     if (_active) {
       return;
@@ -30,14 +30,14 @@ class BackgroundSyncService {
     });
   }
 
-  /// Stops periodic sync and clears the timer.
+  // Stops periodic sync and clears the timer.
   void stop() {
     _timer?.cancel();
     _timer = null;
     _active = false;
   }
 
-  /// Triggers a one-off sync when the service is active.
+  // Triggers a one-off sync when the service is active.
   Future<void> triggerSync() async {
     if (!_active) {
       return;
@@ -45,7 +45,7 @@ class BackgroundSyncService {
     await _runSync();
   }
 
-  /// Runs the sync callback with concurrency protection.
+  // Runs the sync callback with concurrency protection.
   Future<void> _runSync() async {
     if (_syncInFlight) {
       return;
@@ -61,7 +61,7 @@ class BackgroundSyncService {
   }
 }
 
-/// Provides the background sync service wired to action queues.
+// Provides the background sync service wired to action queues.
 final backgroundSyncServiceProvider = Provider<BackgroundSyncService>((ref) {
   final shareQueue = ref.watch(shareActionQueueServiceProvider);
   final sharedScheduleQueue = ref.watch(

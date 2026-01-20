@@ -8,7 +8,7 @@ import 'package:medicines_for_children_flutter/core/notifications/notification_s
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-/// Manages scheduling and cancelling local notifications.
+// Manages scheduling and cancelling local notifications.
 class NotificationService {
   NotificationService(this._store)
     : _plugin = FlutterLocalNotificationsPlugin(),
@@ -19,7 +19,7 @@ class NotificationService {
   final NotificationScheduleCalculator _calculator;
   bool _initialised = false;
 
-  /// Initializes the notifications plugin and time zone data.
+  // Initializes the notifications plugin and time zone data.
   Future<void> ensureInitialized() async {
     if (_initialised) {
       return;
@@ -39,7 +39,7 @@ class NotificationService {
     _initialised = true;
   }
 
-  /// Schedules reminders for each time in a medicine schedule.
+  // Schedules reminders for each time in a medicine schedule.
   Future<void> scheduleForSchedule({
     required MedicineSchedule schedule,
     required Medicine medicine,
@@ -85,7 +85,7 @@ class NotificationService {
     }
   }
 
-  /// Cancels notifications linked to a schedule and clears metadata.
+  // Cancels notifications linked to a schedule and clears metadata.
   Future<void> cancelForSchedule(String scheduleId) async {
     await ensureInitialized();
     final metadata = await _store.readForSchedule(scheduleId);
@@ -98,7 +98,7 @@ class NotificationService {
     await _store.removeSchedule(scheduleId);
   }
 
-  /// Removes any notifications associated with expired schedules.
+  // Removes any notifications associated with expired schedules.
   Future<void> pruneExpired() async {
     await ensureInitialized();
     final all = _store.readAll();
@@ -113,7 +113,7 @@ class NotificationService {
     }
   }
 
-  /// Cancels all scheduled notifications and clears metadata.
+  // Cancels all scheduled notifications and clears metadata.
   Future<void> cancelAll() async {
     await ensureInitialized();
     final all = _store.readAll();
@@ -126,7 +126,7 @@ class NotificationService {
   }
 }
 
-/// Provides the notification service with its backing store.
+// Provides the notification service with its backing store.
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   final store = ref.watch(notificationStoreProvider);
   return NotificationService(store);

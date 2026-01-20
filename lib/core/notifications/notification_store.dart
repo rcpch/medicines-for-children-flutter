@@ -5,20 +5,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/data/storage/shared_preferences_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Describes persisted notification ids and their end date.
+// Describes persisted notification ids and their end date.
 class NotificationMetadata {
   NotificationMetadata({required this.notificationIds, required this.endDate});
 
   final List<int> notificationIds;
   final DateTime endDate;
 
-  /// Serializes the metadata to a JSON map.
+  // Serializes the metadata to a JSON map.
   Map<String, dynamic> toJson() => {
     'notificationIds': notificationIds,
     'endDate': endDate.toIso8601String(),
   };
 
-  /// Hydrates metadata from a JSON map when valid.
+  // Hydrates metadata from a JSON map when valid.
   static NotificationMetadata? fromJson(Map<String, dynamic> json) {
     final ids = (json['notificationIds'] as List?)
         ?.map((item) => item as int)
@@ -35,7 +35,7 @@ class NotificationMetadata {
   }
 }
 
-/// Stores notification metadata keyed by schedule id.
+// Stores notification metadata keyed by schedule id.
 class NotificationStore {
   NotificationStore(this._preferences);
 
@@ -43,7 +43,7 @@ class NotificationStore {
 
   final SharedPreferences _preferences;
 
-  /// Loads stored metadata for a schedule id.
+  // Loads stored metadata for a schedule id.
   Future<NotificationMetadata?> readForSchedule(String scheduleId) async {
     final all = _readAll();
     final value = all[scheduleId];
@@ -53,7 +53,7 @@ class NotificationStore {
     return NotificationMetadata.fromJson(value);
   }
 
-  /// Writes metadata for the given schedule id.
+  // Writes metadata for the given schedule id.
   Future<void> writeForSchedule(
     String scheduleId,
     NotificationMetadata metadata,
@@ -63,19 +63,19 @@ class NotificationStore {
     await _writeAll(all);
   }
 
-  /// Removes metadata for the given schedule id.
+  // Removes metadata for the given schedule id.
   Future<void> removeSchedule(String scheduleId) async {
     final all = _readAll();
     all.remove(scheduleId);
     await _writeAll(all);
   }
 
-  /// Clears all stored notification metadata.
+  // Clears all stored notification metadata.
   Future<void> clearAll() async {
     await _writeAll(<String, dynamic>{});
   }
 
-  /// Returns all stored metadata as typed models.
+  // Returns all stored metadata as typed models.
   Map<String, NotificationMetadata> readAll() {
     final raw = _readAll();
     final Map<String, NotificationMetadata> result = {};
@@ -92,7 +92,7 @@ class NotificationStore {
     return result;
   }
 
-  /// Reads the raw metadata map from storage.
+  // Reads the raw metadata map from storage.
   Map<String, dynamic> _readAll() {
     final raw = _preferences.getString(_key);
     if (raw == null || raw.isEmpty) {
@@ -105,13 +105,13 @@ class NotificationStore {
     return decoded;
   }
 
-  /// Writes the raw metadata map to storage.
+  // Writes the raw metadata map to storage.
   Future<void> _writeAll(Map<String, dynamic> value) async {
     await _preferences.setString(_key, jsonEncode(value));
   }
 }
 
-/// Provides the notification metadata store.
+// Provides the notification metadata store.
 final notificationStoreProvider = Provider<NotificationStore>((ref) {
   final preferences = ref.watch(sharedPreferencesProvider);
   return NotificationStore(preferences);

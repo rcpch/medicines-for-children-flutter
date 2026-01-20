@@ -6,7 +6,7 @@ import 'package:medicines_for_children_flutter/core/domain/models/schedule.dart'
 part 'child.freezed.dart';
 part 'child.g.dart';
 
-/// Represents a child profile and their medicines.
+// Represents a child profile and their medicines.
 @freezed
 abstract class Child with _$Child {
   const factory Child({
@@ -23,6 +23,6 @@ abstract class Child with _$Child {
     required List<AsNeededSchedule> asNeededSchedules,
   }) = _Child;
 
-  /// Builds a child model from a JSON map.
+  // Builds a child model from a JSON map.
   factory Child.fromJson(Map<String, dynamic> json) => _$ChildFromJson(json);
 }

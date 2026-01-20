@@ -7,14 +7,14 @@ import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_state_provider.dart';
 
-/// Manages the selected child id for the active profile.
+// Manages the selected child id for the active profile.
 class SelectedChildController extends Notifier<String?> {
   SelectedChildController();
 
   late ActiveChildLocalDataSource _storage;
   String? _profileId;
 
-  /// Initializes state from storage and listens for auth changes.
+  // Initializes state from storage and listens for auth changes.
   @override
   String? build() {
     _storage = ref.watch(activeChildLocalDataSourceProvider);
@@ -35,7 +35,7 @@ class SelectedChildController extends Notifier<String?> {
     return initial;
   }
 
-  /// Updates selected child state when the active profile changes.
+  // Updates selected child state when the active profile changes.
   void _handleAuthChange(AuthState next) {
     final profileId = next.user?.uid;
     if (_profileId == profileId) {
@@ -49,7 +49,7 @@ class SelectedChildController extends Notifier<String?> {
     state = _storage.readActiveChildId(profileId);
   }
 
-  /// Persists the newly selected child id for the current profile.
+  // Persists the newly selected child id for the current profile.
   Future<void> selectChild(String childId) async {
     final profileId = _profileId;
     if (profileId == null || profileId.isEmpty) {
@@ -60,13 +60,13 @@ class SelectedChildController extends Notifier<String?> {
   }
 }
 
-/// Provides the selected child id state.
+// Provides the selected child id state.
 final selectedChildIdProvider =
     NotifierProvider<SelectedChildController, String?>(
       SelectedChildController.new,
     );
 
-/// Provides the active child entity resolved from the selected id.
+// Provides the active child entity resolved from the selected id.
 final activeChildProvider = Provider<Child?>((ref) {
   final state = ref.watch(primaryCarerStateProvider);
   final selectedChildId = ref.watch(selectedChildIdProvider);

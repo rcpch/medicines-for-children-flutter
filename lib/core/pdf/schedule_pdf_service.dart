@@ -11,9 +11,9 @@ import 'package:medicines_for_children_flutter/core/pdf/pdf_fonts.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-/// Builds PDF exports of medicine schedules.
+// Builds PDF exports of medicine schedules.
 class SchedulePdfService {
-  /// Generates a schedule PDF for the given carer, child, and date range.
+  // Generates a schedule PDF for the given carer, child, and date range.
   Future<Uint8List> buildPdf({
     required PrimaryCarer carer,
     required Child child,
@@ -70,7 +70,7 @@ class SchedulePdfService {
     return doc.save();
   }
 
-  /// Renders a schedule block with times and dosing details.
+  // Renders a schedule block with times and dosing details.
   pw.Widget _scheduleBlock(MedicineSchedule schedule, Medicine? medicine) {
     final times = schedule.times.isEmpty
         ? 'No times recorded'
@@ -106,13 +106,13 @@ class SchedulePdfService {
     );
   }
 
-  /// Returns a display name for the child.
+  // Returns a display name for the child.
   String _childName(Child child) {
     final name = '${child.firstName} ${child.lastName}'.trim();
     return name.isEmpty ? 'Child' : name;
   }
 
-  /// Returns a display name for the medicine, including alias if set.
+  // Returns a display name for the medicine, including alias if set.
   String _medicineName(Medicine medicine) {
     if (medicine.alias.trim().isEmpty) {
       return medicine.name;
@@ -121,7 +121,7 @@ class SchedulePdfService {
   }
 }
 
-/// Provides the schedule PDF service.
+// Provides the schedule PDF service.
 final schedulePdfServiceProvider = Provider<SchedulePdfService>((ref) {
   return SchedulePdfService();
 });

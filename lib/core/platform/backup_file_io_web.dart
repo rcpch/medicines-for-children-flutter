@@ -8,12 +8,12 @@ import 'package:file_selector/file_selector.dart';
 
 import 'backup_file_io.dart';
 
-/// Creates the backup file IO implementation for web.
+// Creates the backup file IO implementation for web.
 BackupFileIO createBackupFileIO() => _WebBackupFileIO();
 
 class _WebBackupFileIO implements BackupFileIO {
   @override
-  /// Saves backup bytes via a browser download.
+  // Saves backup bytes via a browser download.
   Future<void> saveBytes({
     required Uint8List bytes,
     required String filename,
@@ -31,7 +31,7 @@ class _WebBackupFileIO implements BackupFileIO {
   }
 
   @override
-  /// Opens a browser file picker and returns the selected file bytes.
+  // Opens a browser file picker and returns the selected file bytes.
   Future<Uint8List?> pickFileBytes({
     required String label,
     required List<String> extensions,

@@ -9,9 +9,9 @@ import 'package:medicines_for_children_flutter/core/pdf/pdf_fonts.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-/// Builds PDF summaries of a child's medicines.
+// Builds PDF summaries of a child's medicines.
 class MedicineSummaryPdfService {
-  /// Generates a PDF summary document for the given carer and child.
+  // Generates a PDF summary document for the given carer and child.
   Future<Uint8List> buildPdf({
     required PrimaryCarer carer,
     required Child child,
@@ -49,7 +49,7 @@ class MedicineSummaryPdfService {
     return doc.save();
   }
 
-  /// Renders a single medicine section for the summary.
+  // Renders a single medicine section for the summary.
   pw.Widget _medicineBlock(Medicine medicine) {
     final details = <String>[
       'Dose: ${medicine.dose} ${medicine.doseUnit}',
@@ -82,13 +82,13 @@ class MedicineSummaryPdfService {
     );
   }
 
-  /// Returns a display name for the child.
+  // Returns a display name for the child.
   String _childName(Child child) {
     final name = '${child.firstName} ${child.lastName}'.trim();
     return name.isEmpty ? 'Child' : name;
   }
 
-  /// Returns a display name for the medicine, including alias if set.
+  // Returns a display name for the medicine, including alias if set.
   String _medicineName(Medicine medicine) {
     if (medicine.alias.trim().isEmpty) {
       return medicine.name;
@@ -97,7 +97,7 @@ class MedicineSummaryPdfService {
   }
 }
 
-/// Provides the medicine summary PDF service.
+// Provides the medicine summary PDF service.
 final medicineSummaryPdfServiceProvider = Provider<MedicineSummaryPdfService>((
   ref,
 ) {

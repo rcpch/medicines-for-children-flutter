@@ -6,14 +6,14 @@ import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/core/presentation/backup_actions.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 
-/// Actions available from the main overflow menu.
+// Actions available from the main overflow menu.
 enum MainMenuAction { settings, shareCentre, exportBackup, importBackup, signOut }
 
-/// Overflow menu widget for top-level navigation and actions.
+// Overflow menu widget for top-level navigation and actions.
 class MainMenu extends ConsumerWidget {
   const MainMenu({super.key});
 
-  /// Builds the popup menu for primary actions.
+  // Builds the popup menu for primary actions.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return PopupMenuButton<MainMenuAction>(
@@ -39,7 +39,7 @@ class MainMenu extends ConsumerWidget {
     );
   }
 
-  /// Handles menu action selection and navigation/side effects.
+  // Handles menu action selection and navigation/side effects.
   Future<void> _handleAction(
     BuildContext context,
     WidgetRef ref,

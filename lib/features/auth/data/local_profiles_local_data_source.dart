@@ -5,7 +5,7 @@ import 'package:medicines_for_children_flutter/features/auth/domain/local_profil
 import 'package:medicines_for_children_flutter/features/auth/domain/passcode_record.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Persists local profiles and passcodes in shared preferences.
+// Persists local profiles and passcodes in shared preferences.
 class LocalProfilesLocalDataSource {
   LocalProfilesLocalDataSource(this._preferences);
 
@@ -15,13 +15,13 @@ class LocalProfilesLocalDataSource {
 
   final SharedPreferences _preferences;
 
-  /// Loads all stored profiles.
+  // Loads all stored profiles.
   List<LocalProfile> listProfiles() {
     final raw = _preferences.getString(_profilesKey) ?? '';
     return LocalProfile.listFromRawJson(raw);
   }
 
-  /// Persists the provided profile list.
+  // Persists the provided profile list.
   Future<void> writeProfiles(List<LocalProfile> profiles) async {
     await _preferences.setString(
       _profilesKey,
@@ -29,13 +29,13 @@ class LocalProfilesLocalDataSource {
     );
   }
 
-  /// Reads the active profile id, if any.
+  // Reads the active profile id, if any.
   String? readActiveProfileId() {
     final value = _preferences.getString(_activeProfileKey);
     return value == null || value.isEmpty ? null : value;
   }
 
-  /// Writes or clears the active profile id.
+  // Writes or clears the active profile id.
   Future<void> writeActiveProfileId(String? profileId) async {
     if (profileId == null || profileId.isEmpty) {
       await _preferences.remove(_activeProfileKey);
@@ -44,14 +44,14 @@ class LocalProfilesLocalDataSource {
     }
   }
 
-  /// Reads the passcode record for a profile.
+  // Reads the passcode record for a profile.
   PasscodeRecord? readPasscodeRecord(String profileId) {
     return PasscodeRecord.fromRawJson(
       _preferences.getString('$_passcodePrefix$profileId'),
     );
   }
 
-  /// Writes or clears the passcode record for a profile.
+  // Writes or clears the passcode record for a profile.
   Future<void> writePasscodeRecord(
     String profileId,
     PasscodeRecord? record,
@@ -65,7 +65,7 @@ class LocalProfilesLocalDataSource {
   }
 }
 
-/// Provides the local profiles data source.
+// Provides the local profiles data source.
 final localProfilesLocalDataSourceProvider =
     Provider<LocalProfilesLocalDataSource>((ref) {
       final preferences = ref.watch(sharedPreferencesProvider);

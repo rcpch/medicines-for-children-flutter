@@ -8,9 +8,9 @@ import 'package:intl/intl.dart';
 import 'package:medicines_for_children_flutter/core/data/backup/backup_service.dart';
 import 'package:medicines_for_children_flutter/core/platform/backup_file_io.dart';
 
-/// Presents backup import/export flows for the UI.
+// Presents backup import/export flows for the UI.
 class BackupActions {
-  /// Exports an encrypted backup and saves it via platform file IO.
+  // Exports an encrypted backup and saves it via platform file IO.
   static Future<void> exportBackup(BuildContext context, WidgetRef ref) async {
     final passphrase = await _promptPassphrase(
       context: context,
@@ -48,7 +48,7 @@ class BackupActions {
     }
   }
 
-  /// Imports an encrypted backup and restores it as a new profile.
+  // Imports an encrypted backup and restores it as a new profile.
   static Future<void> importBackup(BuildContext context, WidgetRef ref) async {
     final backupFileIO = ref.read(backupFileIOProvider);
     Uint8List? bytes;
@@ -117,7 +117,7 @@ class BackupActions {
     }
   }
 
-  /// Prompts for a new backup passphrase with confirmation.
+  // Prompts for a new backup passphrase with confirmation.
   static Future<String?> _promptPassphrase({
     required BuildContext context,
     required String title,
@@ -187,7 +187,7 @@ class BackupActions {
     return result;
   }
 
-  /// Prompts for the backup passphrase to unlock a restore.
+  // Prompts for the backup passphrase to unlock a restore.
   static Future<String?> _promptImportPassphrase(BuildContext context) async {
     final formKey = GlobalKey<FormState>();
     var passphrase = '';
@@ -234,7 +234,7 @@ class BackupActions {
     return result;
   }
 
-  /// Prompts for optional profile name and passcode during import.
+  // Prompts for optional profile name and passcode during import.
   static Future<_ImportDetails?> _promptImportDetails(
     BuildContext context,
   ) async {
@@ -328,7 +328,7 @@ class BackupActions {
   }
 }
 
-/// Holds optional fields collected during backup import.
+// Holds optional fields collected during backup import.
 class _ImportDetails {
   const _ImportDetails({this.profileName, this.passcode});
 
@@ -336,7 +336,7 @@ class _ImportDetails {
   final String? passcode;
 }
 
-/// Returns true when the error indicates a bad backup passphrase.
+// Returns true when the error indicates a bad backup passphrase.
 bool _isInvalidPassphrase(Object error) {
   return error is SecretBoxAuthenticationError;
 }

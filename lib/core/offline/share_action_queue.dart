@@ -10,10 +10,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const _queueKey = 'pending_share_actions';
 
-/// Types of share centre actions queued while offline.
+// Types of share centre actions queued while offline.
 enum ShareActionType { create, update, end, delete }
 
-/// Serializable queued action for share centre operations.
+// Serializable queued action for share centre operations.
 class PendingShareAction {
   PendingShareAction({
     required this.id,
@@ -22,7 +22,7 @@ class PendingShareAction {
     required this.queuedAt,
   });
 
-  /// Builds a queued action from stored JSON.
+  // Builds a queued action from stored JSON.
   factory PendingShareAction.fromJson(Map<String, dynamic> json) {
     return PendingShareAction(
       id: json['id'] as String,
@@ -42,7 +42,7 @@ class PendingShareAction {
   final Map<String, dynamic> payload;
   final DateTime queuedAt;
 
-  /// Serializes the queued action to JSON.
+  // Serializes the queued action to JSON.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -53,7 +53,7 @@ class PendingShareAction {
   }
 }
 
-/// Manages queued share centre actions for offline recovery.
+// Manages queued share centre actions for offline recovery.
 class ShareActionQueueService {
   ShareActionQueueService({
     required SharedPreferences prefs,
@@ -67,14 +67,14 @@ class ShareActionQueueService {
   final ShareCentreRepository _repository;
   final AppConfig _config;
 
-  /// Adds a new action to the persistent queue.
+  // Adds a new action to the persistent queue.
   Future<void> enqueue(PendingShareAction action) async {
     final queue = await loadQueue();
     queue.add(action);
     await _saveQueue(queue);
   }
 
-  /// Loads queued actions from storage.
+  // Loads queued actions from storage.
   Future<List<PendingShareAction>> loadQueue() async {
     final raw = _prefs.getStringList(_queueKey) ?? const [];
     return raw
@@ -86,7 +86,7 @@ class ShareActionQueueService {
         .toList();
   }
 
-  /// Processes queued actions against the API when available.
+  // Processes queued actions against the API when available.
   Future<void> processQueue() async {
     if (_config.sharedScheduleApiBaseUrl.trim().isEmpty) {
       return;
@@ -106,7 +106,7 @@ class ShareActionQueueService {
     await _saveQueue(remaining);
   }
 
-  /// Executes a queued action, returning success state.
+  // Executes a queued action, returning success state.
   Future<bool> _processAction(PendingShareAction action) async {
     try {
       switch (action.type) {
@@ -149,14 +149,14 @@ class ShareActionQueueService {
     }
   }
 
-  /// Persists the queue to storage.
+  // Persists the queue to storage.
   Future<void> _saveQueue(List<PendingShareAction> queue) async {
     final encoded = queue.map((action) => jsonEncode(action.toJson())).toList();
     await _prefs.setStringList(_queueKey, encoded);
   }
 }
 
-/// Provides the share centre action queue service.
+// Provides the share centre action queue service.
 final shareActionQueueServiceProvider = Provider<ShareActionQueueService>((
   ref,
 ) {

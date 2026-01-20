@@ -9,11 +9,11 @@ import 'package:medicines_for_children_flutter/features/auth/domain/local_profil
 import 'package:medicines_for_children_flutter/core/security/biometric_auth_service.dart';
 import 'package:medicines_for_children_flutter/core/settings/profile_settings_controller.dart';
 
-/// Login screen that lets users select or import profiles.
+// Login screen that lets users select or import profiles.
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
-  /// Creates the login page state.
+  // Creates the login page state.
   @override
   ConsumerState<LoginPage> createState() => _LoginPageState();
 }
@@ -22,7 +22,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   late final TextEditingController _passcodeController;
   bool _biometricsAvailable = false;
 
-  /// Sets up controllers and loads biometric availability.
+  // Sets up controllers and loads biometric availability.
   @override
   void initState() {
     super.initState();
@@ -33,25 +33,25 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     });
   }
 
-  /// Disposes text controllers.
+  // Disposes text controllers.
   @override
   void dispose() {
     _passcodeController.dispose();
     super.dispose();
   }
 
-  /// Navigates to the signup page.
+  // Navigates to the signup page.
   void _goToSignup() {
     context.goNamed(AppRoute.signup.name);
   }
 
-  /// Shows a snackbar message.
+  // Shows a snackbar message.
   void _showMessage(String message) {
     final messenger = ScaffoldMessenger.of(context);
     messenger.showSnackBar(SnackBar(content: Text(message)));
   }
 
-  /// Checks whether biometric auth is supported on this device.
+  // Checks whether biometric auth is supported on this device.
   Future<void> _checkBiometrics() async {
     final available = await ref
         .read(biometricAuthServiceProvider)
@@ -64,7 +64,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     });
   }
 
-  /// Prompts to unlock the selected profile if it has a passcode.
+  // Prompts to unlock the selected profile if it has a passcode.
   Future<void> _selectProfile(LocalProfile profile) async {
     await ref.read(authControllerProvider.notifier).selectProfile(profile.id);
     if (!profile.hasPasscode) {
@@ -141,7 +141,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  /// Builds the login screen UI.
+  // Builds the login screen UI.
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);

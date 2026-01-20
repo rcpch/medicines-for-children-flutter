@@ -271,7 +271,7 @@ class RouterNotifier extends ChangeNotifier {
   final Ref _ref;
   ProviderSubscription<AuthState>? _subscription;
 
-  /// Returns a route redirect based on auth state and current location.
+  // Returns a route redirect based on auth state and current location.
   String? handleRedirect(BuildContext context, GoRouterState state) {
     final authState = _ref.read(authControllerProvider);
     final status = authState.status;
@@ -321,7 +321,7 @@ class RouterNotifier extends ChangeNotifier {
   }
 
   @override
-  /// Cancels auth subscriptions when router notifier is disposed.
+  // Cancels auth subscriptions when router notifier is disposed.
   void dispose() {
     _subscription?.close();
     super.dispose();

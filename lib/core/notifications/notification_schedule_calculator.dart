@@ -1,11 +1,11 @@
 // Notification timing calculations for schedules.
 import 'package:intl/intl.dart';
 
-/// Calculates upcoming notification times and ids.
+// Calculates upcoming notification times and ids.
 class NotificationScheduleCalculator {
   const NotificationScheduleCalculator();
 
-  /// Parses a time string into a DateTime on an arbitrary date.
+  // Parses a time string into a DateTime on an arbitrary date.
   DateTime? parseTime(String value) {
     final sanitized = value.trim().toUpperCase();
     final formats = ['HH:mm', 'H:mm', 'h:mma', 'hh:mma'];
@@ -19,7 +19,7 @@ class NotificationScheduleCalculator {
     return null;
   }
 
-  /// Returns the next DateTime occurrence for a schedule time.
+  // Returns the next DateTime occurrence for a schedule time.
   DateTime? nextInstance({
     required DateTime startDate,
     required String timeString,
@@ -42,7 +42,7 @@ class NotificationScheduleCalculator {
     return DateTime(now.year, now.month, now.day, parsed.hour, parsed.minute);
   }
 
-  /// Generates a stable notification id for a schedule time.
+  // Generates a stable notification id for a schedule time.
   int notificationId(String scheduleId, String time) {
     final raw = '$scheduleId-$time';
     return raw.hashCode.abs() % 2147483647;

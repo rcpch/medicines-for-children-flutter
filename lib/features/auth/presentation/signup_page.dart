@@ -5,11 +5,11 @@ import 'package:go_router/go_router.dart';
 import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 
-/// Signup screen for creating a new local profile.
+// Signup screen for creating a new local profile.
 class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({super.key});
 
-  /// Creates the signup page state.
+  // Creates the signup page state.
   @override
   ConsumerState<SignupPage> createState() => _SignupPageState();
 }
@@ -23,7 +23,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
   bool _obscurePasscode = true;
   bool _obscureConfirmPasscode = true;
 
-  /// Initializes form controllers.
+  // Initializes form controllers.
   @override
   void initState() {
     super.initState();
@@ -32,7 +32,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     _confirmPasscodeController = TextEditingController();
   }
 
-  /// Disposes form controllers.
+  // Disposes form controllers.
   @override
   void dispose() {
     _profileNameController.dispose();
@@ -41,7 +41,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     super.dispose();
   }
 
-  /// Validates input and creates the new profile.
+  // Validates input and creates the new profile.
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -71,7 +71,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     }
   }
 
-  /// Builds the signup form UI.
+  // Builds the signup form UI.
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);

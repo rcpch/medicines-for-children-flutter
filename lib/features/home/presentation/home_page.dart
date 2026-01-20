@@ -19,15 +19,19 @@ import 'package:medicines_for_children_flutter/features/home/application/primary
 import 'package:medicines_for_children_flutter/features/home/application/selected_date_provider.dart';
 import 'package:medicines_for_children_flutter/features/home/domain/daily_schedule_builder.dart';
 
+// Home tab entry point: shows today's schedule and quick actions.
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
+  // Creates the state object that manages consent prompts and provider wiring.
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
+// Stateful HomePage implementation used to run one-time side effects.
 class _HomePageState extends ConsumerState<HomePage> {
   @override
+  // Triggers the telemetry consent prompt once after first render.
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -35,6 +39,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     });
   }
 
+  // Shows an opt-in dialog for anonymous analytics (if enabled and not shown yet).
   Future<void> _maybeShowTelemetryConsent() async {
     final config = ref.read(appConfigProvider);
     if (!config.telemetryConsentEnabled) {
@@ -74,6 +79,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   @override
+  // Builds the Home scaffold and wires callbacks into the HomeBody.
   Widget build(BuildContext context) {
     final state = ref.watch(primaryCarerControllerProvider);
     final controller = ref.read(primaryCarerControllerProvider.notifier);
@@ -90,10 +96,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
-        actions: [
-          const ChildSwitcherAction(),
-          const MainMenu(),
-        ],
+        actions: [const ChildSwitcherAction(), const MainMenu()],
       ),
       body: SafeArea(
         child: HomeBody(
@@ -125,6 +128,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 }
 
+// Main content for the Home page: handles loading/empty states and renders cards.
 class HomeBody extends StatelessWidget {
   const HomeBody({
     super.key,
@@ -152,6 +156,7 @@ class HomeBody extends StatelessWidget {
   final VoidCallback onRecordAsNeeded;
 
   @override
+  // Renders the correct content based on auth/data availability for the home view.
   Widget build(BuildContext context) {
     if (state.isLoading && state.carer == null) {
       return const Center(child: CircularProgressIndicator());
@@ -250,6 +255,7 @@ class HomeBody extends StatelessWidget {
   }
 }
 
+// Simple empty/error state with a retry button.
 class _EmptyState extends StatelessWidget {
   const _EmptyState({required this.message, required this.onRefresh});
 
@@ -257,6 +263,7 @@ class _EmptyState extends StatelessWidget {
   final Future<void> Function() onRefresh;
 
   @override
+  // Displays an informational message and a retry action.
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
@@ -281,12 +288,14 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
+// Summary card showing the signed-in carer and how many children they manage.
 class _CarerSummary extends StatelessWidget {
   const _CarerSummary({required this.carer});
 
   final PrimaryCarer carer;
 
   @override
+  // Renders the welcome/summary information for the primary carer.
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Card(
@@ -318,12 +327,14 @@ class _CarerSummary extends StatelessWidget {
   }
 }
 
+// Card showing the currently selected child's key details.
 class _ChildCard extends StatelessWidget {
   const _ChildCard({required this.child});
 
   final Child child;
 
   @override
+  // Displays the active child's name, condition/allergies, and counts.
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Card(
@@ -354,6 +365,7 @@ class _ChildCard extends StatelessWidget {
   }
 }
 
+// Card section listing scheduled medicines grouped by time-of-day.
 class _ScheduleSection extends StatelessWidget {
   const _ScheduleSection({
     required this.sections,
@@ -368,6 +380,7 @@ class _ScheduleSection extends StatelessWidget {
   final VoidCallback onManageSchedules;
 
   @override
+  // Shows scheduled entries or an empty/loading state, plus schedule management actions.
   Widget build(BuildContext context) {
     if (isLoading && sections.every((section) => section.entries.isEmpty)) {
       return const _LoadingSection(title: 'Today\'s schedule');
@@ -420,11 +433,13 @@ class _ScheduleSection extends StatelessWidget {
   }
 }
 
+// Single scheduled medicine row with status badge and action buttons.
 class _ScheduleTile extends ConsumerWidget {
   const _ScheduleTile({required this.entry});
 
   final DailyScheduleEntry entry;
 
+  // Picks a color used for the status badge based on the administration state.
   Color _statusColor(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     switch (entry.status) {
@@ -437,6 +452,7 @@ class _ScheduleTile extends ConsumerWidget {
     }
   }
 
+  // Returns the user-facing label for the current schedule entry status.
   String _statusLabel() {
     switch (entry.status) {
       case AdministrationStatus.given:
@@ -449,6 +465,7 @@ class _ScheduleTile extends ConsumerWidget {
   }
 
   @override
+  // Renders the scheduled medicine details and wires actions into the controller.
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final adminState = ref.watch(administrationControllerProvider);
@@ -546,6 +563,7 @@ class _ScheduleTile extends ConsumerWidget {
     );
   }
 
+  // Records a given/skipped result for a scheduled dose and shows user feedback.
   Future<void> _markStatus(
     BuildContext context,
     WidgetRef ref,
@@ -586,6 +604,7 @@ class _ScheduleTile extends ConsumerWidget {
     }
   }
 
+  // Reverts a previously recorded scheduled dose status.
   Future<void> _undo(BuildContext context, WidgetRef ref) async {
     final controller = ref.read(administrationControllerProvider.notifier);
     final success = await controller.undoScheduled(
@@ -610,6 +629,7 @@ class _ScheduleTile extends ConsumerWidget {
   }
 }
 
+// Card section showing recorded as-needed administrations for the selected day.
 class _AsNeededSection extends StatelessWidget {
   const _AsNeededSection({
     required this.entries,
@@ -622,6 +642,7 @@ class _AsNeededSection extends StatelessWidget {
   final VoidCallback onRecordAsNeeded;
 
   @override
+  // Shows a list of as-needed administrations or an empty/loading state.
   Widget build(BuildContext context) {
     if (isLoading && entries.isEmpty) {
       return const _LoadingSection(title: 'As-needed activity');
@@ -687,6 +708,7 @@ class _AsNeededSection extends StatelessWidget {
   }
 }
 
+// Horizontally scrollable date picker used to select the schedule day.
 class _CalendarStrip extends StatelessWidget {
   const _CalendarStrip({
     required this.selectedDate,
@@ -697,6 +719,7 @@ class _CalendarStrip extends StatelessWidget {
   final ValueChanged<DateTime> onSelectDate;
 
   @override
+  // Builds a 14-day strip centred around today for quick navigation.
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final days = List.generate(14, (index) {
@@ -759,17 +782,20 @@ class _CalendarStrip extends StatelessWidget {
     );
   }
 
+  // Compares two DateTimes by calendar day (ignoring time-of-day).
   bool _isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 }
 
+// Skeleton placeholder card used while schedule sections are loading.
 class _LoadingSection extends StatelessWidget {
   const _LoadingSection({required this.title});
 
   final String title;
 
   @override
+  // Renders a section header and a few shimmer-like placeholder rows.
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Card(
