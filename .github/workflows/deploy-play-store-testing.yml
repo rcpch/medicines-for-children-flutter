@@ -2,8 +2,8 @@ name: Build app and release to test users (Android & Web)
 
 on:
   workflow_run:
-     workflows: ["Analyze and Test"]
-     types: [completed] #requested
+    workflows: ["Analyze and Test"]
+    types: [completed] #requested
 
 permissions:
   id-token: write # For Google Play auth
@@ -16,53 +16,52 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-    - run: echo "Analyze and Test succeeded - deploy starting"
+      - run: echo "Analyze and Test succeeded - deploy starting"
 
-    - name: Check out code
-      uses: actions/checkout@v4
+      - name: Check out code
+        uses: actions/checkout@v4
 
-    - name: Set up Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.38.7'
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.38.7"
 
-    - name: Extract version from pubspec.yaml and set build number (Android)
-      id: get_version_android
-      run: |
-        VERSION_NAME=$(grep '^version:' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 1)
-        BUILD_NUMBER=$GITHUB_RUN_NUMBER
+      - name: Extract version from pubspec.yaml and set build number (Android)
+        id: get_version_android
+        run: |
+          VERSION_NAME=$(grep '^version:' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 1)
+          BUILD_NUMBER=$GITHUB_RUN_NUMBER
 
-        echo "Detected Android Version Name: $VERSION_NAME"
-        echo "Generated Android Build Number: $BUILD_NUMBER"
+          echo "Detected Android Version Name: $VERSION_NAME"
+          echo "Generated Android Build Number: $BUILD_NUMBER"
 
-        echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
-        echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
 
-    - name: Decode Android keystore
-      run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > android/keystore.jks
+      - name: Decode Android keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > android/keystore.jks
 
-    - name: Decode Android key properties
-      run: echo "${{ secrets.ANDROID_KEY_PROPERTIES }}" | base64 --decode > android/key.properties
+      - name: Decode Android key properties
+        run: echo "${{ secrets.ANDROID_KEY_PROPERTIES }}" | base64 --decode > android/key.properties
 
-    - id: authenticate
-      name: Authenticate with Google Play Store
-      uses: google-github-actions/auth@v2
-      with:
-        service_account: rcpch-growth-charts-app@rcpch-growth-charts-app.iam.gserviceaccount.com
-        workload_identity_provider: projects/221963061860/locations/global/workloadIdentityPools/github/providers/rcpch-growth-charts-app
-        create_credentials_file: true
+      - id: authenticate
+        name: Authenticate with Google Play Store
+        uses: google-github-actions/auth@v2
+        with:
+          service_account: rcpch-growth-charts-app@rcpch-growth-charts-app.iam.gserviceaccount.com
+          workload_identity_provider: projects/221963061860/locations/global/workloadIdentityPools/github/providers/rcpch-growth-charts-app
+          create_credentials_file: true
 
-    - name: Upload to Internal Test Track
-      uses: r0adkll/upload-google-play@v1
-      with:
-        serviceAccountJson: ${{ steps.authenticate.outputs.credentials_file_path }}
-        releaseFiles: build/app/outputs/bundle/release/app-release.aab
-        packageName: uk.ac.rcpch.medicines_for_children_flutter
-        track: internal
+      - name: Upload to Internal Test Track
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: ${{ steps.authenticate.outputs.credentials_file_path }}
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          packageName: uk.ac.rcpch.medicines_for_children_flutter
+          track: internal
 
-
-   on-failure:
-     runs-on: ubuntu-latest
-     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
-     steps:
-       - run: echo "Analyze and Test failed - deploy aborted"
+  on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - run: echo "Analyze and Test failed - deploy aborted"
