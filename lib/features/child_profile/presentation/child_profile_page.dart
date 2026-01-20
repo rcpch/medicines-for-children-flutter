@@ -9,9 +9,11 @@ import 'package:medicines_for_children_flutter/core/platform/image_provider.dart
 import 'package:medicines_for_children_flutter/core/presentation/child_switcher_action.dart';
 import 'package:medicines_for_children_flutter/core/presentation/main_menu.dart';
 
+/// Displays the active child's profile details.
 class ChildProfilePage extends ConsumerWidget {
   const ChildProfilePage({super.key});
 
+  /// Builds the child profile screen UI.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final child = ref.watch(activeChildProvider);
@@ -147,6 +149,7 @@ class ChildProfilePage extends ConsumerWidget {
     );
   }
 
+  /// Formats the child's age in years or months.
   String _formatAge(DateTime dateOfBirth) {
     final now = DateTime.now();
     int years = now.year - dateOfBirth.year;
@@ -165,12 +168,14 @@ class ChildProfilePage extends ConsumerWidget {
   }
 }
 
+/// Reusable card for labeled profile details.
 class _InfoCard extends StatelessWidget {
   const _InfoCard({required this.title, required this.child});
 
   final String title;
   final Widget child;
 
+  /// Builds a titled card section.
   @override
   Widget build(BuildContext context) {
     return Card(

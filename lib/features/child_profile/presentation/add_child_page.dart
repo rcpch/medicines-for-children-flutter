@@ -5,9 +5,11 @@ import 'package:intl/intl.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_controller.dart';
 
+/// Screen for adding a new child profile.
 class AddChildPage extends ConsumerStatefulWidget {
   const AddChildPage({super.key});
 
+  /// Creates the add-child page state.
   @override
   ConsumerState<AddChildPage> createState() => _AddChildPageState();
 }
@@ -23,6 +25,7 @@ class _AddChildPageState extends ConsumerState<AddChildPage> {
   DateTime? _dateOfBirth;
   bool _isSaving = false;
 
+  /// Disposes form controllers.
   @override
   void dispose() {
     _firstNameController.dispose();
@@ -34,6 +37,7 @@ class _AddChildPageState extends ConsumerState<AddChildPage> {
     super.dispose();
   }
 
+  /// Builds the add child form UI.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -138,6 +142,7 @@ class _AddChildPageState extends ConsumerState<AddChildPage> {
     );
   }
 
+  /// Opens the date picker and updates the selected date of birth.
   Future<void> _pickDateOfBirth() async {
     final now = DateTime.now();
     final firstDate = DateTime(now.year - 18, now.month, now.day);
@@ -164,6 +169,7 @@ class _AddChildPageState extends ConsumerState<AddChildPage> {
     });
   }
 
+  /// Splits a comma-delimited allergy list into trimmed values.
   List<String> _parseAllergies(String raw) {
     return raw
         .split(',')
@@ -172,6 +178,7 @@ class _AddChildPageState extends ConsumerState<AddChildPage> {
         .toList();
   }
 
+  /// Validates input, creates a child, and saves via the controller.
   Future<void> _submit() async {
     final form = _formKey.currentState;
     if (form == null || !(form.validate())) {
