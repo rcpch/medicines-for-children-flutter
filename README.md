@@ -1,4 +1,5 @@
-# Medicines for Children · Flutter Port
+# Medicines for Children
+
 ![Coverage](https://img.shields.io/badge/coverage-32.7%25-yellow)
 
 This repository hosts the Flutter implementation of the Medicines for Children mobile and web client. The app delivers the sharing centre, secondary-carer flows, offline-first storage, and release readiness milestones.
@@ -30,6 +31,9 @@ All user documentation is within the app itself, accessible via the Guide tab on
 ### Quick start
 
 ```bash
+# clone the repo
+git clone https://github.com/rcpch/medicines-for-children-flutter.git
+
 # install dependencies
 flutter pub get
 
