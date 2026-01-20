@@ -5,12 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/config/app_config.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+/// Checks app versions and prompts users to update.
 class UpdatePromptService {
   UpdatePromptService(this._config);
 
   final AppConfig _config;
   bool _hasPrompted = false;
 
+  /// Prompts for updates when the current version is behind.
   Future<void> maybePrompt(BuildContext context) async {
     if (_hasPrompted) {
       return;
@@ -69,6 +71,7 @@ class UpdatePromptService {
     );
   }
 
+  /// Compares two dotted version strings.
   int _compareVersions(String current, String target) {
     final currentParts = _splitVersion(current);
     final targetParts = _splitVersion(target);
@@ -85,6 +88,7 @@ class UpdatePromptService {
     return 0;
   }
 
+  /// Splits a dotted version string into integer segments.
   List<int> _splitVersion(String version) {
     return version
         .split('.')
@@ -92,6 +96,7 @@ class UpdatePromptService {
         .toList(growable: false);
   }
 
+  /// Copies the update URL to the clipboard and shows a toast.
   Future<void> _copyUpdateLink(BuildContext context) async {
     await Clipboard.setData(ClipboardData(text: _config.appUpdateUrl));
     if (!context.mounted) {
@@ -103,6 +108,7 @@ class UpdatePromptService {
   }
 }
 
+/// Provides the update prompt service.
 final updatePromptServiceProvider = Provider<UpdatePromptService>((ref) {
   final config = ref.watch(appConfigProvider);
   return UpdatePromptService(config);
