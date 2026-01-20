@@ -11,25 +11,38 @@ import 'package:medicines_for_children_flutter/features/auth/domain/auth_user.da
 import 'package:medicines_for_children_flutter/features/auth/domain/local_profile.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/passcode_record.dart';
 
+/// Defines authentication and profile persistence operations.
 abstract class AuthRepository {
+  /// Emits auth status changes over time.
   Stream<AuthStatus> statusStream();
+  /// Returns the current authenticated user, if any.
   Future<AuthUser?> currentUser();
 
+  /// Lists all locally stored profiles.
   Future<List<LocalProfile>> listProfiles();
+  /// Creates a new profile and optionally sets a passcode.
   Future<LocalProfile> createProfile({required String name, String? passcode});
+  /// Sets the active profile by id.
   Future<void> selectProfile(String profileId);
+  /// Unlocks the active profile with a passcode.
   Future<void> unlockWithPasscode(String passcode);
+  /// Marks the active profile as unlocked by biometrics.
   Future<void> unlockWithBiometrics();
+  /// Verifies a passcode against the active profile.
   Future<bool> verifyPasscode(String passcode);
+  /// Changes or sets the active profile passcode.
   Future<void> changePasscode({
     String? currentPasscode,
     required String newPasscode,
   });
+  /// Signs out and clears the active profile.
   Future<void> signOut();
 
+  /// Completes onboarding by storing a display name.
   Future<void> completeOnboarding({required String displayName});
 }
 
+/// Local implementation of auth backed by shared preferences.
 class LocalAuthRepository implements AuthRepository {
   LocalAuthRepository(this._profiles);
 
@@ -45,6 +58,7 @@ class LocalAuthRepository implements AuthRepository {
   bool _unlocked = false;
   bool _initialised = false;
 
+  /// Loads initial profile state when needed.
   Future<void> _ensureInit() async {
     if (_initialised) {
       return;
@@ -55,6 +69,7 @@ class LocalAuthRepository implements AuthRepository {
     _initialised = true;
   }
 
+  /// Returns the currently active local profile, if any.
   LocalProfile? _readActiveProfile() {
     final id = _activeProfileId;
     if (id == null || id.isEmpty) {
@@ -66,6 +81,7 @@ class LocalAuthRepository implements AuthRepository {
     );
   }
 
+  /// Resolves auth status from the active profile state.
   AuthStatus _resolveStatus(LocalProfile? activeProfile) {
     if (activeProfile == null) {
       return AuthStatus.unauthenticated;
@@ -79,6 +95,7 @@ class LocalAuthRepository implements AuthRepository {
     return AuthStatus.authenticated;
   }
 
+  /// Emits the latest auth status to subscribers.
   void _emitStatus() {
     final status = _resolveStatus(_readActiveProfile());
     if (!_statusController.isClosed) {
@@ -87,6 +104,7 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
+  /// Streams auth status updates and initial status.
   Stream<AuthStatus> statusStream() async* {
     await _ensureInit();
     yield _resolveStatus(_readActiveProfile());
@@ -94,6 +112,7 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
+  /// Returns the current user when the active profile is unlocked.
   Future<AuthUser?> currentUser() async {
     await _ensureInit();
     final profile = _readActiveProfile();
@@ -111,12 +130,14 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
+  /// Lists all locally stored profiles.
   Future<List<LocalProfile>> listProfiles() async {
     await _ensureInit();
     return _profiles.listProfiles();
   }
 
   @override
+  /// Creates a new profile and makes it active.
   Future<LocalProfile> createProfile({
     required String name,
     String? passcode,
@@ -146,6 +167,7 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
+  /// Sets the active profile by id and updates status.
   Future<void> selectProfile(String profileId) async {
     await _ensureInit();
     final profiles = _profiles.listProfiles();
@@ -163,6 +185,7 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
+  /// Unlocks the active profile using a passcode.
   Future<void> unlockWithPasscode(String passcode) async {
     await _ensureInit();
     final profile = _readActiveProfile();
@@ -187,6 +210,7 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
+  /// Unlocks the active profile using biometrics.
   Future<void> unlockWithBiometrics() async {
     await _ensureInit();
     final profile = _readActiveProfile();
@@ -200,6 +224,7 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
+  /// Verifies a passcode against the active profile record.
   Future<bool> verifyPasscode(String passcode) async {
     await _ensureInit();
     final profile = _readActiveProfile();
@@ -217,6 +242,7 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
+  /// Changes or sets the passcode for the active profile.
   Future<void> changePasscode({
     String? currentPasscode,
     required String newPasscode,
@@ -250,6 +276,7 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
+  /// Clears the active profile selection and status.
   Future<void> signOut() async {
     await _ensureInit();
     _activeProfileId = null;
@@ -259,6 +286,7 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
+  /// Sets the display name for the active profile.
   Future<void> completeOnboarding({required String displayName}) async {
     await _ensureInit();
     final profileId = _activeProfileId;
@@ -278,6 +306,7 @@ class LocalAuthRepository implements AuthRepository {
     _emitStatus();
   }
 
+  /// Updates the passcode flag stored on the profile.
   Future<void> _updateProfilePasscodeStatus(
     String profileId,
     bool hasPasscode,
@@ -292,12 +321,14 @@ class LocalAuthRepository implements AuthRepository {
     await _profiles.writeProfiles(updated);
   }
 
+  /// Generates a new random profile id.
   String _generateId() {
     final random = _secureRandom();
     final bytes = List<int>.generate(16, (_) => random.nextInt(256));
     return base64UrlEncode(bytes).replaceAll('=', '');
   }
 
+  /// Returns a secure random generator when available.
   Random _secureRandom() {
     try {
       return Random.secure();
@@ -306,6 +337,7 @@ class LocalAuthRepository implements AuthRepository {
     }
   }
 
+  /// Derives and stores a passcode hash record.
   Future<PasscodeRecord> _derivePasscodeRecord(String passcode) async {
     final random = _secureRandom();
     final salt = List<int>.generate(
@@ -329,6 +361,7 @@ class LocalAuthRepository implements AuthRepository {
     );
   }
 
+  /// Verifies a passcode against the stored hash.
   Future<bool> _verifyPasscode(String passcode, PasscodeRecord record) async {
     final salt = base64Decode(record.saltBase64);
     final expected = base64Decode(record.hashBase64);
@@ -352,11 +385,13 @@ class LocalAuthRepository implements AuthRepository {
     return diff == 0;
   }
 
+  /// Releases auth repository resources.
   Future<void> dispose() async {
     await _statusController.close();
   }
 }
 
+/// Provides the active auth repository implementation.
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   final profiles = ref.watch(localProfilesLocalDataSourceProvider);
   final repo = LocalAuthRepository(profiles);

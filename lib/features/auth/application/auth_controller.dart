@@ -9,6 +9,7 @@ import 'package:medicines_for_children_flutter/features/auth/domain/local_profil
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 import 'package:medicines_for_children_flutter/core/security/biometric_auth_service.dart';
 
+/// Holds the current authentication state and profile list.
 class AuthState {
   const AuthState({
     this.status = AuthStatus.unknown,
@@ -24,8 +25,10 @@ class AuthState {
   final bool isLoading;
   final String? errorMessage;
 
+  /// Returns true when the user is authenticated.
   bool get isAuthenticated => status == AuthStatus.authenticated;
 
+  /// Returns a copy of the state with updated fields.
   AuthState copyWith({
     AuthStatus? status,
     AuthUser? user,
@@ -45,15 +48,18 @@ class AuthState {
   }
 }
 
+/// Provides the auth controller and current auth state.
 final authControllerProvider = NotifierProvider<AuthController, AuthState>(
   AuthController.new,
 );
 
+/// Orchestrates authentication flows and session state.
 class AuthController extends Notifier<AuthState> {
   late final AuthRepository _repository;
   late final TelemetryService _telemetry;
   late final BiometricAuthService _biometrics;
 
+  /// Initializes auth dependencies and subscribes to status changes.
   @override
   AuthState build() {
     _repository = ref.read(authRepositoryProvider);
@@ -67,6 +73,7 @@ class AuthController extends Notifier<AuthState> {
     return const AuthState();
   }
 
+  /// Loads initial profiles and session state.
   Future<void> _bootstrap() async {
     try {
       final profiles = await _repository.listProfiles();
@@ -96,6 +103,7 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
+  /// Resolves auth status based on the current user data.
   AuthStatus _resolveStatusFromUser(AuthUser? user) {
     if (user == null) {
       return AuthStatus.unauthenticated;
@@ -106,6 +114,7 @@ class AuthController extends Notifier<AuthState> {
     return AuthStatus.authenticated;
   }
 
+  /// Syncs state from the repository when auth status changes.
   Future<void> _syncStatus(AuthStatus status) async {
     try {
       if (status == AuthStatus.authenticated ||
@@ -148,6 +157,7 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
+  /// Reloads the profile list from storage.
   Future<void> refreshProfiles() async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
@@ -171,6 +181,7 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
+  /// Creates a new profile and updates auth state.
   Future<void> createProfile({required String name, String? passcode}) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
@@ -202,6 +213,7 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
+  /// Selects the active profile and updates auth state.
   Future<void> selectProfile(String profileId) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
@@ -228,6 +240,7 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
+  /// Unlocks the active profile with a passcode.
   Future<void> unlockWithPasscode(String passcode) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
@@ -254,6 +267,7 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
+  /// Attempts biometric unlock for the active profile.
   Future<bool> unlockWithBiometrics() async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
@@ -304,6 +318,7 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
+  /// Verifies a passcode without changing the session.
   Future<bool> verifyPasscode(String passcode) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
@@ -325,6 +340,7 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
+  /// Changes the active profile passcode.
   Future<bool> changePasscode({
     String? currentPasscode,
     required String newPasscode,
@@ -358,6 +374,7 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
+  /// Completes onboarding by saving a display name.
   Future<void> completeOnboarding({required String displayName}) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
@@ -384,6 +401,7 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
+  /// Signs out and clears session state.
   Future<void> signOut() async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
