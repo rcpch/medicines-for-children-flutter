@@ -65,13 +65,57 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Export PDFs',
+                        'Medicines list',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Generate a PDF from local data to share or print.',
+                      const SizedBox(height: 6),
+                      const Text('Export or print a medicines summary PDF.'),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: [
+                          FilledButton.icon(
+                            onPressed: _exportingMedicines
+                                ? null
+                                : () => _exportMedicinePdf(context, carerState),
+                            icon: _exportingMedicines
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.medication_outlined),
+                            label: const Text('Export medicines'),
+                          ),
+                          OutlinedButton.icon(
+                            onPressed: _printingMedicines
+                                ? null
+                                : () => _printMedicinesPdf(context, carerState),
+                            icon: _printingMedicines
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.print_outlined),
+                            label: const Text('Print medicines'),
+                          ),
+                        ],
                       ),
+                      const SizedBox(height: 16),
+                      const Divider(),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Schedule',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 6),
+                      const Text('Export or print a schedule PDF.'),
                       const SizedBox(height: 12),
                       Wrap(
                         spacing: 12,
@@ -93,21 +137,6 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
                             label: const Text('Export schedule'),
                           ),
                           OutlinedButton.icon(
-                            onPressed: _exportingMedicines
-                                ? null
-                                : () => _exportMedicinePdf(context, carerState),
-                            icon: _exportingMedicines
-                                ? const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Icon(Icons.medication_outlined),
-                            label: const Text('Export medicines'),
-                          ),
-                          FilledButton.tonalIcon(
                             onPressed: _printingSchedule
                                 ? null
                                 : () => _printSchedulePdf(context, carerState),
@@ -121,21 +150,6 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
                                   )
                                 : const Icon(Icons.print_outlined),
                             label: const Text('Print schedule'),
-                          ),
-                          OutlinedButton.icon(
-                            onPressed: _printingMedicines
-                                ? null
-                                : () => _printMedicinesPdf(context, carerState),
-                            icon: _printingMedicines
-                                ? const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Icon(Icons.print_outlined),
-                            label: const Text('Print medicines'),
                           ),
                         ],
                       ),
