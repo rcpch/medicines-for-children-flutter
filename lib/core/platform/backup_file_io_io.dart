@@ -6,10 +6,12 @@ import 'package:file_selector/file_selector.dart';
 
 import 'backup_file_io.dart';
 
+/// Creates the backup file IO implementation for IO platforms.
 BackupFileIO createBackupFileIO() => _IoBackupFileIO();
 
 class _IoBackupFileIO implements BackupFileIO {
   @override
+  /// Saves backup bytes using the native file selector.
   Future<void> saveBytes({
     required Uint8List bytes,
     required String filename,
@@ -29,6 +31,7 @@ class _IoBackupFileIO implements BackupFileIO {
   }
 
   @override
+  /// Opens a file picker and returns the selected file bytes.
   Future<Uint8List?> pickFileBytes({
     required String label,
     required List<String> extensions,

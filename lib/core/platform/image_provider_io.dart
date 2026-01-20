@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 
+/// Resolves a file or network image provider for IO platforms.
 ImageProvider? resolveImageProvider(String path) {
   final trimmed = path.trim();
   if (trimmed.isEmpty) {
