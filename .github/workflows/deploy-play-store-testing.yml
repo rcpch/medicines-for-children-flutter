@@ -1,4 +1,4 @@
-name: Build app and release to test users (Android & Web)
+name: Build Android app and release to test users
 
 on:
   workflow_run:

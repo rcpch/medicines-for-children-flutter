@@ -1,4 +1,4 @@
-name: Build app and release to test users
+name: Build GH Pages Web app for testing
 
 on:
   workflow_run:
