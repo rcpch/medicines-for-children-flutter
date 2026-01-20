@@ -1,6 +1,7 @@
 // Onboarding profile model.
 import 'dart:convert';
 
+// Captures primary carer details collected during onboarding.
 class CarerProfile {
   const CarerProfile({
     required this.firstName,
@@ -10,6 +11,7 @@ class CarerProfile {
     required this.email,
   });
 
+  // Builds a carer profile from stored JSON data.
   factory CarerProfile.fromJson(Map<String, dynamic> json) {
     return CarerProfile(
       firstName: json['firstName'] as String? ?? '',
@@ -20,6 +22,7 @@ class CarerProfile {
     );
   }
 
+  // Serializes the carer profile to JSON.
   Map<String, dynamic> toJson() {
     return {
       'firstName': firstName,
@@ -37,6 +40,7 @@ class CarerProfile {
   final String email;
 }
 
+// Captures child details collected during onboarding.
 class ChildProfile {
   const ChildProfile({
     required this.firstName,
@@ -47,6 +51,7 @@ class ChildProfile {
     required this.notes,
   });
 
+  // Builds a child profile from stored JSON data.
   factory ChildProfile.fromJson(Map<String, dynamic> json) {
     return ChildProfile(
       firstName: json['firstName'] as String? ?? '',
@@ -60,6 +65,7 @@ class ChildProfile {
     );
   }
 
+  // Serializes the child profile to JSON.
   Map<String, dynamic> toJson() {
     return {
       'firstName': firstName,
@@ -79,9 +85,11 @@ class ChildProfile {
   final String notes;
 }
 
+// Bundles carer and child profiles for onboarding persistence.
 class OnboardingProfile {
   const OnboardingProfile({required this.carer, required this.child});
 
+  // Builds an onboarding profile from a decoded map.
   factory OnboardingProfile.fromMap(Map<String, dynamic> json) {
     return OnboardingProfile(
       carer: CarerProfile.fromJson(
@@ -93,6 +101,7 @@ class OnboardingProfile {
     );
   }
 
+  // Parses a JSON string into an onboarding profile.
   factory OnboardingProfile.fromJson(String rawJson) {
     final decoded = jsonDecode(rawJson);
     if (decoded is! Map<String, dynamic>) {
@@ -104,10 +113,12 @@ class OnboardingProfile {
     return OnboardingProfile.fromMap(decoded);
   }
 
+  // Serializes the profile into a JSON-compatible map.
   Map<String, dynamic> toMap() {
     return {'carer': carer.toJson(), 'child': child.toJson()};
   }
 
+  // Serializes the profile to a JSON string.
   String toJson() => jsonEncode(toMap());
 
   final CarerProfile carer;

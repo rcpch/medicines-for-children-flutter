@@ -10,16 +10,22 @@ import 'package:medicines_for_children_flutter/features/auth/application/auth_co
 import 'package:medicines_for_children_flutter/features/onboarding/application/onboarding_draft_provider.dart';
 import 'package:medicines_for_children_flutter/features/onboarding/data/onboarding_local_data_source.dart';
 import 'package:medicines_for_children_flutter/features/onboarding/domain/onboarding_profile.dart';
+import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 
+// Guides users through the multi-step onboarding flow.
 class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
 
   @override
+  // Creates the state for the onboarding stepper.
   ConsumerState<OnboardingPage> createState() => _OnboardingPageState();
 }
 
+// Manages form controllers, step state, and persistence for onboarding.
 class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   final _stepKeys = List.generate(3, (_) => GlobalKey<FormState>());
+  static final List<_DialCodeOption> _dialCodeOptions =
+      _DialCodeOption.buildOptions();
 
   late final TextEditingController _carerFirstNameController;
   late final TextEditingController _carerLastNameController;
@@ -32,10 +38,15 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   late final TextEditingController _childNotesController;
   late final TextEditingController _childDobController;
 
+  _DialCodeOption _selectedDialCode = _dialCodeOptions.firstWhere(
+    (option) => option.isoCode == IsoCode.GB,
+    orElse: () => _dialCodeOptions.first,
+  );
   DateTime? _childDob;
   int _currentStep = 0;
 
   @override
+  // Sets up form controllers and restores any draft data.
   void initState() {
     super.initState();
     _carerFirstNameController = TextEditingController();
@@ -51,6 +62,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     _hydrateFromDraft();
   }
 
+  // Loads draft or stored profile data into the form fields.
   void _hydrateFromDraft() {
     final draft = ref.read(onboardingDraftProvider);
     final profileId = ref.read(authControllerProvider).user?.uid;
@@ -68,7 +80,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     _carerFirstNameController.text = data.carerFirstName;
     _carerLastNameController.text = data.carerLastName;
     _relationshipController.text = data.relationshipToChild;
-    _phoneController.text = data.phoneNumber;
+    _setPhoneFromStored(data.phoneNumber);
     _childFirstNameController.text = data.childFirstName;
     _childLastNameController.text = data.childLastName;
     _childConditionController.text = data.childCondition;
@@ -81,6 +93,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 
   @override
+  // Disposes of all text controllers.
   void dispose() {
     _carerFirstNameController.dispose();
     _carerLastNameController.dispose();
@@ -95,6 +108,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     super.dispose();
   }
 
+  // Splits comma-delimited allergy text into a list.
   List<String> _parseAllergies(String value) {
     return value
         .split(',')
@@ -103,6 +117,75 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         .toList();
   }
 
+  // Initializes the phone field from stored international number text.
+  void _setPhoneFromStored(String phoneNumber) {
+    final raw = phoneNumber.trim();
+    if (raw.isEmpty) {
+      _phoneController.text = '';
+      return;
+    }
+    try {
+      final parsed = raw.startsWith('+')
+          ? PhoneNumber.parse(raw)
+          : PhoneNumber.parse(raw, destinationCountry: _selectedDialCode.isoCode);
+      _selectedDialCode = _dialCodeOptions.firstWhere(
+        (option) => option.isoCode == parsed.isoCode,
+        orElse: () => _selectedDialCode,
+      );
+      _phoneController.text = parsed.nsn;
+    } catch (_) {
+      _phoneController.text = raw;
+    }
+  }
+
+  // Validates the phone number using the selected dial code.
+  String? _validatePhoneNumber(String? value) {
+    final raw = value?.trim() ?? '';
+    if (raw.isEmpty) {
+      return 'Enter phone';
+    }
+    try {
+      final parsed = raw.startsWith('+')
+          ? PhoneNumber.parse(raw)
+          : PhoneNumber.parse(raw, destinationCountry: _selectedDialCode.isoCode);
+      if (!parsed.isValid()) {
+        return 'Enter a valid phone number';
+      }
+    } catch (_) {
+      return 'Enter a valid phone number';
+    }
+    return null;
+  }
+
+  // Builds an international phone number string for storage.
+  String _buildPhoneNumber() {
+    final raw = _phoneController.text.trim();
+    if (raw.isEmpty) {
+      return '';
+    }
+    try {
+      final parsed = raw.startsWith('+')
+          ? PhoneNumber.parse(raw)
+          : PhoneNumber.parse(raw, destinationCountry: _selectedDialCode.isoCode);
+      return parsed.international;
+    } catch (_) {
+      return raw;
+    }
+  }
+
+  // Returns the phone number as displayed in the review step.
+  String _phoneDisplayValue() {
+    final raw = _phoneController.text.trim();
+    if (raw.isEmpty) {
+      return '';
+    }
+    if (raw.startsWith('+')) {
+      return raw;
+    }
+    return '+${_selectedDialCode.dialCode} $raw';
+  }
+
+  // Opens a date picker and stores the selected date of birth.
   Future<void> _pickDateOfBirth() async {
     final now = DateTime.now();
     final firstDate = DateTime(now.year - 18, now.month, now.day);
@@ -128,6 +211,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     }
   }
 
+  // Moves back one onboarding step.
   void _goBack() {
     if (_currentStep == 0) {
       return;
@@ -137,6 +221,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     });
   }
 
+  // Advances the stepper or submits when on the last step.
   void _handleContinue() {
     if (_currentStep < 2) {
       final form = _stepKeys[_currentStep].currentState;
@@ -150,6 +235,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     _submit();
   }
 
+  // Validates forms, persists profile data, and completes onboarding.
   Future<void> _submit() async {
     final detailsForm = _stepKeys[0].currentState;
     final childForm = _stepKeys[1].currentState;
@@ -177,7 +263,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         firstName: _carerFirstNameController.text.trim(),
         lastName: _carerLastNameController.text.trim(),
         relationshipToChild: _relationshipController.text.trim(),
-        phoneNumber: _phoneController.text.trim(),
+        phoneNumber: _buildPhoneNumber(),
         email: authState.user?.email ?? '',
       ),
       child: ChildProfile(
@@ -237,6 +323,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 
   @override
+  // Builds the onboarding stepper UI.
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
 
@@ -351,13 +438,61 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                                     icon: Icons.family_restroom_outlined,
                                   ),
                                   const SizedBox(height: 12),
-                                  TextFormField(
-                                    controller: _phoneController,
-                                    keyboardType: TextInputType.phone,
-                                    decoration: const InputDecoration(
-                                      labelText: 'Phone',
-                                      prefixIcon: Icon(Icons.call_outlined),
-                                    ),
+                                  Row(
+                                    children: [
+                                      Flexible(
+                                        flex: 3,
+                                        child: DropdownButtonFormField<
+                                          _DialCodeOption
+                                        >(
+                                          value: _selectedDialCode,
+                                          isExpanded: true,
+                                          decoration: const InputDecoration(
+                                            labelText: 'Code',
+                                          ),
+                                          items:
+                                              _dialCodeOptions
+                                                  .map(
+                                                    (option) =>
+                                                        DropdownMenuItem(
+                                                          value: option,
+                                                          child: Text(
+                                                            option.label,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ),
+                                                  )
+                                                  .toList(),
+                                          onChanged: (value) {
+                                            if (value == null) {
+                                              return;
+                                            }
+                                            setState(() {
+                                              _selectedDialCode = value;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Flexible(
+                                        flex: 7,
+                                        child: TextFormField(
+                                          controller: _phoneController,
+                                          keyboardType: TextInputType.phone,
+                                          decoration: const InputDecoration(
+                                            labelText: 'Phone',
+                                            prefixIcon: Icon(
+                                              Icons.call_outlined,
+                                            ),
+                                          ),
+                                          autovalidateMode: AutovalidateMode
+                                              .onUserInteraction,
+                                          validator: _validatePhoneNumber,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -434,7 +569,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                                     lines: [
                                       '${_carerFirstNameController.text} ${_carerLastNameController.text}',
                                       _relationshipController.text,
-                                      _phoneController.text,
+                                      _phoneDisplayValue(),
                                     ],
                                   ),
                                   const SizedBox(height: 12),
@@ -469,6 +604,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     );
   }
 
+  // Builds a required text field with a shared validation pattern.
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
@@ -486,6 +622,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     );
   }
 
+  // Builds a card showing summary lines for the review step.
   Widget _buildSummaryTile({
     required String title,
     required List<String> lines,
@@ -510,5 +647,37 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         ),
       ),
     );
+  }
+}
+
+// Represents a phone dial code option for the phone input.
+class _DialCodeOption {
+  const _DialCodeOption({required this.isoCode, required this.dialCode});
+
+  final IsoCode isoCode;
+  final String dialCode;
+
+  // Formats the display label for the dropdown.
+  String get label => '+$dialCode ${isoCode.name}';
+
+  // Builds a sorted list of dial codes for all ISO regions.
+  static List<_DialCodeOption> buildOptions() {
+    final options =
+        IsoCode.values
+            .map(
+              (isoCode) => _DialCodeOption(
+                isoCode: isoCode,
+                dialCode: PhoneNumber(isoCode: isoCode, nsn: '0').countryCode,
+              ),
+            )
+            .toList();
+    options.sort((a, b) {
+      final dialCompare = a.dialCode.compareTo(b.dialCode);
+      if (dialCompare != 0) {
+        return dialCompare;
+      }
+      return a.isoCode.name.compareTo(b.isoCode.name);
+    });
+    return options;
   }
 }

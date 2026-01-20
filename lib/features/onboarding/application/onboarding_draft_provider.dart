@@ -2,21 +2,26 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/features/onboarding/domain/onboarding_profile.dart';
 
+// Manages draft onboarding data during multi-step entry.
 class OnboardingDraftController extends Notifier<OnboardingDraft?> {
   @override
+  // Starts with no draft until user input is provided.
   OnboardingDraft? build() {
     return null;
   }
 
+  // Replaces the current draft with the latest snapshot.
   void setDraft(OnboardingDraft? draft) {
     state = draft;
   }
 
+  // Clears any stored draft data.
   void clear() {
     state = null;
   }
 }
 
+// Mutable onboarding payload captured before saving profile data.
 class OnboardingDraft {
   const OnboardingDraft({
     required this.carerFirstName,
@@ -31,6 +36,7 @@ class OnboardingDraft {
     this.childNotes,
   });
 
+  // Creates a draft snapshot from a persisted onboarding profile.
   factory OnboardingDraft.fromProfile(OnboardingProfile profile) {
     return OnboardingDraft(
       carerFirstName: profile.carer.firstName,
@@ -46,6 +52,7 @@ class OnboardingDraft {
     );
   }
 
+  // Returns a copy with selective field overrides.
   OnboardingDraft copyWith({
     String? carerFirstName,
     String? carerLastName,
@@ -87,6 +94,7 @@ class OnboardingDraft {
   final String? childNotes;
 }
 
+// Exposes the onboarding draft state for the current session.
 final onboardingDraftProvider =
     NotifierProvider<OnboardingDraftController, OnboardingDraft?>(
       OnboardingDraftController.new,
