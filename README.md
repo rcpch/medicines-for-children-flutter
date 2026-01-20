@@ -69,6 +69,65 @@ The app routes secondary-carer links to `/auth/:token` and `/shared-schedule/:ap
 - Android: update `appLinkHost` in `android/app/build.gradle.kts` to your link host.
 - iOS: update `applinks:example.com` in `ios/Runner/Runner.entitlements`.
 
+## Import/Export file format
+
+Backup files use the `.mfc` extension.
+
+They are **UTF-8 encoded JSON files** containing an encrypted payload. You can inspect the outer structure without the passphrase, but the profile data itself is encrypted.
+
+### Outer file structure (unencrypted)
+
+Top-level JSON object:
+
+```json
+{
+	"formatVersion": 1,
+	"createdAt": "2026-01-20T12:34:56.789Z",
+	"kdf": {
+		"salt": "<base64>",
+		"iterations": 100000
+	},
+	"cipher": {
+		"nonce": "<base64>",
+		"cipherText": "<base64>",
+		"mac": "<base64>"
+	}
+}
+```
+
+Field notes:
+
+- `formatVersion`: currently `1`.
+- `createdAt`: ISO-8601 timestamp string.
+- `kdf`: PBKDF2 parameters.
+	- `salt`: 16 random bytes, base64-encoded.
+	- `iterations`: currently `100000`.
+- `cipher`: AES-GCM outputs.
+	- `nonce`: 12 random bytes, base64-encoded.
+	- `cipherText`: encrypted bytes, base64-encoded.
+	- `mac`: authentication tag bytes, base64-encoded.
+
+### Key derivation and encryption
+
+- KDF: PBKDF2-HMAC-SHA256, 100000 iterations, output size 256 bits.
+- Cipher: AES-GCM with a 256-bit key.
+- The user-provided passphrase is used as the PBKDF2 input (UTF-8 bytes).
+
+### Decrypted payload structure (encrypted)
+
+After decryption, the payload is JSON with:
+
+- `profile`: metadata used during restore.
+	- `name`: profile name.
+	- `displayName`: user display name (if present).
+- `primaryCarer`: the full primary-carer document (includes children, medicines, schedules, administrations, etc.).
+- `onboardingProfile` (optional): onboarding draft data.
+
+Restore behavior:
+
+- Importing a backup **always creates a new local profile**.
+- The “Import As” name (if provided) overrides the payload’s `profile.name`.
+
 ## Platform permissions
 
 - iOS: camera and photo library usage strings are defined in `ios/Runner/Info.plist`.
