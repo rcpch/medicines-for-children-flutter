@@ -6,18 +6,21 @@ import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.
 import 'package:medicines_for_children_flutter/core/domain/models/schedule.dart';
 import 'package:medicines_for_children_flutter/features/home/data/primary_carer_repository.dart';
 
+/// In-memory implementation of the primary carer repository for tests.
 class MockPrimaryCarerRepository implements PrimaryCarerRepository {
   MockPrimaryCarerRepository({PrimaryCarer? seed})
     : _seed = seed ?? _samplePrimaryCarer();
 
   final PrimaryCarer _seed;
 
+  /// Returns the seeded primary carer data.
   @override
   Future<PrimaryCarer> fetchPrimaryCarer() async {
     return _seed;
   }
 }
 
+/// Builds a sample primary carer with medicines, schedules, and a child.
 PrimaryCarer _samplePrimaryCarer() {
   final medicine = Medicine(
     id: 'med-1',
