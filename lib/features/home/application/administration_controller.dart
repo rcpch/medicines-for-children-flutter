@@ -4,12 +4,14 @@ import 'package:medicines_for_children_flutter/core/domain/models/administration
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_controller.dart';
 import 'package:medicines_for_children_flutter/features/home/data/administration_repository.dart';
 
+// Holds UI state for administration actions.
 class AdministrationState {
   const AdministrationState({this.isSaving = false, this.errorMessage});
 
   final bool isSaving;
   final String? errorMessage;
 
+  // Returns a copy with updated state fields.
   AdministrationState copyWith({
     bool? isSaving,
     String? errorMessage,
@@ -22,15 +24,18 @@ class AdministrationState {
   }
 }
 
+// Coordinates schedule administration updates.
 class AdministrationController extends Notifier<AdministrationState> {
   late AdministrationRepository _repository;
 
+  // Loads the repository and initial controller state.
   @override
   AdministrationState build() {
     _repository = ref.watch(administrationRepositoryProvider);
     return const AdministrationState();
   }
 
+  // Records a status for a scheduled administration.
   Future<bool> markScheduled({
     required String scheduleId,
     required DateTime dateTime,
@@ -55,6 +60,7 @@ class AdministrationController extends Notifier<AdministrationState> {
     }
   }
 
+  // Clears a previously recorded scheduled administration.
   Future<bool> undoScheduled({
     required String scheduleId,
     required DateTime dateTime,
@@ -78,6 +84,7 @@ class AdministrationController extends Notifier<AdministrationState> {
   }
 }
 
+// Provides the administration controller and state.
 final administrationControllerProvider =
     NotifierProvider<AdministrationController, AdministrationState>(
       AdministrationController.new,

@@ -10,7 +10,9 @@ import 'package:medicines_for_children_flutter/features/auth/domain/auth_user.da
 
 const _administrationRetentionDays = 90;
 
+// Interface for recording medication administrations.
 abstract class AdministrationRepository {
+  // Records a scheduled administration status and notes.
   Future<void> recordScheduledAdministration({
     required String scheduleId,
     required DateTime dateTime,
@@ -18,12 +20,14 @@ abstract class AdministrationRepository {
     String? notes,
   });
 
+  // Clears a scheduled administration entry.
   Future<void> clearScheduledAdministration({
     required String scheduleId,
     required DateTime dateTime,
   });
 }
 
+// Local implementation that persists administrations to profile data.
 class LocalAdministrationRepository implements AdministrationRepository {
   LocalAdministrationRepository({
     required this.authRepository,
@@ -34,6 +38,7 @@ class LocalAdministrationRepository implements AdministrationRepository {
   final ProfileDataLocalDataSource profileData;
 
   @override
+  // Records or updates a scheduled administration in local storage.
   Future<void> recordScheduledAdministration({
     required String scheduleId,
     required DateTime dateTime,
@@ -78,6 +83,7 @@ class LocalAdministrationRepository implements AdministrationRepository {
   }
 
   @override
+  // Removes a scheduled administration from local storage.
   Future<void> clearScheduledAdministration({
     required String scheduleId,
     required DateTime dateTime,
@@ -97,6 +103,7 @@ class LocalAdministrationRepository implements AdministrationRepository {
     await _saveSchedule(context, updatedSchedule);
   }
 
+  // Loads the current profile, carer, and child context.
   Future<_AdministrationContext> _loadContext() async {
     final user = await authRepository.currentUser();
     if (user == null) {
@@ -117,6 +124,7 @@ class LocalAdministrationRepository implements AdministrationRepository {
     );
   }
 
+  // Persists the updated schedule back to local profile data.
   Future<void> _saveSchedule(
     _AdministrationContext context,
     MedicineSchedule schedule,
@@ -137,6 +145,7 @@ class LocalAdministrationRepository implements AdministrationRepository {
     await profileData.writePrimaryCarer(context.profileId, updatedCarer);
   }
 
+  // Returns true when two DateTimes match to the minute.
   bool _isSameMinute(DateTime a, DateTime b) {
     return a.year == b.year &&
         a.month == b.month &&
@@ -145,6 +154,7 @@ class LocalAdministrationRepository implements AdministrationRepository {
         a.minute == b.minute;
   }
 
+  // Removes administrations older than the retention window.
   List<Administration> _pruneAdministrations(
     List<Administration> administrations,
   ) {
@@ -156,11 +166,13 @@ class LocalAdministrationRepository implements AdministrationRepository {
         .toList();
   }
 
+  // Generates a unique id for a new administration.
   String _generateId() {
     return 'admin-${DateTime.now().millisecondsSinceEpoch}';
   }
 }
 
+// Holds loaded context needed to update administrations.
 class _AdministrationContext {
   const _AdministrationContext({
     required this.profileId,
@@ -175,6 +187,7 @@ class _AdministrationContext {
   final Child child;
 }
 
+// Provides the administration repository implementation.
 final administrationRepositoryProvider = Provider<AdministrationRepository>((
   ref,
 ) {

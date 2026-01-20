@@ -9,6 +9,7 @@ import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 import 'package:medicines_for_children_flutter/features/home/data/primary_carer_repository.dart';
 
+// Holds loaded primary carer data and UI flags.
 class PrimaryCarerState {
   const PrimaryCarerState({
     this.carer,
@@ -22,6 +23,7 @@ class PrimaryCarerState {
   final bool isStale;
   final String? errorMessage;
 
+  // Returns a copy with updated state fields.
   PrimaryCarerState copyWith({
     PrimaryCarer? carer,
     bool clearCarer = false,
@@ -39,16 +41,19 @@ class PrimaryCarerState {
   }
 }
 
+// Provides the primary carer controller and state.
 final primaryCarerControllerProvider =
     NotifierProvider<PrimaryCarerController, PrimaryCarerState>(
       PrimaryCarerController.new,
     );
 
+// Orchestrates primary carer data loading and updates.
 class PrimaryCarerController extends Notifier<PrimaryCarerState> {
   late PrimaryCarerRepository _repository;
   late PrimaryCarerLocalDataSource _localDataSource;
   String? _activeProfileId;
 
+  // Loads cached data and listens for auth changes.
   @override
   PrimaryCarerState build() {
     _repository = ref.read(primaryCarerRepositoryProvider);
@@ -78,6 +83,7 @@ class PrimaryCarerController extends Notifier<PrimaryCarerState> {
     );
   }
 
+  // Refreshes cached data when the active profile changes.
   Future<void> _handleAuthChange(AuthState? previous, AuthState next) async {
     final profileId = next.user?.uid;
     if (_activeProfileId == profileId) {
@@ -102,6 +108,7 @@ class PrimaryCarerController extends Notifier<PrimaryCarerState> {
     }
   }
 
+  // Fetches the latest primary carer data from the repository.
   Future<void> refresh() async {
     final profileId = _activeProfileId;
     if (profileId == null || profileId.isEmpty) {
@@ -135,6 +142,7 @@ class PrimaryCarerController extends Notifier<PrimaryCarerState> {
     }
   }
 
+  // Clears cached primary carer data for the active profile.
   Future<void> clear() async {
     final profileId = _activeProfileId;
     if (profileId != null) {
@@ -146,6 +154,7 @@ class PrimaryCarerController extends Notifier<PrimaryCarerState> {
     state = const PrimaryCarerState();
   }
 
+  // Adds a child to the active profile and updates local state.
   Future<bool> addChild(Child child) async {
     final profileId = _activeProfileId;
     if (profileId == null || profileId.isEmpty) {
@@ -171,6 +180,7 @@ class PrimaryCarerController extends Notifier<PrimaryCarerState> {
     return true;
   }
 
+  // Reloads the primary carer data from local storage only.
   Future<void> refreshFromLocal() async {
     final profileId = _activeProfileId;
     if (profileId == null || profileId.isEmpty) {

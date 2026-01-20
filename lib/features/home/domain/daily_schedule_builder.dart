@@ -6,10 +6,12 @@ import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/schedule.dart';
 
+// Provides the daily schedule builder helper.
 final dailyScheduleBuilderProvider = Provider<DailyScheduleBuilder>((ref) {
   return DailyScheduleBuilder();
 });
 
+// View model for a scheduled medicine entry.
 class DailyScheduleEntry {
   const DailyScheduleEntry({
     required this.id,
@@ -29,10 +31,13 @@ class DailyScheduleEntry {
   final AdministrationStatus status;
   final String? notes;
 
+  // True when the scheduled time is in the past.
   bool get isInPast => scheduledDateTime.isBefore(DateTime.now());
+  // True when the scheduled time is upcoming.
   bool get isUpcoming => !isInPast;
 }
 
+// View model for an as-needed administration entry.
 class AsNeededAdministrationEntry {
   const AsNeededAdministrationEntry({
     required this.medicine,
@@ -43,14 +48,17 @@ class AsNeededAdministrationEntry {
   final Administration administration;
 }
 
+// Buckets used to group entries by time of day.
 enum TimeOfDayBucket { morning, afternoon, evening, night }
 
+// Grouping of schedule entries for a time-of-day bucket.
 class TimeOfDaySection {
   const TimeOfDaySection({required this.bucket, required this.entries});
 
   final TimeOfDayBucket bucket;
   final List<DailyScheduleEntry> entries;
 
+  // Human-readable label for the bucket.
   String get label {
     switch (bucket) {
       case TimeOfDayBucket.morning:
@@ -65,7 +73,9 @@ class TimeOfDaySection {
   }
 }
 
+// Builds daily schedule entries and grouped sections for the UI.
 class DailyScheduleBuilder {
+  // Builds scheduled entries for a child on a given date.
   List<DailyScheduleEntry> buildScheduledEntries(Child child, DateTime date) {
     final Map<String, Medicine> medicineById = {
       for (final medicine in child.medicines) medicine.id: medicine,
@@ -118,6 +128,7 @@ class DailyScheduleBuilder {
     return entries;
   }
 
+  // Groups entries into time-of-day sections.
   List<TimeOfDaySection> buildTimeOfDaySections(
     List<DailyScheduleEntry> entries,
   ) {
@@ -138,6 +149,7 @@ class DailyScheduleBuilder {
         .toList();
   }
 
+  // Builds as-needed administration entries for a given date.
   List<AsNeededAdministrationEntry> buildAsNeededEntries(
     Child child,
     DateTime date,
@@ -173,12 +185,14 @@ class DailyScheduleBuilder {
     return entries;
   }
 
+  // Returns true when the date is within the schedule's range.
   bool _isDateInRange(MedicineSchedule schedule, DateTime dateOnly) {
     final DateTime start = _asDateOnly(schedule.startDate);
     final DateTime end = _asDateOnly(schedule.endDate);
     return !dateOnly.isBefore(start) && !dateOnly.isAfter(end);
   }
 
+  // Merges a date with a time string into a DateTime.
   DateTime? _merge(DateTime date, String timeString) {
     final sanitized = timeString.trim().toUpperCase();
     final List<String> patterns = ['HH:mm', 'H:mm', 'h:mma', 'hh:mma'];
@@ -199,6 +213,7 @@ class DailyScheduleBuilder {
     return null;
   }
 
+  // Finds the administration matching a scheduled time.
   Administration? _findAdministration(
     MedicineSchedule schedule,
     DateTime scheduledDateTime,
@@ -211,6 +226,7 @@ class DailyScheduleBuilder {
     return null;
   }
 
+  // Returns true when two DateTimes match to the minute.
   bool _isSameMinute(DateTime a, DateTime b) {
     return a.year == b.year &&
         a.month == b.month &&
@@ -219,10 +235,12 @@ class DailyScheduleBuilder {
         a.minute == b.minute;
   }
 
+  // Strips a DateTime down to a date-only value.
   DateTime _asDateOnly(DateTime dateTime) {
     return DateTime(dateTime.year, dateTime.month, dateTime.day);
   }
 
+  // Maps a time to its time-of-day bucket.
   TimeOfDayBucket _bucketFor(DateTime dateTime) {
     final hour = dateTime.hour;
     if (hour >= 6 && hour < 12) {
