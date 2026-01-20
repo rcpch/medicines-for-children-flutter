@@ -5,6 +5,7 @@ import 'package:medicines_for_children_flutter/core/domain/models/administration
 part 'schedule.freezed.dart';
 part 'schedule.g.dart';
 
+/// Represents a scheduled medicine regimen with specific times.
 @freezed
 abstract class MedicineSchedule with _$MedicineSchedule {
   const factory MedicineSchedule({
@@ -17,10 +18,12 @@ abstract class MedicineSchedule with _$MedicineSchedule {
     required List<Administration> administrations,
   }) = _MedicineSchedule;
 
+  /// Builds a medicine schedule model from a JSON map.
   factory MedicineSchedule.fromJson(Map<String, dynamic> json) =>
       _$MedicineScheduleFromJson(json);
 }
 
+/// Represents an as-needed medicine schedule.
 @freezed
 abstract class AsNeededSchedule with _$AsNeededSchedule {
   const factory AsNeededSchedule({
@@ -29,6 +32,7 @@ abstract class AsNeededSchedule with _$AsNeededSchedule {
     required List<Administration> administrations,
   }) = _AsNeededSchedule;
 
+  /// Builds an as-needed schedule model from a JSON map.
   factory AsNeededSchedule.fromJson(Map<String, dynamic> json) =>
       _$AsNeededScheduleFromJson(json);
 }
