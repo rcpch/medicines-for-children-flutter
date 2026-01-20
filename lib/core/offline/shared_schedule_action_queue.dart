@@ -10,8 +10,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const _queueKey = 'pending_shared_schedule_actions';
 
+/// Types of shared schedule actions queued while offline.
 enum SharedScheduleActionType { confirm, record }
 
+/// Serializable queued action for shared schedule operations.
 class PendingSharedScheduleAction {
   PendingSharedScheduleAction({
     required this.id,
@@ -20,6 +22,7 @@ class PendingSharedScheduleAction {
     required this.queuedAt,
   });
 
+  /// Builds a queued action from stored JSON.
   factory PendingSharedScheduleAction.fromJson(Map<String, dynamic> json) {
     return PendingSharedScheduleAction(
       id: json['id'] as String,
@@ -39,6 +42,7 @@ class PendingSharedScheduleAction {
   final Map<String, dynamic> payload;
   final DateTime queuedAt;
 
+  /// Serializes the queued action to JSON.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -49,6 +53,7 @@ class PendingSharedScheduleAction {
   }
 }
 
+/// Manages queued shared schedule actions for offline recovery.
 class SharedScheduleActionQueueService {
   SharedScheduleActionQueueService({
     required SharedPreferences prefs,
@@ -62,12 +67,14 @@ class SharedScheduleActionQueueService {
   final SharedScheduleRepository _repository;
   final AppConfig _config;
 
+  /// Adds a new action to the persistent queue.
   Future<void> enqueue(PendingSharedScheduleAction action) async {
     final queue = await loadQueue();
     queue.add(action);
     await _saveQueue(queue);
   }
 
+  /// Loads queued actions from storage.
   Future<List<PendingSharedScheduleAction>> loadQueue() async {
     final raw = _prefs.getStringList(_queueKey) ?? const [];
     return raw
@@ -79,6 +86,7 @@ class SharedScheduleActionQueueService {
         .toList();
   }
 
+  /// Processes queued actions against the API when available.
   Future<void> processQueue() async {
     if (_config.sharedScheduleApiBaseUrl.trim().isEmpty) {
       return;
@@ -98,6 +106,7 @@ class SharedScheduleActionQueueService {
     await _saveQueue(remaining);
   }
 
+  /// Executes a queued action, returning success state.
   Future<bool> _processAction(PendingSharedScheduleAction action) async {
     try {
       switch (action.type) {
@@ -129,12 +138,14 @@ class SharedScheduleActionQueueService {
     }
   }
 
+  /// Persists the queue to storage.
   Future<void> _saveQueue(List<PendingSharedScheduleAction> queue) async {
     final encoded = queue.map((action) => jsonEncode(action.toJson())).toList();
     await _prefs.setStringList(_queueKey, encoded);
   }
 }
 
+/// Provides the shared schedule action queue service.
 final sharedScheduleActionQueueServiceProvider =
     Provider<SharedScheduleActionQueueService>((ref) {
       final prefs = ref.watch(sharedPreferencesProvider);
