@@ -1,0 +1,58 @@
+name: Build app and release to test users (Android & Web)
+
+on:
+  workflow_run:
+     workflows: ["Analyze and Test"]
+     types: [completed] #requested
+
+permissions:
+  contents: write # For committing to repo for GitHub Pages for actions/deploy-pages
+  pages: write    # Required for actions/deploy-pages
+
+
+ jobs:
+   on-success-build-and-publish-web:
+     name: Build and Deploy Web App to GitHub Pages
+     runs-on: ubuntu-latest
+     # IMPORTANT: Runs only if the "Analyze and Test" workflow completed successfully
+     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+     steps:
+      - run: echo "Analyze and Test succeeded - deploy starting"
+
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.7'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies  
+        run: flutter pub get
+
+      - name: Build Flutter web app
+        run: flutter build web --release
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Path to the directory containing the static assets to be deployed.
+          # Flutter web builds to 'build/web' by default.
+          path: './build/web'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+
+   on-failure:
+     runs-on: ubuntu-latest
+     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+     steps:
+       - run: echo "Analyze and Test failed - deploy aborted"
+  

@@ -1,4 +1,4 @@
-name: Flutter CI
+name: Analyze and Test
 
 on:
   push:
@@ -35,6 +35,3 @@ jobs:
 
       - name: Run tests
         run: flutter test --coverage
-
-      - name: Build Android APK (dev)
-        run: flutter build apk --debug --flavor dev --target lib/main_dev.dart
