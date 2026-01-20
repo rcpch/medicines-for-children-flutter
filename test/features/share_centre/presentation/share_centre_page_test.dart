@@ -159,8 +159,8 @@ void main() {
           primaryCarerStateProvider.overrideWithValue(
             PrimaryCarerState(carer: carer),
           ),
-          shareCentreControllerProvider.overrideWith(
-            (ref) => ShareCentreController(ref, FakeShareCentreRepository()),
+          shareCentreRepositoryProvider.overrideWithValue(
+            FakeShareCentreRepository(),
           ),
           shareCentreSchedulesProvider(
             child.id,

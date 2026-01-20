@@ -15,16 +15,19 @@ class ProfileSettings {
   }
 }
 
-class ProfileSettingsController extends StateNotifier<ProfileSettings> {
-  ProfileSettingsController(this._prefs, this._profileId)
-    : super(
-        ProfileSettings(
-          biometricsEnabled: _prefs.getBool(_keyFor(_profileId)) ?? false,
-        ),
-      );
+class ProfileSettingsController extends Notifier<ProfileSettings> {
+  ProfileSettingsController(this._profileId);
 
-  final SharedPreferences _prefs;
   final String _profileId;
+  late SharedPreferences _prefs;
+
+  @override
+  ProfileSettings build() {
+    _prefs = ref.watch(sharedPreferencesProvider);
+    return ProfileSettings(
+      biometricsEnabled: _prefs.getBool(_keyFor(_profileId)) ?? false,
+    );
+  }
 
   Future<void> setBiometricsEnabled(bool enabled) async {
     state = state.copyWith(biometricsEnabled: enabled);
@@ -37,11 +40,6 @@ class ProfileSettingsController extends StateNotifier<ProfileSettings> {
 }
 
 final profileSettingsControllerProvider =
-    StateNotifierProvider.family<
-      ProfileSettingsController,
-      ProfileSettings,
-      String
-    >((ref, profileId) {
-      final prefs = ref.watch(sharedPreferencesProvider);
-      return ProfileSettingsController(prefs, profileId);
-    });
+    NotifierProvider.family<ProfileSettingsController, ProfileSettings, String>(
+      ProfileSettingsController.new,
+    );

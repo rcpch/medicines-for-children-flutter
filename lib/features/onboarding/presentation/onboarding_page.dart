@@ -223,7 +223,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               '${_carerFirstNameController.text.trim()} ${_carerLastNameController.text.trim()}'
                   .trim(),
         );
-    ref.read(onboardingDraftProvider.notifier).state = null;
+    ref.read(onboardingDraftProvider.notifier).clear();
 
     if (!mounted) {
       return;

@@ -13,22 +13,22 @@ const _textScaleKey = 'text_scale';
 const _minTextScale = 0.9;
 const _maxTextScale = 1.3;
 
-class SettingsController extends StateNotifier<AppSettings> {
-  SettingsController(this._ref, this._prefs)
-    : super(
-        AppSettings(
-          telemetryEnabled: _prefs.getBool(_telemetryEnabledKey) ?? true,
-          telemetryConsentShown:
-              _prefs.getBool(_telemetryConsentShownKey) ?? false,
-          notificationsEnabled:
-              _prefs.getBool(_notificationsEnabledKey) ?? true,
-          themeMode: _parseThemeMode(_prefs.getString(_themeModeKey)),
-          textScale: _clampTextScale(_prefs.getDouble(_textScaleKey) ?? 1.0),
-        ),
-      );
+class SettingsController extends Notifier<AppSettings> {
+  SettingsController();
 
-  final Ref _ref;
-  final SharedPreferences _prefs;
+  late SharedPreferences _prefs;
+
+  @override
+  AppSettings build() {
+    _prefs = ref.watch(sharedPreferencesProvider);
+    return AppSettings(
+      telemetryEnabled: _prefs.getBool(_telemetryEnabledKey) ?? true,
+      telemetryConsentShown: _prefs.getBool(_telemetryConsentShownKey) ?? false,
+      notificationsEnabled: _prefs.getBool(_notificationsEnabledKey) ?? true,
+      themeMode: _parseThemeMode(_prefs.getString(_themeModeKey)),
+      textScale: _clampTextScale(_prefs.getDouble(_textScaleKey) ?? 1.0),
+    );
+  }
 
   Future<void> setTelemetryEnabled(bool enabled) async {
     state = state.copyWith(telemetryEnabled: enabled);
@@ -48,7 +48,7 @@ class SettingsController extends StateNotifier<AppSettings> {
     state = state.copyWith(notificationsEnabled: enabled);
     await _prefs.setBool(_notificationsEnabledKey, enabled);
     if (!enabled) {
-      await _ref.read(notificationServiceProvider).cancelAll();
+      await ref.read(notificationServiceProvider).cancelAll();
     }
   }
 
@@ -76,7 +76,4 @@ class SettingsController extends StateNotifier<AppSettings> {
 }
 
 final settingsControllerProvider =
-    StateNotifierProvider<SettingsController, AppSettings>((ref) {
-      final prefs = ref.watch(sharedPreferencesProvider);
-      return SettingsController(ref, prefs);
-    });
+    NotifierProvider<SettingsController, AppSettings>(SettingsController.new);

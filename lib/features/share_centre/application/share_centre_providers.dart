@@ -24,16 +24,20 @@ class ShareCentreActionState {
   }
 }
 
-class ShareCentreController extends StateNotifier<ShareCentreActionState> {
-  ShareCentreController(this._ref, this._repository)
-    : _telemetry = _ref.read(telemetryServiceProvider),
-      _queue = _ref.read(shareActionQueueServiceProvider),
-      super(const ShareCentreActionState());
+class ShareCentreController extends Notifier<ShareCentreActionState> {
+  ShareCentreController();
 
-  final Ref _ref;
-  final ShareCentreRepository _repository;
-  final TelemetryService _telemetry;
-  final ShareActionQueueService _queue;
+  late ShareCentreRepository _repository;
+  late TelemetryService _telemetry;
+  late ShareActionQueueService _queue;
+
+  @override
+  ShareCentreActionState build() {
+    _repository = ref.watch(shareCentreRepositoryProvider);
+    _telemetry = ref.read(telemetryServiceProvider);
+    _queue = ref.read(shareActionQueueServiceProvider);
+    return const ShareCentreActionState();
+  }
 
   Future<ShareCentreSchedule?> createSchedule({
     required String childId,
@@ -61,7 +65,7 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
           'digital': digital,
         },
       );
-      _ref.invalidate(shareCentreSchedulesProvider(childId));
+      ref.invalidate(shareCentreSchedulesProvider(childId));
       state = state.copyWith(isSaving: false, clearError: true);
       return schedule;
     } catch (error) {
@@ -114,7 +118,7 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
         'share_centre_updated',
         properties: {'childId': childId, 'shareId': schedule.apiId},
       );
-      _ref.invalidate(shareCentreSchedulesProvider(childId));
+      ref.invalidate(shareCentreSchedulesProvider(childId));
       state = state.copyWith(isSaving: false, clearError: true);
       return schedule;
     } catch (error) {
@@ -185,7 +189,7 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
         'share_centre_ended',
         properties: {'childId': childId, 'shareId': schedule.apiId},
       );
-      _ref.invalidate(shareCentreSchedulesProvider(childId));
+      ref.invalidate(shareCentreSchedulesProvider(childId));
       state = state.copyWith(isSaving: false, clearError: true);
       return schedule;
     } catch (error) {
@@ -227,7 +231,7 @@ class ShareCentreController extends StateNotifier<ShareCentreActionState> {
         'share_centre_deleted',
         properties: {'childId': childId, 'shareId': schedule.apiId},
       );
-      _ref.invalidate(shareCentreSchedulesProvider(childId));
+      ref.invalidate(shareCentreSchedulesProvider(childId));
       state = state.copyWith(isSaving: false, clearError: true);
       return schedule;
     } catch (error) {
@@ -281,7 +285,6 @@ final shareCentreSchedulesProvider =
     });
 
 final shareCentreControllerProvider =
-    StateNotifierProvider<ShareCentreController, ShareCentreActionState>((ref) {
-      final repository = ref.watch(shareCentreRepositoryProvider);
-      return ShareCentreController(ref, repository);
-    });
+    NotifierProvider<ShareCentreController, ShareCentreActionState>(
+      ShareCentreController.new,
+    );

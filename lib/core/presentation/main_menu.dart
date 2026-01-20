@@ -21,10 +21,7 @@ class MainMenu extends ConsumerWidget {
     return PopupMenuButton<MainMenuAction>(
       onSelected: (action) => _handleAction(context, ref, action),
       itemBuilder: (context) => const [
-        PopupMenuItem(
-          value: MainMenuAction.settings,
-          child: Text('Settings'),
-        ),
+        PopupMenuItem(value: MainMenuAction.settings, child: Text('Settings')),
         PopupMenuDivider(),
         PopupMenuItem(
           value: MainMenuAction.exportBackup,
@@ -35,10 +32,7 @@ class MainMenu extends ConsumerWidget {
           child: Text('Import backup'),
         ),
         PopupMenuDivider(),
-        PopupMenuItem(
-          value: MainMenuAction.signOut,
-          child: Text('Sign out'),
-        ),
+        PopupMenuItem(value: MainMenuAction.signOut, child: Text('Sign out')),
       ],
     );
   }
@@ -87,7 +81,9 @@ class MainMenu extends ConsumerWidget {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Backup exported. Store it somewhere safe.')),
+        const SnackBar(
+          content: Text('Backup exported. Store it somewhere safe.'),
+        ),
       );
     } catch (error) {
       if (!context.mounted) {
@@ -111,9 +107,9 @@ class MainMenu extends ConsumerWidget {
       if (!context.mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Unable to open backup: $error')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Unable to open backup: $error')));
       return;
     }
 

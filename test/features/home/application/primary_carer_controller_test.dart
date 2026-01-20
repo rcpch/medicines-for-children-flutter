@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/data/storage/active_child_local_data_source.dart';
@@ -143,10 +145,16 @@ void main() {
 }
 
 Future<void> _awaitAuthenticated(ProviderContainer container) async {
-  final controller = container.read(authControllerProvider.notifier);
-  await controller.stream.firstWhere(
-    (state) => state.status == AuthStatus.authenticated,
-  );
+  final completer = Completer<void>();
+  final sub = container.listen<AuthState>(authControllerProvider, (
+    previous,
+    next,
+  ) {
+    if (next.status == AuthStatus.authenticated && !completer.isCompleted) {
+      completer.complete();
+    }
+  }, fireImmediately: true);
+  await completer.future.whenComplete(sub.close);
 }
 
 PrimaryCarer samplePrimaryCarer() {

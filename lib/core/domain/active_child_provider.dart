@@ -5,29 +5,33 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/core/data/storage/active_child_local_data_source.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
-import 'package:medicines_for_children_flutter/features/home/application/primary_carer_controller.dart';
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_state_provider.dart';
 
-class SelectedChildController extends StateNotifier<String?> {
-  SelectedChildController(this._ref, this._storage) : super(null) {
-    _authSub = _ref.listen<AuthState>(
+class SelectedChildController extends Notifier<String?> {
+  SelectedChildController();
+
+  late ActiveChildLocalDataSource _storage;
+  String? _profileId;
+
+  @override
+  String? build() {
+    _storage = ref.watch(activeChildLocalDataSourceProvider);
+
+    ref.listen<AuthState>(
       authControllerProvider,
       (previous, next) => _handleAuthChange(next),
-      fireImmediately: true,
     );
-    _carerSub = _ref.listen<PrimaryCarerState>(
-      primaryCarerStateProvider,
-      (previous, next) => _handleCarerChange(next),
-      fireImmediately: true,
-    );
-  }
 
-  final Ref _ref;
-  final ActiveChildLocalDataSource _storage;
-  ProviderSubscription<AuthState>? _authSub;
-  ProviderSubscription<PrimaryCarerState>? _carerSub;
-  String? _profileId;
-  PrimaryCarerState? _carerState;
+    final auth = ref.watch(authControllerProvider);
+    final profileId = auth.user?.uid;
+    _profileId = profileId;
+
+    final initial = (profileId == null || profileId.isEmpty)
+        ? null
+        : _storage.readActiveChildId(profileId);
+
+    return initial;
+  }
 
   void _handleAuthChange(AuthState next) {
     final profileId = next.user?.uid;
@@ -40,35 +44,6 @@ class SelectedChildController extends StateNotifier<String?> {
       return;
     }
     state = _storage.readActiveChildId(profileId);
-    _syncWithCarer();
-  }
-
-  void _handleCarerChange(PrimaryCarerState next) {
-    _carerState = next;
-    _syncWithCarer();
-  }
-
-  void _syncWithCarer() {
-    final profileId = _profileId;
-    final carer = _carerState?.carer;
-    if (profileId == null ||
-        profileId.isEmpty ||
-        carer == null ||
-        carer.children.isEmpty) {
-      state = null;
-      return;
-    }
-    final currentId = state;
-    final selected =
-        carer.children.cast<Child?>().firstWhere(
-          (child) => child?.id == currentId,
-          orElse: () => null,
-        ) ??
-        carer.children.first;
-    if (selected.id != currentId) {
-      state = selected.id;
-      unawaited(_storage.writeActiveChildId(profileId, selected.id));
-    }
   }
 
   Future<void> selectChild(String childId) async {
@@ -79,20 +54,12 @@ class SelectedChildController extends StateNotifier<String?> {
     state = childId;
     await _storage.writeActiveChildId(profileId, childId);
   }
-
-  @override
-  void dispose() {
-    _authSub?.close();
-    _carerSub?.close();
-    super.dispose();
-  }
 }
 
 final selectedChildIdProvider =
-    StateNotifierProvider<SelectedChildController, String?>((ref) {
-      final storage = ref.watch(activeChildLocalDataSourceProvider);
-      return SelectedChildController(ref, storage);
-    });
+    NotifierProvider<SelectedChildController, String?>(
+      SelectedChildController.new,
+    );
 
 final activeChildProvider = Provider<Child?>((ref) {
   final state = ref.watch(primaryCarerStateProvider);

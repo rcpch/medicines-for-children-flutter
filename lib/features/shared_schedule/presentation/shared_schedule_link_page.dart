@@ -30,10 +30,10 @@ class SharedScheduleLinkPage extends ConsumerWidget {
         data: (result) {
           if (result.success && result.hasUsableAuthToken) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              ref.read(sharedScheduleSessionProvider.notifier).state = (
+              ref.read(sharedScheduleSessionProvider.notifier).setSession((
                 apiId: result.sharedScheduleId,
                 authToken: result.authToken!,
-              );
+              ));
 
               if (context.mounted) {
                 context.goNamed(

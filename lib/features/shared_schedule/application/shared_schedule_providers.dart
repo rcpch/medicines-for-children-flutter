@@ -5,11 +5,25 @@ import 'package:medicines_for_children_flutter/features/shared_schedule/data/sha
 
 typedef SharedScheduleSession = ({String apiId, String authToken});
 
-final sharedScheduleSessionProvider = StateProvider<SharedScheduleSession?>((
-  ref,
-) {
-  return null;
-});
+class SharedScheduleSessionController extends Notifier<SharedScheduleSession?> {
+  @override
+  SharedScheduleSession? build() {
+    return null;
+  }
+
+  void setSession(SharedScheduleSession session) {
+    state = session;
+  }
+
+  void clear() {
+    state = null;
+  }
+}
+
+final sharedScheduleSessionProvider =
+    NotifierProvider<SharedScheduleSessionController, SharedScheduleSession?>(
+      SharedScheduleSessionController.new,
+    );
 
 final sharedScheduleRepositoryProvider = Provider<SharedScheduleRepository>((
   ref,

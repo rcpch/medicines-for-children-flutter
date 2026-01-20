@@ -21,12 +21,14 @@ class AsNeededRecordState {
   }
 }
 
-class AsNeededRecordController extends StateNotifier<AsNeededRecordState> {
-  AsNeededRecordController(this._ref, this._repository)
-    : super(const AsNeededRecordState());
+class AsNeededRecordController extends Notifier<AsNeededRecordState> {
+  late AsNeededRepository _repository;
 
-  final Ref _ref;
-  final AsNeededRepository _repository;
+  @override
+  AsNeededRecordState build() {
+    _repository = ref.watch(asNeededRepositoryProvider);
+    return const AsNeededRecordState();
+  }
 
   Future<bool> recordAdministration({
     required String medicineId,
@@ -53,12 +55,11 @@ class AsNeededRecordController extends StateNotifier<AsNeededRecordState> {
   }
 
   Future<void> _refreshCarerCache() async {
-    await _ref.read(primaryCarerControllerProvider.notifier).refreshFromLocal();
+    await ref.read(primaryCarerControllerProvider.notifier).refreshFromLocal();
   }
 }
 
 final asNeededRecordControllerProvider =
-    StateNotifierProvider<AsNeededRecordController, AsNeededRecordState>((ref) {
-      final repository = ref.watch(asNeededRepositoryProvider);
-      return AsNeededRecordController(ref, repository);
-    });
+    NotifierProvider<AsNeededRecordController, AsNeededRecordState>(
+      AsNeededRecordController.new,
+    );

@@ -26,13 +26,16 @@ class ScheduleEditorState {
   }
 }
 
-class ScheduleEditorController extends StateNotifier<ScheduleEditorState> {
-  ScheduleEditorController(this._ref, this._repository, this._notifications)
-    : super(const ScheduleEditorState());
+class ScheduleEditorController extends Notifier<ScheduleEditorState> {
+  late ScheduleRepository _repository;
+  late NotificationService _notifications;
 
-  final Ref _ref;
-  final ScheduleRepository _repository;
-  final NotificationService _notifications;
+  @override
+  ScheduleEditorState build() {
+    _repository = ref.watch(scheduleRepositoryProvider);
+    _notifications = ref.watch(notificationServiceProvider);
+    return const ScheduleEditorState();
+  }
 
   Future<MedicineSchedule?> createSchedule({
     required ScheduleDraft draft,
@@ -42,7 +45,7 @@ class ScheduleEditorController extends StateNotifier<ScheduleEditorState> {
     state = state.copyWith(isSaving: true, clearError: true);
     try {
       final schedule = await _repository.createSchedule(draft);
-      final settings = _ref.read(settingsControllerProvider);
+      final settings = ref.read(settingsControllerProvider);
       if (enableNotifications && settings.notificationsEnabled) {
         try {
           await _notifications.scheduleForSchedule(
@@ -78,7 +81,7 @@ class ScheduleEditorController extends StateNotifier<ScheduleEditorState> {
       } catch (_) {
         // Ignore notification failures so edits still succeed.
       }
-      final settings = _ref.read(settingsControllerProvider);
+      final settings = ref.read(settingsControllerProvider);
       if (enableNotifications && settings.notificationsEnabled) {
         try {
           await _notifications.scheduleForSchedule(
@@ -123,13 +126,11 @@ class ScheduleEditorController extends StateNotifier<ScheduleEditorState> {
   }
 
   Future<void> _refreshCarerCache() async {
-    await _ref.read(primaryCarerControllerProvider.notifier).refreshFromLocal();
+    await ref.read(primaryCarerControllerProvider.notifier).refreshFromLocal();
   }
 }
 
 final scheduleEditorControllerProvider =
-    StateNotifierProvider<ScheduleEditorController, ScheduleEditorState>((ref) {
-      final repository = ref.watch(scheduleRepositoryProvider);
-      final notifications = ref.watch(notificationServiceProvider);
-      return ScheduleEditorController(ref, repository, notifications);
-    });
+    NotifierProvider<ScheduleEditorController, ScheduleEditorState>(
+      ScheduleEditorController.new,
+    );

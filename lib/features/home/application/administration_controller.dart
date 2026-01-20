@@ -22,12 +22,14 @@ class AdministrationState {
   }
 }
 
-class AdministrationController extends StateNotifier<AdministrationState> {
-  AdministrationController(this._ref, this._repository)
-    : super(const AdministrationState());
+class AdministrationController extends Notifier<AdministrationState> {
+  late AdministrationRepository _repository;
 
-  final Ref _ref;
-  final AdministrationRepository _repository;
+  @override
+  AdministrationState build() {
+    _repository = ref.watch(administrationRepositoryProvider);
+    return const AdministrationState();
+  }
 
   Future<bool> markScheduled({
     required String scheduleId,
@@ -41,7 +43,7 @@ class AdministrationController extends StateNotifier<AdministrationState> {
         dateTime: dateTime,
         status: status,
       );
-      await _ref.read(primaryCarerControllerProvider.notifier).refresh();
+      await ref.read(primaryCarerControllerProvider.notifier).refresh();
       state = state.copyWith(isSaving: false, clearError: true);
       return true;
     } catch (_) {
@@ -63,7 +65,7 @@ class AdministrationController extends StateNotifier<AdministrationState> {
         scheduleId: scheduleId,
         dateTime: dateTime,
       );
-      await _ref.read(primaryCarerControllerProvider.notifier).refresh();
+      await ref.read(primaryCarerControllerProvider.notifier).refresh();
       state = state.copyWith(isSaving: false, clearError: true);
       return true;
     } catch (_) {
@@ -77,7 +79,6 @@ class AdministrationController extends StateNotifier<AdministrationState> {
 }
 
 final administrationControllerProvider =
-    StateNotifierProvider<AdministrationController, AdministrationState>((ref) {
-      final repository = ref.watch(administrationRepositoryProvider);
-      return AdministrationController(ref, repository);
-    });
+    NotifierProvider<AdministrationController, AdministrationState>(
+      AdministrationController.new,
+    );

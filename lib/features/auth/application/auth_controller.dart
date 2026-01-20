@@ -45,34 +45,33 @@ class AuthState {
   }
 }
 
-final authControllerProvider = StateNotifierProvider<AuthController, AuthState>(
-  (ref) {
-    return AuthController(ref);
-  },
+final authControllerProvider = NotifierProvider<AuthController, AuthState>(
+  AuthController.new,
 );
 
-class AuthController extends StateNotifier<AuthState> {
-  AuthController(this._ref) : super(const AuthState()) {
-    _repository = _ref.read(authRepositoryProvider);
-    _telemetry = _ref.read(telemetryServiceProvider);
-    _biometrics = _ref.read(biometricAuthServiceProvider);
-    _statusSub = _repository.statusStream().listen((status) {
-      unawaited(_syncStatus(status));
-    });
-    unawaited(_bootstrap());
-  }
-
-  final Ref _ref;
+class AuthController extends Notifier<AuthState> {
   late final AuthRepository _repository;
   late final TelemetryService _telemetry;
   late final BiometricAuthService _biometrics;
-  StreamSubscription<AuthStatus>? _statusSub;
+
+  @override
+  AuthState build() {
+    _repository = ref.read(authRepositoryProvider);
+    _telemetry = ref.read(telemetryServiceProvider);
+    _biometrics = ref.read(biometricAuthServiceProvider);
+    final statusSub = _repository.statusStream().listen((status) {
+      unawaited(_syncStatus(status));
+    });
+    ref.onDispose(statusSub.cancel);
+    unawaited(_bootstrap());
+    return const AuthState();
+  }
 
   Future<void> _bootstrap() async {
     try {
       final profiles = await _repository.listProfiles();
       final user = await _repository.currentUser();
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       final status = _resolveStatusFromUser(user);
@@ -84,7 +83,7 @@ class AuthController extends StateNotifier<AuthState> {
         clearError: true,
       );
     } catch (_) {
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       state = state.copyWith(
@@ -113,7 +112,7 @@ class AuthController extends StateNotifier<AuthState> {
           status == AuthStatus.onboarding) {
         final user = await _repository.currentUser();
         final profiles = await _repository.listProfiles();
-        if (!mounted) {
+        if (!ref.mounted) {
           return;
         }
         state = state.copyWith(
@@ -125,7 +124,7 @@ class AuthController extends StateNotifier<AuthState> {
         );
       } else {
         final profiles = await _repository.listProfiles();
-        if (!mounted) {
+        if (!ref.mounted) {
           return;
         }
         state = state.copyWith(
@@ -137,7 +136,7 @@ class AuthController extends StateNotifier<AuthState> {
         );
       }
     } catch (_) {
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       state = state.copyWith(
@@ -153,7 +152,7 @@ class AuthController extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final profiles = await _repository.listProfiles();
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       state = state.copyWith(
@@ -162,7 +161,7 @@ class AuthController extends StateNotifier<AuthState> {
         clearError: true,
       );
     } catch (_) {
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       state = state.copyWith(
@@ -178,7 +177,7 @@ class AuthController extends StateNotifier<AuthState> {
       await _repository.createProfile(name: name, passcode: passcode);
       final profiles = await _repository.listProfiles();
       final user = await _repository.currentUser();
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       state = state.copyWith(
@@ -193,7 +192,7 @@ class AuthController extends StateNotifier<AuthState> {
         properties: {'hasPasscode': passcode != null && passcode.isNotEmpty},
       );
     } catch (_) {
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       state = state.copyWith(
@@ -208,7 +207,7 @@ class AuthController extends StateNotifier<AuthState> {
     try {
       await _repository.selectProfile(profileId);
       final user = await _repository.currentUser();
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       state = state.copyWith(
@@ -219,7 +218,7 @@ class AuthController extends StateNotifier<AuthState> {
       );
       _telemetry.trackEvent('profile_selected');
     } catch (_) {
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       state = state.copyWith(
@@ -234,7 +233,7 @@ class AuthController extends StateNotifier<AuthState> {
     try {
       await _repository.unlockWithPasscode(passcode);
       final user = await _repository.currentUser();
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       state = state.copyWith(
@@ -245,7 +244,7 @@ class AuthController extends StateNotifier<AuthState> {
       );
       _telemetry.trackEvent('profile_unlocked');
     } catch (_) {
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       state = state.copyWith(
@@ -260,7 +259,7 @@ class AuthController extends StateNotifier<AuthState> {
     try {
       final canUse = await _biometrics.isSupported();
       if (!canUse) {
-        if (!mounted) {
+        if (!ref.mounted) {
           return false;
         }
         state = state.copyWith(
@@ -271,7 +270,7 @@ class AuthController extends StateNotifier<AuthState> {
       }
       final ok = await _biometrics.authenticate();
       if (!ok) {
-        if (!mounted) {
+        if (!ref.mounted) {
           return false;
         }
         state = state.copyWith(
@@ -282,7 +281,7 @@ class AuthController extends StateNotifier<AuthState> {
       }
       await _repository.unlockWithBiometrics();
       final user = await _repository.currentUser();
-      if (!mounted) {
+      if (!ref.mounted) {
         return false;
       }
       state = state.copyWith(
@@ -294,7 +293,7 @@ class AuthController extends StateNotifier<AuthState> {
       _telemetry.trackEvent('profile_unlocked_biometrics');
       return true;
     } catch (_) {
-      if (!mounted) {
+      if (!ref.mounted) {
         return false;
       }
       state = state.copyWith(
@@ -309,13 +308,13 @@ class AuthController extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final ok = await _repository.verifyPasscode(passcode);
-      if (!mounted) {
+      if (!ref.mounted) {
         return false;
       }
       state = state.copyWith(isLoading: false, clearError: true);
       return ok;
     } catch (_) {
-      if (!mounted) {
+      if (!ref.mounted) {
         return false;
       }
       state = state.copyWith(
@@ -337,7 +336,7 @@ class AuthController extends StateNotifier<AuthState> {
         newPasscode: newPasscode,
       );
       final profiles = await _repository.listProfiles();
-      if (!mounted) {
+      if (!ref.mounted) {
         return false;
       }
       state = state.copyWith(
@@ -348,7 +347,7 @@ class AuthController extends StateNotifier<AuthState> {
       _telemetry.trackEvent('passcode_changed');
       return true;
     } catch (_) {
-      if (!mounted) {
+      if (!ref.mounted) {
         return false;
       }
       state = state.copyWith(
@@ -363,7 +362,7 @@ class AuthController extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       await _repository.completeOnboarding(displayName: displayName);
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       final user = await _repository.currentUser();
@@ -375,7 +374,7 @@ class AuthController extends StateNotifier<AuthState> {
       );
       _telemetry.trackEvent('onboarding_completed');
     } catch (_) {
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       state = state.copyWith(
@@ -389,7 +388,7 @@ class AuthController extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       await _repository.signOut();
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       state = state.copyWith(
@@ -399,7 +398,7 @@ class AuthController extends StateNotifier<AuthState> {
       );
       _telemetry.trackEvent('signed_out');
     } catch (_) {
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       state = state.copyWith(
@@ -407,11 +406,5 @@ class AuthController extends StateNotifier<AuthState> {
         errorMessage: 'Unable to sign out. Please try again.',
       );
     }
-  }
-
-  @override
-  void dispose() {
-    _statusSub?.cancel();
-    super.dispose();
   }
 }

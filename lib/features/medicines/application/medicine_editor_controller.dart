@@ -23,12 +23,14 @@ class MedicineEditorState {
   }
 }
 
-class MedicineEditorController extends StateNotifier<MedicineEditorState> {
-  MedicineEditorController(this._ref, this._repository)
-    : super(const MedicineEditorState());
+class MedicineEditorController extends Notifier<MedicineEditorState> {
+  late MedicineRepository _repository;
 
-  final Ref _ref;
-  final MedicineRepository _repository;
+  @override
+  MedicineEditorState build() {
+    _repository = ref.watch(medicineRepositoryProvider);
+    return const MedicineEditorState();
+  }
 
   Future<Medicine?> createMedicine(MedicineDraft draft) async {
     state = state.copyWith(isSaving: true, clearError: true);
@@ -79,12 +81,11 @@ class MedicineEditorController extends StateNotifier<MedicineEditorState> {
   }
 
   Future<void> _refreshCarerCache() async {
-    await _ref.read(primaryCarerControllerProvider.notifier).refreshFromLocal();
+    await ref.read(primaryCarerControllerProvider.notifier).refreshFromLocal();
   }
 }
 
 final medicineEditorControllerProvider =
-    StateNotifierProvider<MedicineEditorController, MedicineEditorState>((ref) {
-      final repository = ref.watch(medicineRepositoryProvider);
-      return MedicineEditorController(ref, repository);
-    });
+    NotifierProvider<MedicineEditorController, MedicineEditorState>(
+      MedicineEditorController.new,
+    );

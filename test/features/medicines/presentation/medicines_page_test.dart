@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -167,10 +169,16 @@ Future<void> _writeCarer(
 }
 
 Future<void> _awaitAuthenticated(ProviderContainer container) async {
-  final controller = container.read(authControllerProvider.notifier);
-  await controller.stream.firstWhere(
-    (state) => state.status == AuthStatus.authenticated,
-  );
+  final completer = Completer<void>();
+  final sub = container.listen<AuthState>(authControllerProvider, (
+    previous,
+    next,
+  ) {
+    if (next.status == AuthStatus.authenticated && !completer.isCompleted) {
+      completer.complete();
+    }
+  }, fireImmediately: true);
+  await completer.future.whenComplete(sub.close);
 }
 
 class _TestAuthRepository implements AuthRepository {

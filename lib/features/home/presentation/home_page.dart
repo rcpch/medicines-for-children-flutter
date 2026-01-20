@@ -109,7 +109,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           activeChild: activeChild,
           selectedDate: selectedDate,
           onSelectDate: (date) {
-            ref.read(selectedDateProvider.notifier).state = date;
+            ref.read(selectedDateProvider.notifier).setDate(date);
             telemetry.trackEvent(
               'home_date_selected',
               properties: {'date': DateFormat('yyyy-MM-dd').format(date)},

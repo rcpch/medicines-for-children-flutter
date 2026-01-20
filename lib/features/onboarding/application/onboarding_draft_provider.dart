@@ -2,6 +2,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/features/onboarding/domain/onboarding_profile.dart';
 
+class OnboardingDraftController extends Notifier<OnboardingDraft?> {
+  @override
+  OnboardingDraft? build() {
+    return null;
+  }
+
+  void setDraft(OnboardingDraft? draft) {
+    state = draft;
+  }
+
+  void clear() {
+    state = null;
+  }
+}
+
 class OnboardingDraft {
   const OnboardingDraft({
     required this.carerFirstName,
@@ -72,4 +87,7 @@ class OnboardingDraft {
   final String? childNotes;
 }
 
-final onboardingDraftProvider = StateProvider<OnboardingDraft?>((ref) => null);
+final onboardingDraftProvider =
+    NotifierProvider<OnboardingDraftController, OnboardingDraft?>(
+      OnboardingDraftController.new,
+    );

@@ -40,27 +40,43 @@ class PrimaryCarerState {
 }
 
 final primaryCarerControllerProvider =
-    StateNotifierProvider<PrimaryCarerController, PrimaryCarerState>((ref) {
-      return PrimaryCarerController(ref);
-    });
+    NotifierProvider<PrimaryCarerController, PrimaryCarerState>(
+      PrimaryCarerController.new,
+    );
 
-class PrimaryCarerController extends StateNotifier<PrimaryCarerState> {
-  PrimaryCarerController(this._ref)
-    : _repository = _ref.read(primaryCarerRepositoryProvider),
-      _localDataSource = _ref.read(primaryCarerLocalDataSourceProvider),
-      super(const PrimaryCarerState()) {
-    _authSub = _ref.listen<AuthState>(
+class PrimaryCarerController extends Notifier<PrimaryCarerState> {
+  late PrimaryCarerRepository _repository;
+  late PrimaryCarerLocalDataSource _localDataSource;
+  String? _activeProfileId;
+
+  @override
+  PrimaryCarerState build() {
+    _repository = ref.read(primaryCarerRepositoryProvider);
+    _localDataSource = ref.read(primaryCarerLocalDataSourceProvider);
+    ref.listen<AuthState>(
       authControllerProvider,
       (previous, next) => unawaited(_handleAuthChange(previous, next)),
-      fireImmediately: true,
+    );
+
+    final auth = ref.watch(authControllerProvider);
+    final profileId = auth.user?.uid;
+    _activeProfileId = profileId;
+
+    if (profileId == null || profileId.isEmpty) {
+      return const PrimaryCarerState();
+    }
+
+    final cached = _localDataSource.readForProfile(profileId);
+    if (cached == null) {
+      return const PrimaryCarerState();
+    }
+    return const PrimaryCarerState().copyWith(
+      carer: cached,
+      isStale: true,
+      isLoading: false,
+      clearError: true,
     );
   }
-
-  final Ref _ref;
-  final PrimaryCarerRepository _repository;
-  final PrimaryCarerLocalDataSource _localDataSource;
-  ProviderSubscription<AuthState>? _authSub;
-  String? _activeProfileId;
 
   Future<void> _handleAuthChange(AuthState? previous, AuthState next) async {
     final profileId = next.user?.uid;
@@ -73,7 +89,7 @@ class PrimaryCarerController extends StateNotifier<PrimaryCarerState> {
       return;
     }
     final cached = _localDataSource.readForProfile(profileId);
-    if (!mounted) {
+    if (!ref.mounted) {
       return;
     }
     if (cached != null) {
@@ -99,7 +115,7 @@ class PrimaryCarerController extends StateNotifier<PrimaryCarerState> {
     try {
       final carer = await _repository.fetchPrimaryCarer();
       await _localDataSource.writeForProfile(profileId, carer);
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       state = state.copyWith(
@@ -109,7 +125,7 @@ class PrimaryCarerController extends StateNotifier<PrimaryCarerState> {
         clearError: true,
       );
     } catch (_) {
-      if (!mounted) {
+      if (!ref.mounted) {
         return;
       }
       state = state.copyWith(
@@ -124,7 +140,7 @@ class PrimaryCarerController extends StateNotifier<PrimaryCarerState> {
     if (profileId != null) {
       await _localDataSource.clearForProfile(profileId);
     }
-    if (!mounted) {
+    if (!ref.mounted) {
       return;
     }
     state = const PrimaryCarerState();
@@ -147,11 +163,11 @@ class PrimaryCarerController extends StateNotifier<PrimaryCarerState> {
     }
     final updated = current.copyWith(children: [...current.children, child]);
     await _localDataSource.writeForProfile(profileId, updated);
-    if (!mounted) {
+    if (!ref.mounted) {
       return false;
     }
     state = state.copyWith(carer: updated, isStale: false, clearError: true);
-    await _ref.read(selectedChildIdProvider.notifier).selectChild(child.id);
+    await ref.read(selectedChildIdProvider.notifier).selectChild(child.id);
     return true;
   }
 
@@ -161,7 +177,7 @@ class PrimaryCarerController extends StateNotifier<PrimaryCarerState> {
       return;
     }
     final cached = _localDataSource.readForProfile(profileId);
-    if (cached == null || !mounted) {
+    if (cached == null || !ref.mounted) {
       return;
     }
     state = state.copyWith(
@@ -170,11 +186,5 @@ class PrimaryCarerController extends StateNotifier<PrimaryCarerState> {
       isStale: false,
       clearError: true,
     );
-  }
-
-  @override
-  void dispose() {
-    _authSub?.close();
-    super.dispose();
   }
 }

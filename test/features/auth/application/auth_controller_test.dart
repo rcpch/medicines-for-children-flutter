@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
@@ -26,9 +28,9 @@ void main() {
     });
 
     test('starts unauthenticated with no profiles', () async {
-      final controller = container.read(authControllerProvider.notifier);
-      final nextState = await controller.stream.firstWhere(
-        (state) => state.status == AuthStatus.unauthenticated,
+      final nextState = await _awaitAuthStatus(
+        container,
+        AuthStatus.unauthenticated,
       );
       expect(nextState.status, AuthStatus.unauthenticated);
       expect(nextState.user, isNull);
@@ -37,8 +39,9 @@ void main() {
     test('createProfile transitions to onboarding', () async {
       final controller = container.read(authControllerProvider.notifier);
 
-      final onboardingFuture = controller.stream.firstWhere(
-        (state) => state.status == AuthStatus.onboarding,
+      final onboardingFuture = _awaitAuthStatus(
+        container,
+        AuthStatus.onboarding,
       );
       await controller.createProfile(name: 'Test Profile');
       final nextState = await onboardingFuture;
@@ -78,4 +81,21 @@ void main() {
       expect(unlockedState.status, AuthStatus.onboarding);
     });
   });
+}
+
+Future<AuthState> _awaitAuthStatus(
+  ProviderContainer container,
+  AuthStatus expected,
+) {
+  final completer = Completer<AuthState>();
+  final sub = container.listen<AuthState>(authControllerProvider, (
+    previous,
+    next,
+  ) {
+    if (!completer.isCompleted && next.status == expected) {
+      completer.complete(next);
+    }
+  }, fireImmediately: true);
+  completer.future.whenComplete(sub.close);
+  return completer.future;
 }
