@@ -33,7 +33,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Flutter web app
-        run: flutter build web --release
+        run: flutter build web --release --base-href /medicines-for-children-flutter/
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
