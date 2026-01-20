@@ -75,7 +75,7 @@
 ## Milestone 6 – Quality, Compliance, and Release Readiness
 
   - [x] Implement accessibility pass (semantic labels, large text support, high-contrast themes, screen-reader flows) and add automated `flutter_gherkin` or `integration_test` scripts covering critical journeys.
-  - [x] Add privacy/legal surfaces (consent modals, privacy policy links, data deletion request entry point) and telemetry opt-in settings.
+  - [x] Add privacy/legal surfaces (consent modals, privacy policy links) and telemetry opt-in settings.
   - [x] Add dark theme support aligned to brand palette and accessibility guidance.
   - [x] Harden offline behaviour (cache last N days of schedules/medicines, queue mutations for retry) and add background sync service.
   - [x] Configure performance monitoring, error reporting, and in-app update prompts.
@@ -96,6 +96,7 @@
   - [x] Extend accessibility coverage for schedule semantics in integration tests.
   - [x] Update coverage badge after running standard coverage tool.
   - [x] Improve child date-of-birth picker defaults (year-first view, under-18 bounds).
+  - [x] Add an About page in the overflow menu (app version, platform, external links).
   - [x] Share schedule text amended to "there are no shared schedules" when none exist.
   - [x] remove the confirmation checkbox when onboarding - there's no need for it.
   - [x] put the "anonymous analytics" dialog behind a feature flag, we don't need it yet.

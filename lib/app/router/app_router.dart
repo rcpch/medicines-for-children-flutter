@@ -6,6 +6,7 @@ import 'package:medicines_for_children_flutter/features/auth/application/auth_co
 import 'package:medicines_for_children_flutter/features/auth/domain/auth_status.dart';
 import 'package:medicines_for_children_flutter/features/auth/presentation/login_page.dart';
 import 'package:medicines_for_children_flutter/features/auth/presentation/signup_page.dart';
+import 'package:medicines_for_children_flutter/features/about/presentation/about_page.dart';
 import 'package:medicines_for_children_flutter/features/child_profile/presentation/add_child_page.dart';
 import 'package:medicines_for_children_flutter/features/child_profile/presentation/child_profile_page.dart';
 import 'package:medicines_for_children_flutter/features/home/presentation/home_page.dart';
@@ -36,6 +37,7 @@ enum AppRoute {
   login('/login'),
   signup('/signup'),
   onboarding('/onboarding'),
+  about('/about'),
   home('/home'),
   schedules('schedule'),
   addSchedule('add'),
@@ -85,6 +87,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoute.splash.path,
         name: AppRoute.splash.name,
         builder: (context, state) => const SplashPage(),
+      ),
+      GoRoute(
+        path: AppRoute.about.path,
+        name: AppRoute.about.name,
+        builder: (context, state) => const AboutPage(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>

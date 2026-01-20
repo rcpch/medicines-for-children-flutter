@@ -1,12 +1,127 @@
 // User guide list screen UI.
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/core/presentation/main_menu.dart';
 import 'package:medicines_for_children_flutter/features/user_guide/domain/user_guide_content.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UserGuidePage extends StatelessWidget {
   const UserGuidePage({super.key});
+
+  static final Uri _repoIssuesUri = Uri.parse(
+    'https://github.com/rcpch/medicines-for-children-flutter/issues',
+  );
+
+  Future<String> _deviceOsSummary() async {
+    try {
+      final plugin = DeviceInfoPlugin();
+
+      if (kIsWeb) {
+        final web = await plugin.webBrowserInfo;
+        final browser = web.browserName.name;
+        final platform = web.platform ?? 'web';
+        return '$browser ($platform)';
+      }
+
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          final info = await plugin.androidInfo;
+          final manufacturer = info.manufacturer;
+          final model = info.model;
+          final release = info.version.release;
+          return '$manufacturer $model (Android $release)';
+        case TargetPlatform.iOS:
+          final info = await plugin.iosInfo;
+          final model = info.modelName;
+          final version = info.systemVersion;
+          return '$model (iOS $version)';
+        case TargetPlatform.macOS:
+          final info = await plugin.macOsInfo;
+          final model = info.model;
+          final osVersion = info.osRelease;
+          return '$model (macOS $osVersion)';
+        case TargetPlatform.linux:
+          final info = await plugin.linuxInfo;
+          return info.prettyName;
+        case TargetPlatform.windows:
+          final info = await plugin.windowsInfo;
+          final productName = info.productName;
+          final buildNumber = info.buildNumber;
+          return '$productName (build $buildNumber)';
+        case TargetPlatform.fuchsia:
+          return 'Fuchsia';
+      }
+    } catch (_) {
+      return 'Unknown';
+    }
+  }
+
+  Future<String> _appVersionSummary() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      final version = info.version;
+      final build = info.buildNumber;
+      return build.isEmpty ? version : '$version+$build';
+    } catch (_) {
+      return 'Unknown';
+    }
+  }
+
+  Future<Uri> _buildFeedbackUri() async {
+    final deviceOs = await _deviceOsSummary();
+    final appVersion = await _appVersionSummary();
+
+    final body =
+        '''## Summary
+
+## What were you trying to do?
+
+## What worked well?
+
+## What could be improved?
+
+## If this relates to medicines/schedules, what’s the context?
+- Child age group (optional):
+- Type of schedule (e.g. daily, alternating days, PRN/as needed):
+
+## Environment
+- Device/OS: $deviceOs
+- App version: $appVersion
+
+## Additional context
+''';
+
+    return Uri(
+      scheme: 'https',
+      host: 'github.com',
+      path: '/rcpch/medicines-for-children-flutter/issues/new',
+      queryParameters: {'template': 'app_feedback.md', 'body': body},
+    );
+  }
+
+  Future<void> _openFeedback(BuildContext context) async {
+    final uri = await _buildFeedbackUri();
+
+    if (!context.mounted) {
+      return;
+    }
+
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Could not open feedback form. You can file feedback here: ${_repoIssuesUri.toString()}',
+          ),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +151,19 @@ class UserGuidePage extends StatelessWidget {
                 AppRoute.userGuideDetail.name,
                 pathParameters: {'sectionId': section.id},
               ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            child: ListTile(
+              key: const ValueKey('guide-feedback'),
+              leading: const Icon(Icons.feedback_outlined),
+              title: const Text('Feedback'),
+              subtitle: const Text(
+                'Report bugs or suggest improvements on GitHub.',
+              ),
+              trailing: const Icon(Icons.open_in_new),
+              onTap: () => _openFeedback(context),
             ),
           ),
           const SizedBox(height: 12),

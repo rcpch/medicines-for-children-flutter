@@ -41,6 +41,7 @@ This area brings the 'user guide' inside the app for easier access
 
 - In-app user guide and FAQs
 - Privacy policy and terms of service links
+- Feedback via GitHub Issues (with pre-filled Issue template which includes app version and device info)
 
 ### Settings screen
 
@@ -51,6 +52,14 @@ This area brings the 'user guide' inside the app for easier access
   - Theme selection (Light, Dark, System)
   - Text size adjustment (Small, Default, Large, Extra large)
   - Notifications reminders toggle
+
+### About screen
+
+- Accessed via top-right 'three dots' menu
+- Shows app name, version, and platform
+- Links out to:
+  - GitHub repository
+  - Medicines for Children website
 
 
 

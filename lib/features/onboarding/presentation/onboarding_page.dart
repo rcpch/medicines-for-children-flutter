@@ -455,6 +455,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                                                   .map(
                                                     (option) =>
                                                         DropdownMenuItem(
+                                                          key: ValueKey(
+                                                            'dial-code-${option.isoCode.name}',
+                                                          ),
                                                           value: option,
                                                           child: Text(
                                                             option.label,

@@ -7,7 +7,14 @@ import 'package:medicines_for_children_flutter/core/presentation/backup_actions.
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 
 // Actions available from the main overflow menu.
-enum MainMenuAction { settings, shareCentre, exportBackup, importBackup, signOut }
+enum MainMenuAction {
+  settings,
+  about,
+  shareCentre,
+  exportBackup,
+  importBackup,
+  signOut,
+}
 
 // Overflow menu widget for top-level navigation and actions.
 class MainMenu extends ConsumerWidget {
@@ -20,6 +27,7 @@ class MainMenu extends ConsumerWidget {
       onSelected: (action) => _handleAction(context, ref, action),
       itemBuilder: (context) => const [
         PopupMenuItem(value: MainMenuAction.settings, child: Text('Settings')),
+        PopupMenuItem(value: MainMenuAction.about, child: Text('About')),
         PopupMenuItem(
           value: MainMenuAction.shareCentre,
           child: Text('Share centre'),
@@ -48,6 +56,9 @@ class MainMenu extends ConsumerWidget {
     switch (action) {
       case MainMenuAction.settings:
         context.goNamed(AppRoute.settings.name);
+        return;
+      case MainMenuAction.about:
+        context.pushNamed(AppRoute.about.name);
         return;
       case MainMenuAction.shareCentre:
         context.goNamed(AppRoute.shareCentre.name);
