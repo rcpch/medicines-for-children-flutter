@@ -1,4 +1,4 @@
-// Share Centre detail screen UI.
+// Sharing detail screen UI.
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

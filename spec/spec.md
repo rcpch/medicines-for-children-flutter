@@ -415,7 +415,7 @@ At present there is no lookup of medicines against a master list to ensure corre
       - For shared schedules, cards visually highlight who is responsible (e.g. text “Due by [carer name]”) and include entry for shared start/end points.
     - “Add to schedule” popup:
       - Options to add recurring action or as-needed.
-    - Share centre access:
+    - Sharing access:
       - Button to open a sharing hub/ShareCentre storyboard (for creating and managing shared schedules).
   - Data operations:
     - On appear:
@@ -433,7 +433,7 @@ At present there is no lookup of medicines against a master list to ensure corre
   - Navigation:
     - Central tab; other tabs likely include Medicines and Profile.
     - From Home, user can:
-      - Open Share Centre.
+      - Open Sharing.
       - Open schedule management screens (AddScheduleViewController, AsNeededViewController).
       - Navigate to medicine details via cards for quick access.
 
@@ -554,7 +554,7 @@ At present there is no lookup of medicines against a master list to ensure corre
     - Deletion triggers NetworkHelper.deleteCarer to set flag.
     - Adding/editing uses NetworkHelper.addEditSecondaryCarer.
   - Navigation:
-    - From Child or Profile sections; integrated with Share Centre flows.
+    - From Child or Profile sections; integrated with Sharing flows.
 
 - **CarerViewController & AddEditSecondaryCarerViewController**
   - Purpose:

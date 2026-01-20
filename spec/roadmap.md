@@ -64,8 +64,8 @@
 
   - [x] Implement HTTP client for shared schedule endpoints (`/sharedSchedule`, `/mySharedSchedules`, `/exportSchedulePdf`, `/auth/:token`, `/administration/:apiId` etc.) with ApiKey/token headers.
   - [x] Add shared schedule confirm/decline + administration recording endpoints.
-  - [x] Build Share Centre UI: list of shares, detail view, create/extend/end flows, PDF export, digital link presentation (including native share sheet integration).
-  - [x] Add Share Centre list, create form, detail management, and link copy actions.
+  - [x] Build Sharing UI: list of shares, detail view, create/extend/end flows, PDF export, digital link presentation (including native share sheet integration).
+  - [x] Add Sharing list, create form, detail management, and link copy actions.
   - [x] Implement secondary-carer experience inside Flutter as WebView or Flutter web target: token-based auth, pending confirmation, schedule view, record/append administration note flows using backend endpoints.
   - [x] Add secure link ingestion (App Links / Universal Links) to route invite tokens directly into the secondary-carer flow.
   - [x] Record all share actions (creation, approval, decline) in analytics breadcrumbs.
@@ -109,7 +109,7 @@
   - [x] Secondary-carer "Important information" view that mirrors the webapp (condition, notes, allergies, care period summary, download schedule).
   - [x] Secondary-carer guidance banner with dismiss state (webapp guidance copy parity).
   - [x] Secondary-carer schedule download action that can generate PDF if one is not already available.
-  - [x] Share centre export flow for medicine summary PDF (iOS Export Medicine view parity).
+  - [x] Sharing export flow for medicine summary PDF (iOS Export Medicine view parity).
   - [x] Local/offline schedule PDF export option for primary carers when backend is unavailable (iOS local PDF share parity).
 
 ## Milestone 10 – Printing Enhancements

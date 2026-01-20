@@ -1,8 +1,8 @@
-# Share centre (PDF export/print + shares)
+# Sharing (PDF export/print + shares)
 
 ## Goal
 
-Validate Share centre entry point, PDF export/print actions, and the shared schedule list.
+Validate Sharing entry point, PDF export/print actions, and the shared schedule list.
 
 ## Preconditions
 
@@ -12,8 +12,8 @@ Validate Share centre entry point, PDF export/print actions, and the shared sche
 
 ## Steps (with expected outcomes)
 
-1. Go to **Child** tab → open **Share centre**.
-   - Expected: Screen title is **“Share centre”**.
+1. Go to **Child** tab → open **Sharing**.
+   - Expected: Screen title is **“Sharing”**.
 
 2. In the **Medicines list** card, tap **Export medicines**.
    - Expected: A PDF is generated and saved.

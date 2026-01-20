@@ -24,7 +24,7 @@ This file tracks areas where product intent, UI copy, or platform behaviour is u
 - Should schedule creation default reminders ON per schedule if global reminders are enabled?
 - Should schedule reminders be re-created if the user toggles reminders OFF then ON globally?
 
-## Share centre
+## Sharing
 
 - “New share” creation flow: what is the intended minimum viable sharing capability on each milestone?
 - Expected behaviour on platforms without printing support.

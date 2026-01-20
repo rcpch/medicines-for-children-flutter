@@ -14,7 +14,7 @@ These scripts are manual QA checklists for core user journeys in the Flutter app
 2. [Medicines (add/edit/archive + QR)](02-medicines.md)
 3. [Schedules (add/edit/delete)](03-schedules.md)
 4. [Reminders & notifications](04-reminders-and-notifications.md)
-5. [Share centre (PDF export/print + shares)](05-share-centre.md)
+5. [Sharing (PDF export/print + shares)](05-share-centre.md)
 6. [Backups (export/import .mfc)](06-backups-export-import.md)
 7. [Settings & user guide](07-settings-and-user-guide.md)
 

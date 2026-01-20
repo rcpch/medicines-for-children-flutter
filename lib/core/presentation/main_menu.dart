@@ -24,7 +24,7 @@ class MainMenu extends ConsumerWidget {
         PopupMenuItem(value: MainMenuAction.settings, child: Text('Settings')),
         PopupMenuItem(
           value: MainMenuAction.shareCentre,
-          child: Text('Share centre'),
+          child: Text('Sharing'),
         ),
         PopupMenuDivider(),
         PopupMenuItem(

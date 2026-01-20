@@ -1,4 +1,4 @@
-// Share Centre data access layer.
+// Sharing data access layer.
 import 'package:dio/dio.dart';
 
 class ShareCentreSchedule {

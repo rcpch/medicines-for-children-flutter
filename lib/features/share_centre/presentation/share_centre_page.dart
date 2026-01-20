@@ -1,4 +1,4 @@
-// Share Centre list screen UI.
+// Sharing list screen UI.
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -34,7 +34,7 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
     final child = ref.watch(activeChildProvider);
     if (child == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Share centre')),
+        appBar: AppBar(title: const Text('Sharing')),
         body: const Padding(
           padding: EdgeInsets.all(16),
           child: Text('No child profile available yet.'),
@@ -47,7 +47,7 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
     final carerState = ref.watch(primaryCarerStateProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Share centre')),
+      appBar: AppBar(title: const Text('Sharing')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.pushNamed(AppRoute.shareCentreCreate.name),
         icon: const Icon(Icons.add),

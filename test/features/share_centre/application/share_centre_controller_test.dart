@@ -106,7 +106,7 @@ Future<ProviderContainer> _createContainer({
 }
 
 void main() {
-  test('share centre controller tracks create event', () async {
+  test('sharing controller tracks create event', () async {
     final schedule = ShareCentreSchedule(
       apiId: 'share-1',
       status: 'pending',
@@ -146,7 +146,7 @@ void main() {
     expect(tracked, isTrue);
   });
 
-  test('share centre controller tracks delete event', () async {
+  test('sharing controller tracks delete event', () async {
     final schedule = ShareCentreSchedule(
       apiId: 'share-2',
       status: 'active',
@@ -184,7 +184,7 @@ void main() {
     expect(tracked, isTrue);
   });
 
-  test('share centre controller tracks pdf export event', () async {
+  test('sharing controller tracks pdf export event', () async {
     final schedule = ShareCentreSchedule(
       apiId: 'share-3',
       status: 'active',

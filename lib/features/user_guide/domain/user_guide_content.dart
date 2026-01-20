@@ -66,10 +66,10 @@ const userGuideSections = <UserGuideSection>[
   ),
   UserGuideSection(
     id: 'share-centre',
-    title: 'Share centre',
+    title: 'Sharing',
     summary: 'Create a share link or PDF for another carer.',
     steps: [
-      'Tap Child, then tap Share centre to view existing shares.',
+      'Tap Child, then tap Sharing to view existing shares.',
       'Tap New share to start a new shared schedule.',
       'Tap the date range fields to set the share period.',
       'Tap Digital share or PDF share to choose the format.',
@@ -93,7 +93,7 @@ const userGuideSections = <UserGuideSection>[
     title: 'Exporting & backups',
     summary: 'Export PDFs or back up your data for safe keeping.',
     steps: [
-      'Tap Child, then tap Share centre to access export tools.',
+      'Tap Child, then tap Sharing to access export tools.',
       'Tap Export medicines to generate a medicines summary PDF.',
       'Tap Export schedule to choose a date range for a schedule PDF.',
       'Tap Settings, then tap Export data to save a backup file.',
@@ -107,7 +107,7 @@ const userGuideSections = <UserGuideSection>[
     steps: [
       'Tap Home to view the most recently synced schedule.',
       'Tap Given or Skip to record actions while offline.',
-      'Tap Share centre to review shared schedules while offline.',
+      'Tap Sharing to review shared schedules while offline.',
       'Tap Home to continue recording actions until you reconnect.',
     ],
   ),
