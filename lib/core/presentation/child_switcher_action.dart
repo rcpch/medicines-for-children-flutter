@@ -5,9 +5,11 @@ import 'package:medicines_for_children_flutter/core/domain/active_child_provider
 import 'package:medicines_for_children_flutter/core/domain/models/child.dart';
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_state_provider.dart';
 
+/// Action widget for selecting the active child profile.
 class ChildSwitcherAction extends ConsumerWidget {
   const ChildSwitcherAction({super.key});
 
+  /// Builds a popup menu to switch between children.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final carer = ref.watch(primaryCarerStateProvider).carer;
@@ -68,9 +70,10 @@ class ChildSwitcherAction extends ConsumerWidget {
     );
   }
 
+  /// Resolves the currently selected child from the stored id.
   Child _resolveSelected(List<Child> children, String? selectedId) {
     return children.cast<Child?>().firstWhere(
-          (child) => child?.id == selectedId,
+      (child) => child?.id == selectedId,
           orElse: () => null,
         ) ??
         children.first;
