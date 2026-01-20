@@ -10,17 +10,21 @@ import 'package:medicines_for_children_flutter/core/settings/settings_controller
 import 'package:medicines_for_children_flutter/features/schedules/application/schedule_editor_controller.dart';
 import 'package:medicines_for_children_flutter/features/schedules/domain/schedule_draft.dart';
 
+// Form for creating or editing a medicine schedule.
 class ScheduleFormPage extends ConsumerStatefulWidget {
   const ScheduleFormPage({super.key, this.scheduleId});
 
   final String? scheduleId;
 
+  // Returns true when editing an existing schedule.
   bool get isEditing => scheduleId != null;
 
   @override
+  // Creates the state for the schedule form.
   ConsumerState<ScheduleFormPage> createState() => _ScheduleFormPageState();
 }
 
+// Manages schedule form state, validation, and submission.
 class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
   final _formKey = GlobalKey<FormState>();
   DateTime? _startDate;
@@ -31,6 +35,7 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
   bool _enableNotifications = true;
 
   @override
+  // Loads existing schedule data and notification state.
   void initState() {
     super.initState();
     final settings = ref.read(settingsControllerProvider);
@@ -63,6 +68,7 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
   }
 
   @override
+  // Builds the schedule form UI and error states.
   Widget build(BuildContext context) {
     final child = ref.watch(activeChildProvider);
     final editorState = ref.watch(scheduleEditorControllerProvider);
@@ -238,6 +244,7 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
     );
   }
 
+  // Validates input and creates or updates the schedule.
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) {
       return;
@@ -325,6 +332,7 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
     }
   }
 
+  // Prompts for a time and inserts it into the list.
   Future<void> _pickTime() async {
     final picked = await showTimePicker(
       context: context,
@@ -344,6 +352,7 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
     }
   }
 
+  // Loads the schedule being edited from the active child.
   MedicineSchedule? _loadSchedule() {
     if (!widget.isEditing || widget.scheduleId == null) {
       return null;
@@ -358,6 +367,7 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
     );
   }
 
+  // Finds the currently selected medicine for the schedule.
   Medicine? _findMedicine() {
     final child = ref.read(activeChildProvider);
     if (child == null || _selectedMedicineId == null) {
@@ -369,12 +379,14 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
     );
   }
 
+  // Formats a time for storage in the schedule model.
   String _formatTime(TimeOfDay time) {
     final hour = time.hour.toString().padLeft(2, '0');
     final minute = time.minute.toString().padLeft(2, '0');
     return '$hour:$minute';
   }
 
+  // Parses a stored time string into a TimeOfDay value.
   TimeOfDay? _parseTime(String raw) {
     final parts = raw.split(':');
     if (parts.length != 2) {
@@ -389,6 +401,7 @@ class _ScheduleFormPageState extends ConsumerState<ScheduleFormPage> {
   }
 }
 
+// Tap-to-pick date field used by the schedule form.
 class _DateField extends StatelessWidget {
   const _DateField({
     required this.label,
@@ -401,6 +414,7 @@ class _DateField extends StatelessWidget {
   final ValueChanged<DateTime> onPick;
 
   @override
+  // Builds a tappable field that opens the date picker.
   Widget build(BuildContext context) {
     final text = value == null
         ? 'Select date'

@@ -8,12 +8,17 @@ import 'package:medicines_for_children_flutter/core/domain/models/schedule.dart'
 import 'package:medicines_for_children_flutter/features/auth/data/auth_repository.dart';
 import 'package:medicines_for_children_flutter/features/schedules/domain/schedule_draft.dart';
 
+// Interface for schedule persistence.
 abstract class ScheduleRepository {
+  // Creates and returns a new schedule.
   Future<MedicineSchedule> createSchedule(ScheduleDraft draft);
+  // Updates an existing schedule.
   Future<void> updateSchedule(MedicineSchedule schedule);
+  // Deletes a schedule by id.
   Future<void> deleteSchedule(String scheduleId);
 }
 
+// Stores schedules in local profile data.
 class LocalScheduleRepository implements ScheduleRepository {
   LocalScheduleRepository({
     required this.authRepository,
@@ -26,6 +31,7 @@ class LocalScheduleRepository implements ScheduleRepository {
   final ActiveChildLocalDataSource activeChildStorage;
 
   @override
+  // Creates and saves a schedule for the active child.
   Future<MedicineSchedule> createSchedule(ScheduleDraft draft) async {
     final context = await _loadContext();
     final schedule = MedicineSchedule(
@@ -46,6 +52,7 @@ class LocalScheduleRepository implements ScheduleRepository {
   }
 
   @override
+  // Updates a schedule for the active child.
   Future<void> updateSchedule(MedicineSchedule schedule) async {
     final context = await _loadContext();
     final updatedSchedules = context.child.schedules
@@ -56,6 +63,7 @@ class LocalScheduleRepository implements ScheduleRepository {
   }
 
   @override
+  // Removes a schedule from the active child.
   Future<void> deleteSchedule(String scheduleId) async {
     final context = await _loadContext();
     final updatedSchedules = context.child.schedules
@@ -65,6 +73,7 @@ class LocalScheduleRepository implements ScheduleRepository {
     await _saveChild(context, updatedChild);
   }
 
+  // Loads the active profile, carer, and child context.
   Future<_ScheduleContext> _loadContext() async {
     final user = await authRepository.currentUser();
     if (user == null) {
@@ -86,6 +95,7 @@ class LocalScheduleRepository implements ScheduleRepository {
     );
   }
 
+  // Writes updated child data back to storage.
   Future<void> _saveChild(_ScheduleContext context, Child updatedChild) async {
     final updatedChildren = [...context.carer.children];
     updatedChildren[context.childIndex] = updatedChild;
@@ -93,6 +103,7 @@ class LocalScheduleRepository implements ScheduleRepository {
     await profileData.writePrimaryCarer(context.profileId, updatedCarer);
   }
 
+  // Determines the active child index from stored selection.
   int _resolveChildIndex(PrimaryCarer carer, String profileId) {
     final activeChildId = activeChildStorage.readActiveChildId(profileId);
     if (activeChildId == null || activeChildId.isEmpty) {
@@ -104,11 +115,13 @@ class LocalScheduleRepository implements ScheduleRepository {
     return index == -1 ? 0 : index;
   }
 
+  // Generates a simple unique id for schedules.
   String _generateId() {
     return 'sched-${DateTime.now().millisecondsSinceEpoch}';
   }
 }
 
+// Bundles profile data needed to update schedules.
 class _ScheduleContext {
   const _ScheduleContext({
     required this.profileId,
@@ -123,6 +136,7 @@ class _ScheduleContext {
   final int childIndex;
 }
 
+// Provides the schedule repository implementation.
 final scheduleRepositoryProvider = Provider<ScheduleRepository>((ref) {
   final authRepository = ref.watch(authRepositoryProvider);
   final profileData = ref.watch(profileDataLocalDataSourceProvider);

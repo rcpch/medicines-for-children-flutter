@@ -11,7 +11,9 @@ import 'package:medicines_for_children_flutter/features/auth/domain/auth_user.da
 
 const _administrationRetentionDays = 90;
 
+// Interface for storing as-needed administrations.
 abstract class AsNeededRepository {
+  // Records an as-needed administration entry.
   Future<void> recordAdministration({
     required String medicineId,
     required DateTime dateTime,
@@ -19,6 +21,7 @@ abstract class AsNeededRepository {
   });
 }
 
+// Stores as-needed administrations in local profile data.
 class LocalAsNeededRepository implements AsNeededRepository {
   LocalAsNeededRepository({
     required this.authRepository,
@@ -31,6 +34,7 @@ class LocalAsNeededRepository implements AsNeededRepository {
   final ActiveChildLocalDataSource activeChildStorage;
 
   @override
+  // Appends a new administration to the selected as-needed schedule.
   Future<void> recordAdministration({
     required String medicineId,
     required DateTime dateTime,
@@ -73,6 +77,7 @@ class LocalAsNeededRepository implements AsNeededRepository {
     await _saveChild(context, updatedChild);
   }
 
+  // Loads the active profile, carer, and child context.
   Future<_AsNeededContext> _loadContext() async {
     final user = await authRepository.currentUser();
     if (user == null) {
@@ -95,6 +100,7 @@ class LocalAsNeededRepository implements AsNeededRepository {
     );
   }
 
+  // Writes updated child data back to storage.
   Future<void> _saveChild(_AsNeededContext context, Child updatedChild) async {
     final updatedChildren = [...context.carer.children];
     updatedChildren[context.childIndex] = updatedChild;
@@ -102,6 +108,7 @@ class LocalAsNeededRepository implements AsNeededRepository {
     await profileData.writePrimaryCarer(context.profileId, updatedCarer);
   }
 
+  // Determines the active child index from stored selection.
   int _resolveChildIndex(PrimaryCarer carer, String profileId) {
     final activeChildId = activeChildStorage.readActiveChildId(profileId);
     if (activeChildId == null || activeChildId.isEmpty) {
@@ -113,10 +120,12 @@ class LocalAsNeededRepository implements AsNeededRepository {
     return index == -1 ? 0 : index;
   }
 
+  // Generates a simple unique id for administrations.
   String _generateId() {
     return 'admin-${DateTime.now().millisecondsSinceEpoch}';
   }
 
+  // Filters out administrations older than the retention window.
   List<Administration> _pruneAdministrations(
     List<Administration> administrations,
   ) {
@@ -129,6 +138,7 @@ class LocalAsNeededRepository implements AsNeededRepository {
   }
 }
 
+// Bundles profile data needed to update as-needed administrations.
 class _AsNeededContext {
   const _AsNeededContext({
     required this.profileId,
@@ -145,6 +155,7 @@ class _AsNeededContext {
   final int childIndex;
 }
 
+// Provides the as-needed repository implementation.
 final asNeededRepositoryProvider = Provider<AsNeededRepository>((ref) {
   final authRepository = ref.watch(authRepositoryProvider);
   final profileData = ref.watch(profileDataLocalDataSourceProvider);

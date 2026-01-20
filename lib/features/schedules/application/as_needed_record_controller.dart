@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_controller.dart';
 import 'package:medicines_for_children_flutter/features/schedules/data/as_needed_repository.dart';
 
+// Holds UI state for recording an as-needed dose.
 class AsNeededRecordState {
   const AsNeededRecordState({this.isSaving = false, this.errorMessage});
 
   final bool isSaving;
   final String? errorMessage;
 
+  // Creates a new state with selective field overrides.
   AsNeededRecordState copyWith({
     bool? isSaving,
     String? errorMessage,
@@ -21,15 +23,18 @@ class AsNeededRecordState {
   }
 }
 
+// Handles as-needed administration records and refreshes cache.
 class AsNeededRecordController extends Notifier<AsNeededRecordState> {
   late AsNeededRepository _repository;
 
   @override
+  // Wires up dependencies and initializes default state.
   AsNeededRecordState build() {
     _repository = ref.watch(asNeededRepositoryProvider);
     return const AsNeededRecordState();
   }
 
+  // Records an as-needed administration for a medicine.
   Future<bool> recordAdministration({
     required String medicineId,
     required DateTime dateTime,
@@ -54,11 +59,13 @@ class AsNeededRecordController extends Notifier<AsNeededRecordState> {
     }
   }
 
+  // Reloads cached carer data after recording a dose.
   Future<void> _refreshCarerCache() async {
     await ref.read(primaryCarerControllerProvider.notifier).refreshFromLocal();
   }
 }
 
+// Provides access to the as-needed record controller.
 final asNeededRecordControllerProvider =
     NotifierProvider<AsNeededRecordController, AsNeededRecordState>(
       AsNeededRecordController.new,

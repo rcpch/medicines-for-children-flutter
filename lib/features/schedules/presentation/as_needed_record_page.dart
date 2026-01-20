@@ -6,25 +6,30 @@ import 'package:medicines_for_children_flutter/core/domain/active_child_provider
 import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';
 import 'package:medicines_for_children_flutter/features/schedules/application/as_needed_record_controller.dart';
 
+// Records an as-needed dose for the active child.
 class AsNeededRecordPage extends ConsumerStatefulWidget {
   const AsNeededRecordPage({super.key});
 
   @override
+  // Creates the state for the as-needed record form.
   ConsumerState<AsNeededRecordPage> createState() => _AsNeededRecordPageState();
 }
 
+// Manages form fields for as-needed dose recording.
 class _AsNeededRecordPageState extends ConsumerState<AsNeededRecordPage> {
   final _notesController = TextEditingController();
   String? _selectedMedicineId;
   DateTime _dateTime = DateTime.now();
 
   @override
+  // Disposes of the notes controller.
   void dispose() {
     _notesController.dispose();
     super.dispose();
   }
 
   @override
+  // Builds the as-needed dose record form.
   Widget build(BuildContext context) {
     final child = ref.watch(activeChildProvider);
     final recordState = ref.watch(asNeededRecordControllerProvider);
@@ -128,6 +133,7 @@ class _AsNeededRecordPageState extends ConsumerState<AsNeededRecordPage> {
     );
   }
 
+  // Submits an as-needed administration entry.
   Future<void> _submit() async {
     if (_selectedMedicineId == null) {
       return;
@@ -160,6 +166,7 @@ class _AsNeededRecordPageState extends ConsumerState<AsNeededRecordPage> {
   }
 }
 
+// Tap-to-pick date/time field used in the record form.
 class _DateTimeField extends StatelessWidget {
   const _DateTimeField({
     required this.label,
@@ -172,6 +179,7 @@ class _DateTimeField extends StatelessWidget {
   final ValueChanged<DateTime> onPick;
 
   @override
+  // Builds a tappable field that opens date and time pickers.
   Widget build(BuildContext context) {
     final formatted = DateFormat('d MMM y · h:mm a').format(value);
     return Semantics(

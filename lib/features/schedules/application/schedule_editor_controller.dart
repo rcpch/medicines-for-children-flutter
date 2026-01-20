@@ -8,12 +8,14 @@ import 'package:medicines_for_children_flutter/features/home/application/primary
 import 'package:medicines_for_children_flutter/features/schedules/data/schedule_repository.dart';
 import 'package:medicines_for_children_flutter/features/schedules/domain/schedule_draft.dart';
 
+// Holds UI state for schedule save/edit operations.
 class ScheduleEditorState {
   const ScheduleEditorState({this.isSaving = false, this.errorMessage});
 
   final bool isSaving;
   final String? errorMessage;
 
+  // Creates a new state with selective field overrides.
   ScheduleEditorState copyWith({
     bool? isSaving,
     String? errorMessage,
@@ -26,17 +28,20 @@ class ScheduleEditorState {
   }
 }
 
+// Coordinates schedule CRUD operations and notifications.
 class ScheduleEditorController extends Notifier<ScheduleEditorState> {
   late ScheduleRepository _repository;
   late NotificationService _notifications;
 
   @override
+  // Wires up dependencies and initializes default state.
   ScheduleEditorState build() {
     _repository = ref.watch(scheduleRepositoryProvider);
     _notifications = ref.watch(notificationServiceProvider);
     return const ScheduleEditorState();
   }
 
+  // Creates a schedule and optionally schedules notifications.
   Future<MedicineSchedule?> createSchedule({
     required ScheduleDraft draft,
     required Medicine medicine,
@@ -68,6 +73,7 @@ class ScheduleEditorController extends Notifier<ScheduleEditorState> {
     }
   }
 
+  // Updates a schedule and refreshes related notifications.
   Future<bool> updateSchedule({
     required MedicineSchedule schedule,
     required Medicine medicine,
@@ -104,6 +110,7 @@ class ScheduleEditorController extends Notifier<ScheduleEditorState> {
     }
   }
 
+  // Deletes a schedule and cancels any notifications.
   Future<bool> deleteSchedule(String scheduleId) async {
     state = state.copyWith(isSaving: true, clearError: true);
     try {
@@ -125,11 +132,13 @@ class ScheduleEditorController extends Notifier<ScheduleEditorState> {
     }
   }
 
+  // Reloads cached carer data after schedule changes.
   Future<void> _refreshCarerCache() async {
     await ref.read(primaryCarerControllerProvider.notifier).refreshFromLocal();
   }
 }
 
+// Provides access to the schedule editor controller.
 final scheduleEditorControllerProvider =
     NotifierProvider<ScheduleEditorController, ScheduleEditorState>(
       ScheduleEditorController.new,

@@ -8,10 +8,12 @@ import 'package:medicines_for_children_flutter/core/domain/active_child_provider
 import 'package:medicines_for_children_flutter/core/presentation/child_switcher_action.dart';
 import 'package:medicines_for_children_flutter/features/schedules/application/schedule_editor_controller.dart';
 
+// Lists schedules for the active child and offers edit/delete actions.
 class SchedulesPage extends ConsumerWidget {
   const SchedulesPage({super.key});
 
   @override
+  // Builds the schedule list or empty states.
   Widget build(BuildContext context, WidgetRef ref) {
     final child = ref.watch(activeChildProvider);
 
@@ -92,6 +94,7 @@ class SchedulesPage extends ConsumerWidget {
     );
   }
 
+  // Handles edit/delete actions from the schedule menu.
   Future<void> _handleAction(
     BuildContext context,
     WidgetRef ref,
@@ -158,4 +161,5 @@ class SchedulesPage extends ConsumerWidget {
   }
 }
 
+// Actions available for each schedule entry.
 enum _ScheduleAction { edit, delete }
