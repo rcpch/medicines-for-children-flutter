@@ -12,11 +12,26 @@
 ## Branding and theming
 
 - Follow RCPCH brand guidelines for colors, fonts, and logos.
+- Additional Medicines For Children logos.
 - Support light, dark, and system themes.
 - Allow text size scaling (Small, Default, Large, Extra large).
 - Consistent use of icons and imagery aligned with RCPCH style.
 
+## Integrations
+
+- iCloud, Google Drive and Dropbox integration for backup import/export.
+- QR Code scanning of medication packaging to obtain drug, unit size, quantity data via https://github.com/chriswilson1982/drug-data-api, https://api.ampoule.app/v2/docs
+- In the UK, all medical product packs will have an EAN13 barcode, which provides the GTIN. Many packs will also have a 2D data matrix code, which usually encodes the GTIN as well as batch number and expiry date.
+---
+
+
 ## Top-level screens
+
+### Splash screen
+
+- Shown on startup (all platforms)
+- Displays Medicines For Children branding (logo + app name)
+- Clearly indicates: **PRE-ALPHA Evaluation Release**
 
 ### 'Home' screen
 
