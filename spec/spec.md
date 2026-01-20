@@ -63,7 +63,7 @@
   - Route
   - Frequency
   - Type (Everyday, As-needed, Both) (optional)
-  - Status (In use, No longer used) (optional)
+  - Status (In use, No longer used) CAN BE REMOVED FROM THE ADD MEDICINE FLOW
   - Notes (optional)
   - Add photo from camera or gallery (optional) - do we need to limit number of photos, size, resolution? At present no limit.
   - 
@@ -74,11 +74,11 @@ At present there is no lookup of medicines against a master list to ensure corre
 
 ### Edit Medicine flow
 - Select a medicine from the Medicines list by tapping on it
-- Form pre-populated with existing medicine details
+- Form pre-populated with existing medicine data.
 - Photos are shown at the top of the view.
 - It should be possible to select which photo is the primary photo shown in lists.
 - It should be possible to selectively delete photos.
-- Add or change details as needed
+- Add or change details as needed, including the ability to set a medicine as "No longer used".
 
 ---
 
