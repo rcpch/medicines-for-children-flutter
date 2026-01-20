@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:medicines_for_children_flutter/app/router/app_router.dart';
+import 'package:medicines_for_children_flutter/core/presentation/backup_actions.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 import 'package:medicines_for_children_flutter/features/auth/domain/local_profile.dart';
 import 'package:medicines_for_children_flutter/core/security/biometric_auth_service.dart';
@@ -145,6 +146,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       }
     });
 
+    final hasProfiles = authState.profiles.isNotEmpty;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Choose profile'),
@@ -161,13 +164,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   const Icon(Icons.family_restroom_outlined, size: 72),
                   const SizedBox(height: 16),
                   Text(
-                    'Welcome back',
+                    hasProfiles
+                        ? 'Welcome back'
+                        : 'Welcome to Medicines for Children',
                     style: Theme.of(context).textTheme.headlineSmall,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Select a local profile to continue. Data stays on this device unless you export it.',
+                    hasProfiles
+                        ? 'Select a local profile to continue. Data stays on this device unless you export it.'
+                        : 'Create a profile or import a backup to get started.',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
@@ -185,6 +192,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   ? null
                                   : _goToSignup,
                               child: const Text('Create a profile'),
+                            ),
+                            const SizedBox(height: 12),
+                            OutlinedButton.icon(
+                              onPressed: authState.isLoading
+                                  ? null
+                                  : () => BackupActions.importBackup(
+                                        context,
+                                        ref,
+                                      ),
+                              icon: const Icon(Icons.file_upload_outlined),
+                              label: const Text('Import a backup'),
                             ),
                           ],
                         ),
@@ -212,6 +230,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     onPressed: authState.isLoading ? null : _goToSignup,
                     icon: const Icon(Icons.add_circle_outline),
                     label: const Text('Create another profile'),
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: authState.isLoading
+                        ? null
+                        : () => BackupActions.importBackup(context, ref),
+                    icon: const Icon(Icons.file_upload_outlined),
+                    label: const Text('Import a backup'),
                   ),
                 ],
               ),
