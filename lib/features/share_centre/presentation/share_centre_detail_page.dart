@@ -9,12 +9,14 @@ import 'package:medicines_for_children_flutter/features/share_centre/data/share_
 import 'package:medicines_for_children_flutter/features/home/application/primary_carer_state_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+// Shows details and actions for a shared schedule.
 class ShareCentreDetailPage extends ConsumerWidget {
   const ShareCentreDetailPage({super.key, required this.shareId});
 
   final String shareId;
 
   @override
+  // Builds the share details view and management actions.
   Widget build(BuildContext context, WidgetRef ref) {
     final child = ref.watch(activeChildProvider);
     if (child == null) {
@@ -295,6 +297,7 @@ class ShareCentreDetailPage extends ConsumerWidget {
     );
   }
 
+  // Builds a status label for the share.
   String _statusLabel(ShareCentreSchedule schedule) {
     if (schedule.status.isNotEmpty) {
       return schedule.status;
@@ -302,6 +305,7 @@ class ShareCentreDetailPage extends ConsumerWidget {
     return schedule.isDeleted ? 'Ended' : 'Pending';
   }
 
+  // Copies a link to the clipboard and shows feedback.
   Future<void> _copyToClipboard(
     BuildContext context,
     String text,
@@ -316,6 +320,7 @@ class ShareCentreDetailPage extends ConsumerWidget {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  // Shares a link via the platform share sheet.
   Future<void> _shareLink(String url, {String? subject}) async {
     if (url.isEmpty) {
       return;
@@ -323,6 +328,7 @@ class ShareCentreDetailPage extends ConsumerWidget {
     await SharePlus.instance.share(ShareParams(text: url, subject: subject));
   }
 
+  // Prompts for a date when extending a share.
   Future<DateTime?> _selectDate(
     BuildContext context, {
     required DateTime initialDate,
@@ -336,6 +342,7 @@ class ShareCentreDetailPage extends ConsumerWidget {
     );
   }
 
+  // Confirms destructive or important share actions.
   Future<bool?> _confirmAction(
     BuildContext context, {
     required String title,
@@ -369,6 +376,7 @@ class ShareCentreDetailPage extends ConsumerWidget {
   }
 }
 
+// Label/value row used in the share detail card.
 class _InfoRow extends StatelessWidget {
   const _InfoRow({required this.label, required this.value});
 
@@ -376,6 +384,7 @@ class _InfoRow extends StatelessWidget {
   final String value;
 
   @override
+  // Builds the info row.
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 4),

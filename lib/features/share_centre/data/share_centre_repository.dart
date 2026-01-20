@@ -1,6 +1,7 @@
 // Sharing data access layer.
 import 'package:dio/dio.dart';
 
+// Model for a shared schedule returned by the API.
 class ShareCentreSchedule {
   const ShareCentreSchedule({
     required this.apiId,
@@ -16,6 +17,7 @@ class ShareCentreSchedule {
     required this.notes,
   });
 
+  // Builds a schedule from the server response payload.
   factory ShareCentreSchedule.fromJson(Map<String, dynamic> json) {
     final apiId = _readString(json, ['apiId', 'api_id', 'id', 'scheduleId']);
     final status = _readString(json, ['status', 'state']);
@@ -75,6 +77,7 @@ class ShareCentreSchedule {
   final String pdfUrl;
   final String notes;
 
+  // Returns a carer label preferring name over email.
   String get displayCarer {
     if (carerName.isNotEmpty) {
       return carerName;
@@ -86,10 +89,13 @@ class ShareCentreSchedule {
   }
 }
 
+// Interface for share centre API operations.
 abstract class ShareCentreRepository {
+  // Fetches shared schedules for the given child.
   Future<List<ShareCentreSchedule>> fetchSharedSchedules({
     required String childId,
   });
+  // Creates a shared schedule for the given child.
   Future<ShareCentreSchedule> createSharedSchedule({
     required String childId,
     required String email,
@@ -98,12 +104,14 @@ abstract class ShareCentreRepository {
     required bool digital,
     String? notes,
   });
+  // Exports a schedule PDF and returns its URL.
   Future<String> exportSchedulePdf({
     required String childId,
     required DateTime dateFrom,
     required DateTime dateTo,
     required String primaryCarerEmail,
   });
+  // Updates a shared schedule with new metadata.
   Future<ShareCentreSchedule> updateSharedSchedule({
     required String apiId,
     required String childId,
@@ -113,7 +121,9 @@ abstract class ShareCentreRepository {
     String? notes,
     bool? deleted,
   });
+  // Ends a shared schedule in the backend.
   Future<ShareCentreSchedule> endSharedSchedule({required String apiId});
+  // Marks a shared schedule as deleted.
   Future<ShareCentreSchedule> deleteSharedSchedule({
     required String apiId,
     required String childId,
@@ -122,12 +132,14 @@ abstract class ShareCentreRepository {
   });
 }
 
+// HTTP implementation of the share centre repository.
 class HttpShareCentreRepository implements ShareCentreRepository {
   HttpShareCentreRepository(this._dio);
 
   final Dio _dio;
 
   @override
+  // Loads all shared schedules for a child.
   Future<List<ShareCentreSchedule>> fetchSharedSchedules({
     required String childId,
   }) async {
@@ -143,6 +155,7 @@ class HttpShareCentreRepository implements ShareCentreRepository {
   }
 
   @override
+  // Creates a shared schedule on the backend.
   Future<ShareCentreSchedule> createSharedSchedule({
     required String childId,
     required String email,
@@ -171,6 +184,7 @@ class HttpShareCentreRepository implements ShareCentreRepository {
   }
 
   @override
+  // Requests a schedule PDF export and returns the url.
   Future<String> exportSchedulePdf({
     required String childId,
     required DateTime dateFrom,
@@ -200,6 +214,7 @@ class HttpShareCentreRepository implements ShareCentreRepository {
   }
 
   @override
+  // Updates a shared schedule on the backend.
   Future<ShareCentreSchedule> updateSharedSchedule({
     required String apiId,
     required String childId,
@@ -229,6 +244,7 @@ class HttpShareCentreRepository implements ShareCentreRepository {
   }
 
   @override
+  // Ends a shared schedule on the backend.
   Future<ShareCentreSchedule> endSharedSchedule({required String apiId}) async {
     final response = await _dio.get<Map<String, dynamic>>(
       '/sharedSchedule/end/$apiId',
@@ -241,6 +257,7 @@ class HttpShareCentreRepository implements ShareCentreRepository {
   }
 
   @override
+  // Marks a shared schedule deleted via the update call.
   Future<ShareCentreSchedule> deleteSharedSchedule({
     required String apiId,
     required String childId,
@@ -257,6 +274,7 @@ class HttpShareCentreRepository implements ShareCentreRepository {
   }
 }
 
+// Extracts a schedule list from several possible API response shapes.
 List<Map<String, dynamic>> _extractScheduleList(dynamic data) {
   if (data is List) {
     return data.whereType<Map<String, dynamic>>().toList(growable: false);
@@ -271,10 +289,12 @@ List<Map<String, dynamic>> _extractScheduleList(dynamic data) {
   return const <Map<String, dynamic>>[];
 }
 
+// Serializes a DateTime into the API date map shape.
 Map<String, int> _toDateMap(DateTime date) {
   return <String, int>{'day': date.day, 'month': date.month, 'year': date.year};
 }
 
+// Reads the first non-empty string from the list of possible keys.
 String _readString(Map<String, dynamic> json, List<String> keys) {
   for (final key in keys) {
     final value = json[key];
@@ -289,6 +309,7 @@ String _readString(Map<String, dynamic> json, List<String> keys) {
   return '';
 }
 
+// Builds a display name from a nested carer payload.
 String _parseCarerName(dynamic source) {
   if (source is Map<String, dynamic>) {
     final firstName = _readString(source, [
@@ -313,6 +334,7 @@ String _parseCarerName(dynamic source) {
   return '';
 }
 
+// Parses a date from multiple possible API formats.
 DateTime? _parseDate(dynamic value) {
   if (value == null) {
     return null;
@@ -344,6 +366,7 @@ DateTime? _parseDate(dynamic value) {
   return null;
 }
 
+// Reads an integer value from a map using multiple keys.
 int? _readInt(Map<dynamic, dynamic> json, List<String> keys) {
   for (final key in keys) {
     final value = json[key];
@@ -361,6 +384,7 @@ int? _readInt(Map<dynamic, dynamic> json, List<String> keys) {
   return null;
 }
 
+// Parses a boolean from a variety of API payload types.
 bool _parseBool(dynamic value) {
   if (value == null) {
     return false;

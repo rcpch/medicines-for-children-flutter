@@ -16,13 +16,16 @@ import 'package:medicines_for_children_flutter/features/share_centre/application
 import 'package:medicines_for_children_flutter/features/share_centre/data/share_centre_repository.dart';
 import 'package:printing/printing.dart';
 
+// Home screen for viewing and exporting shared schedules.
 class ShareCentrePage extends ConsumerStatefulWidget {
   const ShareCentrePage({super.key});
 
   @override
+  // Creates the share centre state.
   ConsumerState<ShareCentrePage> createState() => _ShareCentrePageState();
 }
 
+// Handles share centre actions and export/print state.
 class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
   bool _exportingSchedule = false;
   bool _exportingMedicines = false;
@@ -30,6 +33,7 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
   bool _printingMedicines = false;
 
   @override
+  // Builds the share centre list and export controls.
   Widget build(BuildContext context) {
     final child = ref.watch(activeChildProvider);
     if (child == null) {
@@ -226,6 +230,7 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
     );
   }
 
+  // Exports the selected schedule date range as a PDF.
   Future<void> _exportSchedulePdf(
     BuildContext context,
     PrimaryCarerState carerState,
@@ -265,6 +270,7 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
     }
   }
 
+  // Exports a medicines summary PDF.
   Future<void> _exportMedicinePdf(
     BuildContext context,
     PrimaryCarerState carerState,
@@ -303,6 +309,7 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
     }
   }
 
+  // Prints the selected schedule date range.
   Future<void> _printSchedulePdf(
     BuildContext context,
     PrimaryCarerState carerState,
@@ -332,6 +339,7 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
     }
   }
 
+  // Prints a medicines summary PDF.
   Future<void> _printMedicinesPdf(
     BuildContext context,
     PrimaryCarerState carerState,
@@ -361,6 +369,7 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
     }
   }
 
+  // Builds the schedule PDF payload after prompting for a date range.
   Future<_SchedulePdfPayload?> _buildSchedulePdf(
     BuildContext context,
     PrimaryCarerState carerState,
@@ -407,6 +416,7 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
     return _SchedulePdfPayload(bytes: bytes, range: range);
   }
 
+  // Builds a medicines summary PDF from the active child.
   Future<Uint8List?> _buildMedicinesPdf(
     BuildContext context,
     PrimaryCarerState carerState,
@@ -423,6 +433,7 @@ class _ShareCentrePageState extends ConsumerState<ShareCentrePage> {
   }
 }
 
+// Bundles PDF bytes with the selected date range.
 class _SchedulePdfPayload {
   const _SchedulePdfPayload({required this.bytes, required this.range});
 
@@ -430,6 +441,7 @@ class _SchedulePdfPayload {
   final DateTimeRange range;
 }
 
+// List tile for a shared schedule entry.
 class _ShareScheduleTile extends StatelessWidget {
   const _ShareScheduleTile({required this.schedule, required this.onTap});
 
@@ -437,6 +449,7 @@ class _ShareScheduleTile extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
+  // Builds the shared schedule tile.
   Widget build(BuildContext context) {
     final dateLabel = _formatDateRange(schedule.dateFrom, schedule.dateTo);
     final statusLabel = schedule.status.isEmpty ? 'Pending' : schedule.status;
@@ -460,6 +473,7 @@ class _ShareScheduleTile extends StatelessWidget {
   }
 }
 
+// Formats a date range label for shared schedules.
 String _formatDateRange(DateTime start, DateTime end) {
   final formatter = DateFormat('d MMM');
   final startLabel = formatter.format(start);

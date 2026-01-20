@@ -7,14 +7,17 @@ import 'package:medicines_for_children_flutter/app/router/app_router.dart';
 import 'package:medicines_for_children_flutter/core/domain/active_child_provider.dart';
 import 'package:medicines_for_children_flutter/features/share_centre/application/share_centre_providers.dart';
 
+// Form for creating a new shared schedule.
 class ShareCentreCreatePage extends ConsumerStatefulWidget {
   const ShareCentreCreatePage({super.key});
 
   @override
+  // Creates the state for the share creation form.
   ConsumerState<ShareCentreCreatePage> createState() =>
       _ShareCentreCreatePageState();
 }
 
+// Manages share creation form fields and validation.
 class _ShareCentreCreatePageState extends ConsumerState<ShareCentreCreatePage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
@@ -24,6 +27,7 @@ class _ShareCentreCreatePageState extends ConsumerState<ShareCentreCreatePage> {
   bool _digital = true;
 
   @override
+  // Initializes the default date range for sharing.
   void initState() {
     super.initState();
     final now = DateTime.now();
@@ -32,6 +36,7 @@ class _ShareCentreCreatePageState extends ConsumerState<ShareCentreCreatePage> {
   }
 
   @override
+  // Disposes of form controllers.
   void dispose() {
     _emailController.dispose();
     _notesController.dispose();
@@ -39,6 +44,7 @@ class _ShareCentreCreatePageState extends ConsumerState<ShareCentreCreatePage> {
   }
 
   @override
+  // Builds the share creation form UI.
   Widget build(BuildContext context) {
     final child = ref.watch(activeChildProvider);
     if (child == null) {
@@ -199,6 +205,7 @@ class _ShareCentreCreatePageState extends ConsumerState<ShareCentreCreatePage> {
     );
   }
 
+  // Prompts for a date within the allowed range.
   Future<DateTime?> _pickDate(
     BuildContext context, {
     required DateTime initialDate,
@@ -213,6 +220,7 @@ class _ShareCentreCreatePageState extends ConsumerState<ShareCentreCreatePage> {
   }
 }
 
+// Tap-to-pick date card used in the share form.
 class _DateCard extends StatelessWidget {
   const _DateCard({
     required this.label,
@@ -225,6 +233,7 @@ class _DateCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
+  // Builds the date picker card UI.
   Widget build(BuildContext context) {
     final formatted = DateFormat.yMMMd().format(date);
     return InkWell(

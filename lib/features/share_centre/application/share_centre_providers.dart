@@ -6,12 +6,14 @@ import 'package:medicines_for_children_flutter/core/offline/share_action_queue.d
 import 'package:medicines_for_children_flutter/core/telemetry/telemetry_service.dart';
 import 'package:medicines_for_children_flutter/features/share_centre/data/share_centre_repository.dart';
 
+// Holds UI state for share centre actions.
 class ShareCentreActionState {
   const ShareCentreActionState({this.isSaving = false, this.errorMessage});
 
   final bool isSaving;
   final String? errorMessage;
 
+  // Creates a new state with selective field overrides.
   ShareCentreActionState copyWith({
     bool? isSaving,
     String? errorMessage,
@@ -24,6 +26,7 @@ class ShareCentreActionState {
   }
 }
 
+// Orchestrates share centre actions and queues offline work.
 class ShareCentreController extends Notifier<ShareCentreActionState> {
   ShareCentreController();
 
@@ -32,6 +35,7 @@ class ShareCentreController extends Notifier<ShareCentreActionState> {
   late ShareActionQueueService _queue;
 
   @override
+  // Wires up dependencies and initializes default state.
   ShareCentreActionState build() {
     _repository = ref.watch(shareCentreRepositoryProvider);
     _telemetry = ref.read(telemetryServiceProvider);
@@ -39,6 +43,7 @@ class ShareCentreController extends Notifier<ShareCentreActionState> {
     return const ShareCentreActionState();
   }
 
+  // Creates a shared schedule and tracks telemetry.
   Future<ShareCentreSchedule?> createSchedule({
     required String childId,
     required String email,
@@ -96,6 +101,7 @@ class ShareCentreController extends Notifier<ShareCentreActionState> {
     }
   }
 
+  // Updates an existing shared schedule and tracks telemetry.
   Future<ShareCentreSchedule?> updateSchedule({
     required String childId,
     required String apiId,
@@ -149,6 +155,7 @@ class ShareCentreController extends Notifier<ShareCentreActionState> {
     }
   }
 
+  // Exports a shared schedule PDF and returns the url.
   Future<String?> exportPdf({
     required String childId,
     required DateTime dateFrom,
@@ -178,6 +185,7 @@ class ShareCentreController extends Notifier<ShareCentreActionState> {
     }
   }
 
+  // Ends a shared schedule and tracks telemetry.
   Future<ShareCentreSchedule?> endSchedule({
     required String childId,
     required String apiId,
@@ -213,6 +221,7 @@ class ShareCentreController extends Notifier<ShareCentreActionState> {
     }
   }
 
+  // Deletes a shared schedule and tracks telemetry.
   Future<ShareCentreSchedule?> deleteSchedule({
     required String childId,
     required String apiId,
@@ -261,6 +270,7 @@ class ShareCentreController extends Notifier<ShareCentreActionState> {
   }
 }
 
+// Determines whether a request failure is due to network issues.
 bool _isNetworkError(Object error) {
   if (error is DioException) {
     return error.type == DioExceptionType.connectionError ||
@@ -270,11 +280,13 @@ bool _isNetworkError(Object error) {
   return false;
 }
 
+// Provides the share centre repository implementation.
 final shareCentreRepositoryProvider = Provider<ShareCentreRepository>((ref) {
   final dio = ref.watch(securedApiClientProvider);
   return HttpShareCentreRepository(dio);
 });
 
+// Loads share schedules for the current child.
 final shareCentreSchedulesProvider =
     FutureProvider.family<List<ShareCentreSchedule>, String>((
       ref,
@@ -284,6 +296,7 @@ final shareCentreSchedulesProvider =
       return repository.fetchSharedSchedules(childId: childId);
     });
 
+// Provides access to share centre actions.
 final shareCentreControllerProvider =
     NotifierProvider<ShareCentreController, ShareCentreActionState>(
       ShareCentreController.new,
