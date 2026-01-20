@@ -6,6 +6,7 @@ on:
      types: [completed] #requested
 
 permissions:
+  id-token: write # For actions/deploy-pages
   contents: write # For committing to repo for GitHub Pages for actions/deploy-pages
   pages: write    # Required for actions/deploy-pages
 
