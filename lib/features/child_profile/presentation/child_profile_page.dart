@@ -141,15 +141,6 @@ class ChildProfilePage extends ConsumerWidget {
               child: Text('${child.medicines.length} active medicines'),
             ),
             const SizedBox(height: 16),
-            Card(
-              child: ListTile(
-                title: const Text('Share centre'),
-                subtitle: const Text('Invite carers to view the schedule.'),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => context.pushNamed(AppRoute.shareCentre.name),
-              ),
-            ),
-            const SizedBox(height: 12),
           ],
         ),
       ),

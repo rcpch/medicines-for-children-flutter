@@ -11,7 +11,7 @@ import 'package:medicines_for_children_flutter/core/data/backup/backup_service.d
 import 'package:medicines_for_children_flutter/core/platform/backup_file_io.dart';
 import 'package:medicines_for_children_flutter/features/auth/application/auth_controller.dart';
 
-enum MainMenuAction { settings, exportBackup, importBackup, signOut }
+enum MainMenuAction { settings, shareCentre, exportBackup, importBackup, signOut }
 
 class MainMenu extends ConsumerWidget {
   const MainMenu({super.key});
@@ -22,6 +22,10 @@ class MainMenu extends ConsumerWidget {
       onSelected: (action) => _handleAction(context, ref, action),
       itemBuilder: (context) => const [
         PopupMenuItem(value: MainMenuAction.settings, child: Text('Settings')),
+        PopupMenuItem(
+          value: MainMenuAction.shareCentre,
+          child: Text('Share centre'),
+        ),
         PopupMenuDivider(),
         PopupMenuItem(
           value: MainMenuAction.exportBackup,
@@ -45,6 +49,9 @@ class MainMenu extends ConsumerWidget {
     switch (action) {
       case MainMenuAction.settings:
         context.goNamed(AppRoute.settings.name);
+        return;
+      case MainMenuAction.shareCentre:
+        context.goNamed(AppRoute.shareCentre.name);
         return;
       case MainMenuAction.exportBackup:
         await _exportBackup(context, ref);
