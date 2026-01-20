@@ -7,6 +7,7 @@ import 'package:medicines_for_children_flutter/core/domain/models/primary_carer.
 import 'package:medicines_for_children_flutter/features/onboarding/domain/onboarding_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Stores profile-specific data blobs in shared preferences.
 class ProfileDataLocalDataSource {
   ProfileDataLocalDataSource(this._preferences);
 
@@ -16,6 +17,7 @@ class ProfileDataLocalDataSource {
 
   final SharedPreferences _preferences;
 
+  /// Reads the primary carer record for a profile.
   PrimaryCarer? readPrimaryCarer(String profileId) {
     final data = _readRaw(profileId);
     if (data == null) {
@@ -28,12 +30,14 @@ class ProfileDataLocalDataSource {
     return PrimaryCarer.fromJson(rawCarer);
   }
 
+  /// Writes the primary carer record for a profile.
   Future<void> writePrimaryCarer(String profileId, PrimaryCarer carer) async {
     final data = _readRaw(profileId) ?? <String, dynamic>{};
     data[_primaryCarerKey] = carer.toJson();
     await _writeRaw(profileId, data);
   }
 
+  /// Reads the onboarding profile for a profile.
   OnboardingProfile? readOnboardingProfile(String profileId) {
     final data = _readRaw(profileId);
     if (data == null) {
@@ -46,6 +50,7 @@ class ProfileDataLocalDataSource {
     return OnboardingProfile.fromMap(rawOnboarding);
   }
 
+  /// Writes the onboarding profile for a profile.
   Future<void> writeOnboardingProfile(
     String profileId,
     OnboardingProfile profile,
@@ -55,6 +60,7 @@ class ProfileDataLocalDataSource {
     await _writeRaw(profileId, data);
   }
 
+  /// Removes the onboarding profile entry for a profile.
   Future<void> clearOnboardingProfile(String profileId) async {
     final data = _readRaw(profileId);
     if (data == null) {
@@ -64,10 +70,12 @@ class ProfileDataLocalDataSource {
     await _writeRaw(profileId, data);
   }
 
+  /// Clears all stored data for a profile.
   Future<void> clearProfile(String profileId) async {
     await _preferences.remove('$_profileDataPrefix$profileId');
   }
 
+  /// Reads the raw JSON map for a profile from storage.
   Map<String, dynamic>? _readRaw(String profileId) {
     final raw = _preferences.getString('$_profileDataPrefix$profileId');
     if (raw == null || raw.isEmpty) {
@@ -80,6 +88,7 @@ class ProfileDataLocalDataSource {
     return decoded;
   }
 
+  /// Writes the raw JSON map for a profile to storage.
   Future<void> _writeRaw(String profileId, Map<String, dynamic> data) async {
     await _preferences.setString(
       '$_profileDataPrefix$profileId',
@@ -88,6 +97,7 @@ class ProfileDataLocalDataSource {
   }
 }
 
+/// Provides the profile data local data source.
 final profileDataLocalDataSourceProvider = Provider<ProfileDataLocalDataSource>(
   (ref) {
     final preferences = ref.watch(sharedPreferencesProvider);
