@@ -138,13 +138,18 @@ Medicines for Children is an **offline-first** medicine management app for carer
 - Support everyday and as-needed medicines (and a medicine that is both).
 - Filter medicines by everyday/as-needed.
 - Optional medicine photos to help identification.
-- Optional QR scan flow to add medicine details.
+- Optional scan barcode to add medication by EAN13 GTIN using https://api.ampoule.app/v2/docs.
+- Optional M4C QR Code poster scan flow to add medicine details.
+- Track stock level per medicine (e.g. number of tablets or units on hand).
+- Allow users to set a low-stock threshold and receive reorder alerts.
+- Allow updates to stock levels after scheduled and as-needed administrations.
 
 ### Schedules (regular)
 
 - Create and edit schedules for medicines.
 - Define schedule timing (days and times) and active date range.
 - View a day-by-day schedule with grouped time-of-day sections.
+- Indicate when a medicine will need reordering based on upcoming doses and current stock.
 
 ### As-needed administrations
 
@@ -191,12 +196,14 @@ Medicines for Children is an **offline-first** medicine management app for carer
 - Per-device toggle to enable/disable reminders.
 - Schedule notifications for upcoming doses when reminders are enabled.
 - Clear/refresh notifications when schedules change or expire.
+- Low-stock alerts per medicine using the configured threshold (X number of days left, or X number of tablets left)
 
 ### Settings
 
 - Theme: system/light/dark.
 - Text size scaling.
 - Notifications reminders toggle.
+- Medication stock alerts toggle, threshold (X number of working days left, or X number of tablets left)
 - Analytics/telemetry toggle (where enabled) and consent prompt on first run.
 
 ### In-app guide
