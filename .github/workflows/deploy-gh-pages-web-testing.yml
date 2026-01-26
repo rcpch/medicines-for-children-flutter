@@ -36,7 +36,7 @@ jobs:
         run: flutter build web --release --base-href /medicines-for-children-flutter/
 
       - name: Upload artifact for GitHub Pages
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           # Path to the directory containing the static assets to be deployed.
           # Flutter web builds to 'build/web' by default.
