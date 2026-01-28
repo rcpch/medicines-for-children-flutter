@@ -36,7 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   cryptography: ^2.7.0
   device_info_plus: ^12.3.0
-  dio: ^5.7.0
+  dio: ^5.9.1
   file_selector: ^1.0.3
   flutter_dotenv: ^6.0.0
   flutter_local_notifications: ^19.5.0
