@@ -952,10 +952,10 @@ packages:
     dependency: "direct main"
     description:
       name: phone_numbers_parser
-      sha256: ca0e0ddbea2876b6df7efadd1d79a92cb9fd574170c807a6be31a19457b1b120
+      sha256: "2c9b190a8f56c7ce4d6703ac09d766a687b10e4328c44a6f924d9dffa54b6375"
       url: "https://pub.dev"
     source: hosted
-    version: "9.0.18"
+    version: "9.0.19"
   platform:
     dependency: transitive
     description:
