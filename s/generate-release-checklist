@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-output_path="build/release_checklist.md"
+output_path="build/release-checklist.md"
 mkdir -p "$(dirname "${output_path}")"
 
 cat <<'EOF' > "${output_path}"
@@ -20,6 +20,8 @@ cat <<'EOF' > "${output_path}"
 - [ ] Crash-free session rate checked for the last beta cohort.
 - [ ] Backup/export/import flows spot-checked.
 - [ ] Accessibility regression spot-check completed.
+- [ ] Clinical safety impact reviewed and hazard/test evidence linked.
+- [ ] Security and privacy impact reviewed with no unresolved release-blocking findings.
 EOF
 
 printf "Release checklist generated at %s\n" "${output_path}"

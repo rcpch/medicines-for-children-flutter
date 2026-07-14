@@ -158,9 +158,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final hasProfiles = authState.profiles.isNotEmpty;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Choose profile'),
-      ),
+      appBar: AppBar(title: const Text('Choose profile')),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -207,9 +205,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               onPressed: authState.isLoading
                                   ? null
                                   : () => BackupActions.importBackup(
-                                        context,
-                                        ref,
-                                      ),
+                                      context,
+                                      ref,
+                                    ),
                               icon: const Icon(Icons.file_upload_outlined),
                               label: const Text('Import a backup'),
                             ),

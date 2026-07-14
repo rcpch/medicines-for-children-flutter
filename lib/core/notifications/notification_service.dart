@@ -35,7 +35,7 @@ class NotificationService {
       android: androidSettings,
       linux: linuxSettings,
     );
-    await _plugin.initialize(initSettings);
+    await _plugin.initialize(settings: initSettings);
     _initialised = true;
   }
 
@@ -67,11 +67,11 @@ class NotificationService {
         ),
       );
       await _plugin.zonedSchedule(
-        id,
-        '${medicine.name} reminder',
-        '${medicine.dose} ${medicine.doseUnit} · ${medicine.route}',
-        scheduled,
-        details,
+        id: id,
+        title: '${medicine.name} reminder',
+        body: '${medicine.dose} ${medicine.doseUnit} · ${medicine.route}',
+        scheduledDate: scheduled,
+        notificationDetails: details,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.time,
       );
@@ -93,7 +93,7 @@ class NotificationService {
       return;
     }
     for (final id in metadata.notificationIds) {
-      await _plugin.cancel(id);
+      await _plugin.cancel(id: id);
     }
     await _store.removeSchedule(scheduleId);
   }
@@ -106,7 +106,7 @@ class NotificationService {
     for (final entry in all.entries) {
       if (entry.value.endDate.isBefore(now)) {
         for (final id in entry.value.notificationIds) {
-          await _plugin.cancel(id);
+          await _plugin.cancel(id: id);
         }
         await _store.removeSchedule(entry.key);
       }
@@ -119,7 +119,7 @@ class NotificationService {
     final all = _store.readAll();
     for (final entry in all.entries) {
       for (final id in entry.value.notificationIds) {
-        await _plugin.cancel(id);
+        await _plugin.cancel(id: id);
       }
     }
     await _store.clearAll();

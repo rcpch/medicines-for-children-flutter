@@ -1,4 +1,7 @@
 // Background sync for offline actions.
+// Constructor parameter names intentionally omit private field prefixes.
+// ignore_for_file: prefer_initializing_formals
+
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';

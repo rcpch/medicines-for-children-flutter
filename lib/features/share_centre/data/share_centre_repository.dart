@@ -230,9 +230,9 @@ class HttpShareCentreRepository implements ShareCentreRepository {
         'childId': childId,
         'dateFrom': _toDateMap(dateFrom),
         'dateTo': _toDateMap(dateTo),
-        if (digital != null) 'digital': digital,
-        if (notes != null) 'notes': notes,
-        if (deleted != null) 'deleted': deleted,
+        'digital': ?digital,
+        'notes': ?notes,
+        'deleted': ?deleted,
       },
     );
 

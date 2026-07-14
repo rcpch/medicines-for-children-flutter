@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Enforce formatting as the lint baseline.
-dart format --set-exit-if-changed .
+# Check formatting and run static analysis, matching CI.
+cd "$(git rev-parse --show-toplevel)"
+
+dart format --output=none --set-exit-if-changed .
+exec flutter analyze "$@"

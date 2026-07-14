@@ -1,4 +1,7 @@
 // Queue for shared schedule actions while offline.
+// Constructor parameter names intentionally omit private field prefixes.
+// ignore_for_file: prefer_initializing_formals
+
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -4,6 +4,8 @@ set -euo pipefail
 # Generate launcher icons for all supported targets.
 # Source image is configured in pubspec.yaml under `flutter_launcher_icons:`.
 
+cd "$(git rev-parse --show-toplevel)"
+
 flutter pub get
 
-dart run flutter_launcher_icons
+exec dart run flutter_launcher_icons "$@"

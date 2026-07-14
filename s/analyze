@@ -2,4 +2,6 @@
 set -euo pipefail
 
 # Run Flutter's static analysis.
-flutter analyze
+cd "$(git rev-parse --show-toplevel)"
+
+exec flutter analyze "$@"

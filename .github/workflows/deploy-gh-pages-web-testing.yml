@@ -2,54 +2,52 @@ name: Build GH Pages Web app for testing
 
 on:
   workflow_run:
-     workflows: ["Analyze and Test"]
-     types: [completed] #requested
+    workflows: ["Analyze and Test"]
+    types: [completed]
 
 permissions:
-  id-token: write # For actions/deploy-pages
-  contents: write # For committing to repo for GitHub Pages for actions/deploy-pages
-  pages: write    # Required for actions/deploy-pages
+  contents: read
+  id-token: write
+  pages: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
 
 jobs:
-   on-success-build-and-publish-web:
-     name: Build and Deploy Web App to GitHub Pages
-     runs-on: ubuntu-latest
-     # IMPORTANT: Runs only if the "Analyze and Test" workflow completed successfully
-     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-     steps:
-      - run: echo "Analyze and Test succeeded - deploy starting"
+  deploy:
+    name: Build and deploy web app to GitHub Pages
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'live' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
-      - name: Check out code
-        uses: actions/checkout@v4
+    steps:
+      - name: Check out tested revision
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
-          flutter-version: '3.38.7'
-          channel: 'stable'
+          flutter-version: "3.44.4"
+          channel: "stable"
           cache: true
 
-      - name: Install dependencies  
+      - name: Install dependencies
         run: flutter pub get
 
       - name: Build Flutter web app
         run: flutter build web --release --base-href /medicines-for-children-flutter/
 
-      - name: Upload artifact for GitHub Pages
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
-          # Path to the directory containing the static assets to be deployed.
-          # Flutter web builds to 'build/web' by default.
-          path: './build/web'
+          path: ./build/web
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
-
-
-   on-failure:
-     runs-on: ubuntu-latest
-     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
-     steps:
-       - run: echo "Analyze and Test failed - deploy aborted"
-  
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0

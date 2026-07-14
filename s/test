@@ -2,4 +2,6 @@
 set -euo pipefail
 
 # Run unit/widget tests.
-flutter test
+cd "$(git rev-parse --show-toplevel)"
+
+exec flutter test "$@"

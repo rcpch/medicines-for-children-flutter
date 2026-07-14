@@ -323,23 +323,14 @@ class LocalAuthRepository implements AuthRepository {
 
   // Generates a new random profile id.
   String _generateId() {
-    final random = _secureRandom();
+    final random = Random.secure();
     final bytes = List<int>.generate(16, (_) => random.nextInt(256));
     return base64UrlEncode(bytes).replaceAll('=', '');
   }
 
-  // Returns a secure random generator when available.
-  Random _secureRandom() {
-    try {
-      return Random.secure();
-    } catch (_) {
-      return Random();
-    }
-  }
-
   // Derives and stores a passcode hash record.
   Future<PasscodeRecord> _derivePasscodeRecord(String passcode) async {
-    final random = _secureRandom();
+    final random = Random.secure();
     final salt = List<int>.generate(
       _passcodeSaltBytes,
       (_) => random.nextInt(256),

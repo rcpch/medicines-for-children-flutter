@@ -23,10 +23,22 @@ All user documentation is within the app itself, accessible via the Guide tab on
 ## Developer Documentation
 
 
-### Prerequisites
+### New laptop prerequisites
 
-- Flutter 3.38.0+ with Dart 3.10+
-- Xcode 15 / Android Studio Iguana+ for platform builds
+- Flutter `3.44.4`, which includes Dart `3.12.2`. This is the newest stable Flutter release at least seven full days old at the time of the 2026-07-13 dependency review.
+- Android Studio with the Android SDK, platform tools, command-line tools, and an emulator image. Run `flutter doctor --android-licenses` after installation. Android Studio is optional if the equivalent SDK command-line tools are installed and configured.
+- Chrome or Chromium for web development.
+- Linux desktop builds: Clang, CMake, Ninja, pkg-config, GTK 3 development headers, and the standard C++ development libraries listed by the Flutter Linux setup guide.
+- macOS/iOS builds: a current supported Xcode and CocoaPods on a Mac.
+- Store and Play deployment only: Ruby/Bundler, Fastlane, and project signing credentials. These are not needed for normal development or tests.
+
+Flutter supplies Dart, so a separate Dart SDK installation is not required. Verify the setup before fetching project dependencies:
+
+```bash
+flutter --version
+dart --version
+flutter doctor -v
+```
 
 ### Quick start
 
@@ -38,12 +50,11 @@ git clone https://github.com/rcpch/medicines-for-children-flutter.git
 flutter pub get
 
 # (re)generate freezed/json_serializable outputs
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 
-# run format, analyzer and tests
-dart format lib test
-flutter analyze
-flutter test --coverage
+# run the same format, analyzer and test gates as CI
+s/lint
+s/test --coverage
 
 # launch the dev flavor (uses lib/main_dev.dart)
 flutter run --flavor dev --target lib/main_dev.dart
@@ -150,10 +161,14 @@ Restore behavior:
 ### Release automation
 
 - `fastlane/` contains TestFlight and Play internal lanes (see `fastlane/README.md` for required env vars).
-- `scripts/generate_release_checklist.sh` generates `build/release_checklist.md`.
-- Monitoring dashboard guidance lives in `docs/monitoring.md`.
+- `s/generate-release-checklist` generates `build/release-checklist.md`.
 
 ### Contributing
 
 Contributions are welcome! Please open issues or pull requests as needed. See `CONTRIBUTING.md` for guidelines.
 
+## Safety, security, and licence
+
+- Read [SAFETY.md](SAFETY.md) before changing schedules, reminders, administrations, scans, imports, exports, or sharing.
+- Report vulnerabilities privately using [SECURITY.md](SECURITY.md), never through a public issue containing health data or credentials.
+- The repository currently contains the GNU General Public License version 3 in [LICENSE](LICENSE). The precise `only` versus `or later` policy and any future relicensing require project-owner confirmation; house-style relicensing has therefore not been applied mechanically.

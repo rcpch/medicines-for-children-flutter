@@ -2,6 +2,8 @@
 set -euo pipefail
 
 # Run the app on the Linux desktop target.
+cd "$(git rev-parse --show-toplevel)"
+
 clang_path="$(command -v clang || true)"
 if [[ -n "$clang_path" ]]; then
 	clang_real="$(readlink -f "$clang_path" || echo "$clang_path")"

@@ -34,7 +34,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Medicines for Children'), findsOneWidget);
-    expect(find.text('Flutter port bootstrap in progress'), findsOneWidget);
+    expect(find.text('Medicines For Children'), findsOneWidget);
+    expect(find.text('PRE-ALPHA Evaluation Release'), findsOneWidget);
   });
 }

@@ -1,5 +1,6 @@
 // Controller for schedule create/edit.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medicines_for_children_flutter/core/domain/active_child_provider.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/medicine.dart';
 import 'package:medicines_for_children_flutter/core/domain/models/schedule.dart';
 import 'package:medicines_for_children_flutter/core/notifications/notification_service.dart';
@@ -135,6 +136,8 @@ class ScheduleEditorController extends Notifier<ScheduleEditorState> {
   // Reloads cached carer data after schedule changes.
   Future<void> _refreshCarerCache() async {
     await ref.read(primaryCarerControllerProvider.notifier).refreshFromLocal();
+    // Reconcile derived state before navigation resumes hidden consumers.
+    ref.read(activeChildProvider);
   }
 }
 

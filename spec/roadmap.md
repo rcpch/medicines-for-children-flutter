@@ -1,5 +1,7 @@
 # Flutter Implementation Roadmap (Technical)
 
+Legend: [x] done, [~] in progress or partially done, [ ] not started. New work uses stable `SCAN-*`, `QRX-*`, and `OPS-*` identifiers; existing historical milestones retain their original wording.
+
 ## Milestone 0 – Repository Bootstrap
 
 - [x] Initialize Flutter project (`flutter create medicines_for_children`) with sound null safety, Riverpod/Bloc-ready structure, and separate `lib/app`, `lib/features`, `lib/core` directories.
@@ -165,3 +167,41 @@
 - [ ] Define a lightweight local search index (prefix + fuzzy matching) for fast, offline suggestions.
 - [ ] Add ranked suggestions in the medicine name field, with clear attribution to the data source.
 - [ ] Add tests covering matching accuracy, ranking, and empty/edge cases.
+
+## Milestone 16 - Pack Identification And Therapeutic Classification
+
+This milestone depends on `sct` roadmap item `R69`. The Flutter app should consume a small, versioned lookup contract backed by the `sct` library or `sct serve`; it must not bundle or redistribute licensed dm+d source releases. The existing static Medicines for Children URL catalogue remains a separate advice-content flow.
+
+- [ ] **SCAN-1 - Define the cross-repository lookup contract.** Accept canonical GTIN-14 and return the matched AMPP plus available AMP, VMPP, VMP, VTM, ingredient, BNF, and ATC identifiers and display terms. Include dm+d, SNOMED CT, BNF, and ATC release identifiers; mapping provenance; match status; ambiguity; and warnings. Publish conformance fixtures in both repositories before UI integration.
+- [ ] **SCAN-2 - Complete the `sct` terminology path.** Deliver `sct` `R69`: ingest NHSBSA dm+d GTIN XML and supplementary BNF/ATC mapping files, normalise GTIN-8/12/13/14, preserve AMPP-to-GTIN provenance, traverse the medicines graph without name-based inference, and expose the lookup through a reusable Rust API and a narrow server endpoint suitable for the app.
+- [ ] **SCAN-3 - Parse real pack codes.** Extend `mobile_scanner` handling beyond QR URLs to EAN-8, UPC-A, EAN-13, GTIN-14, and GS1 DataMatrix. Parse GS1 application identifiers including `(01)` GTIN, `(10)` batch, `(17)` expiry, and `(21)` serial where present; validate lengths and check digits; normalise to GTIN-14; and never send batch or serial values to lookup services unless a separately approved use requires them.
+- [ ] **SCAN-4 - Add a product lookup boundary.** Introduce an injected repository with an `sct`-backed implementation and a deterministic fake. Keep optional Ampoule/drug-data API enrichment behind the same boundary, but use `sct` as the terminology and therapeutic-class source of truth. Cache successful responses with release metadata for offline review and provide a clear offline/manual-entry fallback.
+- [ ] **SCAN-5 - Extend the Medicine model without conflating terminology levels.** Store the scanned GTIN, dm+d identifiers by level, sourced BNF/ATC classes, lookup provenance, and last-validated release separately from the carer-editable display name, dose, route, and schedule. Provide migration defaults for existing Medicine JSON and encrypted backups.
+- [ ] **SCAN-6 - Build a confirm-before-save workflow.** Show the pack match, formulation, strength, pack size, identifiers, therapeutic class, source date, ambiguity, and warnings. Require explicit confirmation against the box; never populate dose, route, frequency, or schedule from therapeutic classification; support "not this medicine" and manual correction.
+- [ ] **SCAN-7 - Add safety and conformance evidence.** Cover valid and invalid check digits, leading-zero normalisation, GS1 separators, malformed and oversized payloads, unknown GTINs, one-to-many mappings, inactive concepts, stale releases, offline lookup, API failure, and fixtures agreed with `sct`. Link the evidence to `HAZ-004` and complete clinical review before pilot use.
+
+- **Gate**: The same shared fixtures prove GTIN -> AMPP -> VTM -> BNF/ATC results in `sct` and Flutter; no result is saved without confirmation; unknown, ambiguous, stale, malformed, and offline states are understandable and safe.
+
+## Milestone 17 - Offline Schedule Transfer By QR
+
+Schedule transfer is distinct from whole-profile `.mfc` Backup and online Share. The transfer contains one Child's medicine plan and deliberately excludes profile credentials, carer details, photos, API keys, share tokens, notification IDs, and queued actions.
+
+- [ ] **QRX-1 - Specify a canonical versioned payload.** Define a deterministic schema containing transfer version, export ID, creation time, minimal Child identity for human matching, Medicines, regular and as-needed Schedules, and an Administration-history mode of `none`, `dateRange`, or `all`. Record timezone semantics explicitly and use stable fixture IDs only within the payload.
+- [ ] **QRX-2 - Define the privacy and cryptographic envelope.** Default Administration history to excluded. Show a content summary and shoulder-surfing warning before displaying codes. Support authenticated encryption with a passphrase shared out of band; for intentionally unencrypted transfers, provide corruption detection while making clear that a checksum does not establish trust.
+- [ ] **QRX-3 - Design for QR capacity rather than assuming one code.** Measure the canonical payload, compress before text encoding, set strict compressed and expanded size/count limits, and use one QR only when it fits at a robust error-correction level. Otherwise emit a numbered multi-part or animated sequence carrying export ID, part count, part index, and whole-payload digest. Photos are always excluded.
+- [ ] **QRX-4 - Implement export selection and preview.** Let the carer select the active Child and Administration-history mode, including date bounds where applicable. Preview included child details, medicine and schedule counts, administration count, encryption state, number of QR parts, and expiry if the envelope adopts one.
+- [ ] **QRX-5 - Implement defensive scanning and assembly.** Reuse the scanner with a distinct Schedule-transfer discriminator. Accept parts in any order, detect duplicates and mixed export IDs, permit resuming an interrupted scan only without persisting clear health data, enforce limits before decompression, authenticate/decrypt before parsing, and reject unsupported versions without mutation.
+- [ ] **QRX-6 - Preview and atomically import.** Validate every reference and date before writing. Show additions and conflicts, require the user to choose a destination profile, and default to creating a new Child. Remap all local IDs and references; do not silently merge or replace an existing Child. Commit all records in one operation or none.
+- [ ] **QRX-7 - Define duplicate and update semantics before offering merge.** Decide whether a later transfer can update a previously imported Child, how transfer identity is retained, and how conflicting Medicines, Schedules, and Administrations are reconciled. Until this is specified and reviewed, only new-Child import is supported.
+- [ ] **QRX-8 - Add conformance, privacy, and safety tests.** Include golden payloads and round trips for each Administration-history mode, maximum supported content, Unicode, timezone/DST boundaries, out-of-order and missing parts, duplicate scans, wrong passphrases, tampering, decompression bombs, identifier collisions, repeated imports, and unsupported future versions. Link evidence to `HAZ-001`, `HAZ-005`, and `HAZ-007`.
+
+- **Gate**: A schedule created on one offline device can be transferred to another with an exact, reviewable round trip; Administration history is absent unless explicitly selected; malformed or hostile input causes no partial write; and multi-part recovery is proven on representative devices.
+
+## Milestone 18 - Repository And Release Operations
+
+- [~] **OPS-1 - Standardise the development toolchain.** Flutter `3.44.4` and Dart `3.12.2` are pinned in CI under the one-week cooldown policy; direct constraints and the audited lockfile are updated; code generation, analysis, tests, web release build, Android production-flavour release build, and Linux debug build pass. Remaining: representative iOS, macOS, and Windows builds on their supported hosts.
+- [x] **OPS-2 - Adopt baseline repository guidance.** Add vendor-neutral agent instructions, a specification index and glossary, security reporting guidance, an editor configuration, and root clinical safety entry point.
+- [x] **OPS-3 - Harden routine dependency and CI automation.** Pin GitHub Actions to verified SHAs, use the same Flutter version in CI and deployment workflows, and configure weekly Dependabot updates with cooldown and grouping.
+- [ ] **OPS-4 - Resolve licensing policy.** Confirm whether the existing GPLv3 project is `GPL-3.0-only` or `GPL-3.0-or-later`, whether RCPCH contributors permit any move to the house-standard AGPL licence, and how written content, branding, fonts, generated files, and third-party terminology data are covered before adding SPDX/REUSE enforcement.
+- [ ] **OPS-5 - Complete safety governance.** Appoint the clinical safety owner, agree the risk matrix, score and review the hazard log, and link release evidence before pilot or production use.
+- [ ] **OPS-6 - Migrate to Android built-in Kotlin.** Remove the temporary `android.builtInKotlin=false` and `android.newDsl=false` compatibility flags once the app and `mobile_scanner` support Flutter's built-in Kotlin migration, then prove all Android flavours still build.

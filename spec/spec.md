@@ -22,6 +22,8 @@
 - iCloud, Google Drive and Dropbox integration for backup import/export.
 - QR Code scanning of medication packaging to obtain drug, unit size, quantity data via https://github.com/chriswilson1982/drug-data-api, https://api.ampoule.app/v2/docs
 - In the UK, all medical product packs will have an EAN13 barcode, which provides the GTIN. Many packs will also have a 2D data matrix code, which usually encodes the GTIN as well as batch number and expiry date.
+- A pack-code lookup may resolve a validated GTIN through dm+d to AMPP/AMP/VMP/VTM identifiers and sourced BNF or ATC therapeutic classes using the `sct` terminology service. The carer must review the result against the packaging before a Medicine is saved.
+- Offline schedule transfer via QR may export one Child's Medicines and Schedules, with Administration history excluded by default and optionally included for a selected range or in full.
 ---
 
 
@@ -190,6 +192,9 @@ Medicines for Children is an **offline-first** medicine management app for carer
 - Export medicine summary as PDF.
 - Export an encrypted backup file for safekeeping.
 - Import a backup to create a new local profile.
+- Export a versioned Schedule transfer for one Child as one QR symbol or a numbered multi-part sequence when it does not fit safely in one symbol.
+- Let the carer choose whether a Schedule transfer excludes Administration history, includes a selected date range, or includes all retained Administration history.
+- Preview the transfer contents and privacy implications before display or sharing, and preview changes before an atomic import.
 
 ### Notifications & reminders
 

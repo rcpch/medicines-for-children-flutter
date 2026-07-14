@@ -1,6 +1,8 @@
 // App root widget wiring theme, routing, and providers.
 import 'dart:async';
+import 'dart:ui' show FrameTiming;
 
+import 'package:flutter/foundation.dart' show FlutterExceptionHandler;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -31,6 +33,11 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp>
   late final GoRouter _router;
   late final BackgroundSyncService _backgroundSyncService;
   ProviderSubscription<AuthState>? _authSubscription;
+  FlutterExceptionHandler? _originalFlutterErrorHandler;
+  FlutterExceptionHandler? _installedFlutterErrorHandler;
+  bool Function(Object, StackTrace)? _originalPlatformErrorHandler;
+  bool Function(Object, StackTrace)? _installedPlatformErrorHandler;
+  void Function(List<FrameTiming>)? _timingsCallback;
   bool _reportedSlowFrame = false;
   bool _checkedForUpdates = false;
 
@@ -75,7 +82,8 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp>
   // Installs telemetry-backed error and performance reporting hooks.
   void _configureErrorHandling() {
     final telemetry = ref.read(telemetryServiceProvider);
-    FlutterError.onError = (details) {
+    _originalFlutterErrorHandler = FlutterError.onError;
+    _installedFlutterErrorHandler = (details) {
       telemetry.trackEvent(
         'app_error',
         properties: {
@@ -83,17 +91,22 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp>
           'context': details.context?.toDescription(),
         },
       );
-      FlutterError.presentError(details);
+      _originalFlutterErrorHandler?.call(details);
     };
-    WidgetsBinding.instance.platformDispatcher.onError = (error, stack) {
+    FlutterError.onError = _installedFlutterErrorHandler;
+
+    final platformDispatcher = WidgetsBinding.instance.platformDispatcher;
+    _originalPlatformErrorHandler = platformDispatcher.onError;
+    _installedPlatformErrorHandler = (error, stack) {
       telemetry.trackEvent(
         'app_error',
         properties: {'exception': error.toString(), 'stack': stack.toString()},
       );
-      return false;
+      return _originalPlatformErrorHandler?.call(error, stack) ?? false;
     };
+    platformDispatcher.onError = _installedPlatformErrorHandler;
 
-    WidgetsBinding.instance.addTimingsCallback((timings) {
+    _timingsCallback = (timings) {
       if (_reportedSlowFrame) {
         return;
       }
@@ -109,13 +122,25 @@ class _MedicinesAppState extends ConsumerState<MedicinesApp>
           break;
         }
       }
-    });
+    };
+    WidgetsBinding.instance.addTimingsCallback(_timingsCallback!);
   }
 
   // Cleans up observers and background work when the app exits.
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    final platformDispatcher = WidgetsBinding.instance.platformDispatcher;
+    if (identical(FlutterError.onError, _installedFlutterErrorHandler)) {
+      FlutterError.onError = _originalFlutterErrorHandler;
+    }
+    if (identical(platformDispatcher.onError, _installedPlatformErrorHandler)) {
+      platformDispatcher.onError = _originalPlatformErrorHandler;
+    }
+    final timingsCallback = _timingsCallback;
+    if (timingsCallback != null) {
+      WidgetsBinding.instance.removeTimingsCallback(timingsCallback);
+    }
     _backgroundSyncService.stop();
     _authSubscription?.close();
     super.dispose();

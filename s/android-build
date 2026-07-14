@@ -2,4 +2,6 @@
 set -euo pipefail
 
 # Build a release APK for the prod flavor.
-flutter build apk --release --flavor prod --target lib/main_prod.dart
+cd "$(git rev-parse --show-toplevel)"
+
+exec flutter build apk --release --flavor prod --target lib/main_prod.dart "$@"

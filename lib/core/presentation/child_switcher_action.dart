@@ -73,7 +73,7 @@ class ChildSwitcherAction extends ConsumerWidget {
   // Resolves the currently selected child from the stored id.
   Child _resolveSelected(List<Child> children, String? selectedId) {
     return children.cast<Child?>().firstWhere(
-      (child) => child?.id == selectedId,
+          (child) => child?.id == selectedId,
           orElse: () => null,
         ) ??
         children.first;

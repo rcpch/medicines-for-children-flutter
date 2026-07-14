@@ -142,37 +142,38 @@ void main() {
     );
     final router = container.read(appRouterProvider);
     final semantics = tester.ensureSemantics();
-    addTearDown(semantics.dispose);
+    try {
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Semantics &&
+              widget.properties.label?.contains('Scheduled Amoxicillin') ==
+                  true,
+        ),
+        findsWidgets,
+      );
 
-    expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is Semantics &&
-            widget.properties.label?.contains('Scheduled Amoxicillin') == true,
-      ),
-      findsWidgets,
-    );
+      router.goNamed(AppRoute.addSchedule.name);
+      await tester.pumpAndSettle();
 
-    router.goNamed(AppRoute.addSchedule.name);
-    await tester.pumpAndSettle();
-
-    expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is Semantics &&
-            widget.properties.label?.contains('Start date.') == true,
-      ),
-      findsWidgets,
-    );
-    expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is Semantics &&
-            widget.properties.label?.contains('End date.') == true,
-      ),
-      findsWidgets,
-    );
-
-    semantics.dispose();
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Semantics &&
+              widget.properties.label?.contains('Start date.') == true,
+        ),
+        findsWidgets,
+      );
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Semantics &&
+              widget.properties.label?.contains('End date.') == true,
+        ),
+        findsWidgets,
+      );
+    } finally {
+      semantics.dispose();
+    }
   });
 }

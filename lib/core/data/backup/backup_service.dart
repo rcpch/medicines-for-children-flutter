@@ -115,7 +115,7 @@ class BackupService {
     String plaintext,
     String passphrase,
   ) async {
-    final random = _secureRandom();
+    final random = Random.secure();
     final salt = List<int>.generate(_saltBytes, (_) => random.nextInt(256));
     final nonce = List<int>.generate(_nonceBytes, (_) => random.nextInt(256));
 
@@ -191,15 +191,6 @@ class BackupService {
     final secretBox = SecretBox(cipherText, nonce: nonce, mac: Mac(macBytes));
     final clear = await algorithm.decrypt(secretBox, secretKey: key);
     return utf8.decode(clear);
-  }
-
-  // Returns a secure random generator, falling back if unavailable.
-  Random _secureRandom() {
-    try {
-      return Random.secure();
-    } catch (_) {
-      return Random();
-    }
   }
 }
 
